@@ -1,3 +1,8 @@
+# custom stuff added by graham #
+*~
+reader
+desugar
+
 # Compiled source #
 ###################
 *.com
@@ -36,6 +41,4 @@
 ehthumbs.db
 Thumbs.db
 
-#custom stuff added by graham#
-!*.*
-*~
+
