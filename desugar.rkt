@@ -205,22 +205,15 @@
 
 ; matchs any quoted list
 (define (quote? exp)
-    (cond
-        [(eq? 'quote (car exp)) #t] ;; same here.......
-        [else #f]))
+        (eq? 'quote (car exp)))
 
 (define (let? exp)
   (and (eq? 'let (car exp))
        (list? (car (cdr exp)))
-       (not (null? (cdr (cdr exp))))));; I dont think you need a cond, the and should just return true or false.........
-   #| (cond
-        [(and (eq? 'let (car exp)) (list? (cadr exp)))  #t]
-        [else #f])) |#
+       (not (null? (cdr (cdr exp))))))
 
 (define (letrec? exp)
-    (cond
-        [(and (eq? 'letrec (car exp)) (list? (cadr exp)))  #t] ;; and here.........
-        [else #f]))
+        (and (eq? 'letrec (car exp)) (list? (cadr exp))))
 
 ;; matches lambda I think
 (define (lambda? exp)
