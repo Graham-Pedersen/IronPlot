@@ -2,15 +2,14 @@
 
 ; TODO remove language dependances from racket
 
-
 #lang racket
 
 
 ; Entry Point
 
 (define (desugar-input)
-    (define program (car (read-input)))
-
+    (define program (read-input))
+    (displayln program)
     ; convert all the top leves forms into defines
     (set! program (tops-to-defs program))
     ; now that everthing is defines we can desugar defines
@@ -26,10 +25,9 @@
     (if (eof-object? line)
         '()
         (cons line (read-input))))
-
+    
 
 ; Desugaring Functions
-
 
 (define (tops-to-defs tops)
     (define (top-to-def top)
@@ -38,7 +36,6 @@
             [(function-def? top) (function-def->var-def top)]
             [(var-def? top) top]
             [else `(define ,(gensym '_) ,top)]))
-
     (map top-to-def tops))
 
 
@@ -53,9 +50,9 @@
         [(symbol? exp) exp]
         [(atomic? exp) exp]
         [(quote?  exp) (desugar-quote exp)]
-        [(let?    exp) (desugar-let exp)]  
-	[(letrec? exp) (desugar-letrec exp)]
-	[(lambda? exp) (desugar-lambda exp)]
+        [(let?    exp) (desugar-let exp)]
+	    [(letrec? exp) (desugar-letrec exp)]
+	    [(lambda? exp) (desugar-lambda exp)]
         [(and (eq? 'and (car exp))
               (null? (cdr exp))) #t] ;; `(and)
         [(and (eq? 'or (car exp))
@@ -215,7 +212,7 @@
 (define (let? exp)
   (and (eq? 'let (car exp))
        (list? (car (cdr exp)))
-       (not (null? (cdr (cdr eexp))))));; I dont think you need a cond, the and should just return true or false.........
+       (not (null? (cdr (cdr exp))))));; I dont think you need a cond, the and should just return true or false.........
    #| (cond
         [(and (eq? 'let (car exp)) (list? (cadr exp)))  #t]
         [else #f])) |#
@@ -248,16 +245,17 @@
        (not null? (cdr exp))))
 
 (define (if? exp)
+  (displayln exp)
   (cond ;; maybe a better way to check these?
     [(and (eq? 'if (car exp)) ;; matches `(if ,test ,exp)
           (not (null? (cdr exp)))
           (not (null? (cdr (cdr exp))))
-          (null? (cdr (cdr (cdr exp)))))]
+            (null? (cdr (cdr (cdr exp)))))]
     [(and (eq? 'if (car exp)) ;; matches `(if ,test ,exp ,exp2)
           (not (null? (cdr exp)))
           (not (null? (cdr (cdr exp))))
           (not (null? (cdr (cdr (cdr exp)))))
-          (null? (cdr (cdr (cdr (cdr exp))))))]))
+            (null? (cdr (cdr (cdr (cdr exp))))))]))
 
 (define (set!? exp)
   (and (eq? 'set! (car exp))

@@ -1,6 +1,3 @@
-#lang racket
-    
-
 (define (boring_fact x)
     (if 
         (<= x 1)

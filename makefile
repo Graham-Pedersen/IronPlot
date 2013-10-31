@@ -1,13 +1,10 @@
-all: desugar reader
+all: desugar
 
-desugar:
+desugar: desugar.rkt
 		raco exe desugar.rkt
 
-reader:
-		raco exe reader.rkt
-
 clean:
-		rm -rf reader desugar *.exe
+		rm -rf desugar *.exe
 
 tests = $(shell ls test/*.plot)
 tests: racket-tests-compile plot-tests-compile
