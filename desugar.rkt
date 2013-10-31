@@ -245,17 +245,16 @@
        (not null? (cdr exp))))
 
 (define (if? exp)
-  (displayln exp)
-  (cond ;; maybe a better way to check these?
-    [(and (eq? 'if (car exp)) ;; matches `(if ,test ,exp)
+  (or (and (eq? 'if (car exp)) ;; matches `(if ,test ,exp)
           (not (null? (cdr exp)))
           (not (null? (cdr (cdr exp))))
-            (null? (cdr (cdr (cdr exp)))))]
-    [(and (eq? 'if (car exp)) ;; matches `(if ,test ,exp ,exp2)
+          (null? (cdr (cdr (cdr exp))))) 
+      
+      (and (eq? 'if (car exp)) ;; matches `(if ,test ,exp ,exp2)
           (not (null? (cdr exp)))
           (not (null? (cdr (cdr exp))))
           (not (null? (cdr (cdr (cdr exp)))))
-            (null? (cdr (cdr (cdr (cdr exp))))))]))
+          (null? (cdr (cdr (cdr (cdr exp))))))))
 
 (define (set!? exp)
   (and (eq? 'set! (car exp))
