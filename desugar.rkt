@@ -9,12 +9,9 @@
 
 (define (desugar-input)
     (define program (read-input))
-    (displayln program)
-    ; convert all the top leves forms into defines
-    (set! program (tops-to-defs program))
-    ; now that everthing is defines we can desugar defines
-    (set! program (map desugar-define program))
-    (displayln (pretty-format program)))
+    (set! program (tops-to-defs program)) ;; convert tops into defines  
+    (set! program (map desugar-define program)) ;; desugar the defines now
+    (displayln (pretty-format program 40)))
 
 
 ; Helper Functions
@@ -31,7 +28,6 @@
 
 (define (tops-to-defs tops)
     (define (top-to-def top)
-        (displayln top)
         (cond 
             [(function-def? top) (function-def->var-def top)]
             [(var-def? top) top]
@@ -53,10 +49,6 @@
         [(let?    exp) (desugar-let exp)]
 	    [(letrec? exp) (desugar-letrec exp)]
 	    [(lambda? exp) (desugar-lambda exp)]
-        [(and (eq? 'and (car exp))
-              (null? (cdr exp))) #t] ;; `(and)
-        [(and (eq? 'or (car exp))
-              (null? (cdr exp))) #f] ;; `(or)
         [(and? exp) (desugar-and exp)]
         [(or? exp) (desugar-or exp)] 
         [(if? exp) (desugar-if exp)]
@@ -156,22 +148,21 @@
 ;; ----------- desugaring and/or ------------
 
 (define (desugar-or exp)
-  (cond
-    [(null? (cdr (cdr exp))) (desugar-exp exp)]
-    [else
-     (define $t (gensym 't))
-     (desugar-exp
-      `(let ((,$t ,(car (cdr exp))))
-         (if ,$t ,$t (or . ,(cdr (cdr exp))))))]))
+  (match exp
+    [`(or) #f]
+    [`(or ,exp) (desugar-exp exp)]
+    [`(or ,exp . ,rest) 
+        (define $t (gensym 't))
+        (desugar-exp 
+            `(let ((,$t ,exp))
+                (if ,$t #t (or . ,rest))))])) 
 
 
 (define (desugar-and exp)
-  (cond
-    [(null? (cdr (cdr exp))) (desugar-exp exp)]
-    [else
-     `(if ,(desugar-exp (car (cdr exp)))
-          ,(desugar-exp `(and . ,(cdr (cdr exp))))
-          #f)]))
+  (match exp
+    [`(and) #t]
+    [`(and ,exp) (desugar-exp exp)]
+    [`(and ,exp . ,rest) `(if ,(desugar-exp exp) ,(desugar-exp `(and . ,rest)) #f)]))
 
 ;; ---------- desugaring if ---------------
 
@@ -229,13 +220,11 @@
   (and (eq? 'quasi-quote (car exp))
        (not (null? (cdr exp)))))
 
-(define (and? exp) ;; just need to check that there is at least one expression
-  (and (eq? 'and (car exp))
-       (not (null? (cdr exp)))))
+(define (and? exp) ;; check that the first element of the list is and
+  (eq? 'and (car exp)))
 
 (define (or? exp)
-  (and (eq? 'or (car exp))
-       (not null? (cdr exp))))
+  (eq? 'or (car exp)))
 
 (define (if? exp)
   (or (and (eq? 'if (car exp)) ;; matches `(if ,test ,exp)
