@@ -11,6 +11,21 @@
     (define program (read-input))
     (set! program (tops-to-defs program)) ;; convert tops into defines  
     (set! program (map desugar-define program)) ;; desugar the defines now
+    (set! program (partition-k 
+                    atomic-define?
+                    program
+                    (lambda (atomic complex)
+                        (define bindings
+                            (for/list ([c complex])
+                                (match c
+                                    [`(define ,v ,complex)
+                                     1(,v (void))])))
+                        (define sets
+                            (for/list ([c complex])
+                                (match c
+                                    [`(define ,v ,complex)
+                                    `(set! ,v ,complex)])))
+                    (append atomic (list `(let ,bidings ,sets))))))
     (displayln (pretty-format program 40)))
 
 
@@ -262,5 +277,13 @@
     [(eq? 'quote (car exp)) #t]
     [(eq? 'void (car exp))       #t]
     [else          #f]))
+
+(define (partition-k pred list k)
+  (if (not (pair? list))
+      (k '() '())
+      (partition-k pred (cdr list) (lambda (in out)
+        (if (pred (car list))
+            (k (cons (car list) in) out)
+            (k in (cons (car list) out)))))))
 
 (desugar-input)
