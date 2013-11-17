@@ -1,4 +1,4 @@
-; This is a very simple desugarer for a simple scheme like language based on the article at http://matt.might.net/articles/desugaring-scheme/ over time we will grow this into a consideral subset of the racket language which we will grow out of this file by adding and changing functionality
+;This is a very simple desugarer for a simple scheme like language based on the article at http://matt.might.net/articles/desugaring-scheme/ over time we will grow this into a consideral subset of the racket language which we will grow out of this file by adding and changing functionality
 
 ; TODO remove language dependances from racket
 
@@ -19,13 +19,13 @@
                             (for/list ([c complex])
                                 (match c
                                     [`(define ,v ,complex)
-                                     1(,v (void))])))
+                                     `(,v (void))])))
                         (define sets
                             (for/list ([c complex])
                                 (match c
                                     [`(define ,v ,complex)
                                     `(set! ,v ,complex)])))
-                    (append atomic (list `(let ,bidings ,sets))))))
+                    (append atomic (list `(let ,bindings ,sets))))))
     (displayln (pretty-format program 40)))
 
 
@@ -62,8 +62,8 @@
         [(atomic? exp) exp]
         [(quote?  exp) (desugar-quote exp)]
         [(let?    exp) (desugar-let exp)]
-	    [(letrec? exp) (desugar-letrec exp)]
-	    [(lambda? exp) (desugar-lambda exp)]
+	[(letrec? exp) (desugar-letrec exp)]
+	[(lambda? exp) (desugar-lambda exp)]
         [(and? exp) (desugar-and exp)]
         [(or? exp) (desugar-or exp)] 
         [(if? exp) (desugar-if exp)]
@@ -75,7 +75,28 @@
  
 ;; --------- desugar helpers -------------
    
-(define (desugar-body body) body)
+(define (desugar-body body)
+  (match body
+    [`(,exp)
+     (desugar-exp exp)]
+    [`(,(and (? not-define?) exps) ...)
+     `(begin ,@(map desugar-exp exps))]
+    [`(,tops ... ,exp)
+     (define defs (tops-to-defs tops))
+     (desugar-exp (match defs
+                    [`((define ,vs ,es) ...)
+                     `(letrec ,(map list vs es) ,exp)]))]))
+
+;; define?
+(define (define? sx)
+  (match sx
+    [`(define . ,_) #t]
+    [else #f]))
+
+;; not-define?
+(define (not-define? sx)
+  (not (define? sx)))
+
 #|
 ;; desugar body of a lambda or begin
 (define (desugar-body body) 
@@ -199,6 +220,12 @@
   `(set! ,(car (cdr exp)) ,(desugar-exp (cdr (cdr exp)))))
 
 ; ----- matching helper functions -----
+
+; aotmic-define? : term -> boolean
+(define (atomic-define? def)
+  (match def
+    [`(define ,v ,exp) (atomic? exp)]
+    [else #f]))
 
 
 ; matches `(define (,f ,params ...) . ,body)
