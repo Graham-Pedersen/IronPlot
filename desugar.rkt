@@ -52,14 +52,14 @@
 
 ; desugar define statements of the form (define ,v ,exp)
 (define (desugar-define def)
-    (cond
-        [(var-def? def) `(define ,(cadr def) ,(desugar-exp (caddr def)))]
-        [else `(cannot desugar define ,def)]))
+    (match def
+        [`(define ,v ,exp) (displayln `(in define ,exp)) `(define ,v ,(desugar-exp exp))]
+        [else (displayln `(cannot desugar define ,def))]))
 
 (define (desugar-exp exp)
+ ;;(displayln `(in desugar-exp ,exp))
     (cond
         [(symbol? exp) exp]
-        [(atomic? exp) exp]
         [(quote?  exp) (desugar-quote exp)]
         [(let?    exp) (desugar-let exp)]
 	[(letrec? exp) (desugar-letrec exp)]
@@ -68,10 +68,11 @@
         [(or? exp) (desugar-or exp)] 
         [(if? exp) (desugar-if exp)]
         [(set!? exp) (desugar-set! exp)]
-        [(quasi-quote? exp) ] ;; need to do
-        [(begin? exp) ]
+        [(quasi-quote? exp) exp] ;; need to do
+        [(begin? exp) exp]
+        [(atomic? exp) exp]
         [(function-call? exp) (desugar-func exp)]
-        [else (displayln `(could not desugar expression ,exp))]))
+        [else (displayln `(could not desugar expression ,@exp))]))
  
 ;; --------- desugar helpers -------------
    
@@ -122,10 +123,9 @@
 
 (define (desugar-quasi-quote s-exp) s-exp)
 
-(define (desugar-let exp)
+(define (desugar-let exp) ;; `(let ((,vs ,es) ...) . ,body)
     (define vars (cadr exp))
-    (define body (caddr exp))
-
+    (define body (cddr exp))
         (define var-getter 
             (lambda (x)
                 (if (null? x)
@@ -139,6 +139,7 @@
 
     (define var-names (var-getter vars))
     (define exps (exp-getter vars))
+  (displayln `(in let ,@body))
     `((lambda ,var-names ,(desugar-body body))
         ,@(map desugar-exp exps)))
 
@@ -160,14 +161,17 @@
           (cdr e))))
   (desugar-exp
    `(let ,(map (lambda (v) (list (get-var v) '(void))) vars)
-      ,@(map (lambda (v) `(set! ,(get-var v) ,(get-exp v))) vars)
+      ,@(map (lambda (v) `(set! ,(get-var v) ,@(get-exp v))) vars)
       ,@body)))
 
 ;; ------ desugaring lambda ------
 
 (define (desugar-lambda exp) ;; `(lambda ,params . ,body)
-  (define body (cdr (cdr exp)))
-  `(lambda ,(car (cdr exp)) ,(desugar-body body)))
+  (match exp
+    [`(lambda ,params . ,body)
+     (displayln `(in lambda ,body))
+     `(lambda ,params ,(desugar-body body))]))
+     
 
 ;; --------- functions ---------
                             
@@ -184,14 +188,15 @@
 ;; ----------- desugaring and/or ------------
 
 (define (desugar-or exp)
+  (displayln `(in or ,exp))
   (match exp
     [`(or) #f]
     [`(or ,exp) (desugar-exp exp)]
     [`(or ,exp . ,rest) 
-        (define $t (gensym 't))
-        (desugar-exp 
-            `(let ((,$t ,exp))
-                (if ,$t #t (or . ,rest))))])) 
+     (define $t (gensym 't))
+     (desugar-exp 
+      `(let ((,$t ,exp))
+         (if ,$t ,$t (or . ,rest))))])) 
 
 
 (define (desugar-and exp)
@@ -216,8 +221,11 @@
 
 ;; ------------ desugaring/transforming set! ---------
 
-(define (desugar-set! exp)
-  `(set! ,(car (cdr exp)) ,(desugar-exp (cdr (cdr exp)))))
+(define (desugar-set! exp) ;; `(set! ,v ,exp)
+  
+  (match exp
+    [`(set! ,v ,exp2)
+     `(set! ,v ,(desugar-exp exp2))]))
 
 ; ----- matching helper functions -----
 
@@ -246,27 +254,44 @@
        (not (null? (cdr (cdr exp))))))
 
 (define (letrec? exp)
-        (and (eq? 'letrec (car exp)) (list? (cadr exp))))
+  (match exp
+    [`(letrec ((,vs ,es) ...) . ,body) #t]
+    [else #f]))
 
 ;; matches lambda I think
 (define (lambda? exp)
+  (match exp
+    [`(lambda ,params . ,body) #t]
+    [else #f]))
+  #|
   (and (eq? 'lambda (car exp))
        (list? (car (cdr exp)))
        (not (null? (cdr (cdr exp))))))
+|#
 
 (define (begin? exp)
-  (and (eq? 'begin (car exp))
-       (not (null? (cdr exp)))))
+  (match exp
+    [`(begin . ,body) #t]
+    [else #f]))
 
 (define (quasi-quote? exp)
-  (and (eq? 'quasi-quote (car exp))
-       (not (null? (cdr exp)))))
+  (match exp
+  [`(quasi-quote ,qq-exp) #t]
+  [else #f]))
 
 (define (and? exp) ;; check that the first element of the list is and
-  (eq? 'and (car exp)))
+  (match exp
+    [`(and) #t]
+    [`(and ,exp) #t]
+    [`(and ,exp . ,rest) #t]
+    [else #f]))
 
 (define (or? exp)
-  (eq? 'or (car exp)))
+  (match exp
+    [`(or) #t]
+    [`(or ,exp) #t]
+    [`(or ,exp . ,rest) #t]
+    [else #f]))
 
 (define (if? exp)
   (or (and (eq? 'if (car exp)) ;; matches `(if ,test ,exp)
