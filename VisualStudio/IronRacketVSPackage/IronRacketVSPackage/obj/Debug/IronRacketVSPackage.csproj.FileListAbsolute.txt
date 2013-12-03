@@ -24,3 +24,9 @@ C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\Iro
 C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\obj\Debug\IronRacketVSPackage.pkgdef
 C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\obj\Debug\IronRacketVSPackage.latest.pkgdef
 C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\obj\Debug\extension.vsixmanifest
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\bin\Debug\Microsoft.VisualStudio.Data.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\bin\Debug\Microsoft.Data.ConnectionUI.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\bin\Debug\Microsoft.TeamFoundation.WorkItemTracking.Client.DataStoreLoader.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\bin\Debug\Microsoft.VisualStudio.Data.xml
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\bin\Debug\Microsoft.Data.ConnectionUI.xml
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\bin\Debug\Microsoft.WITDataStore.dll

@@ -1,0 +1,12 @@
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\Templates\MyExtFile.plot
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\Templates\IronRacketVSPackage.vsdir
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\IronRacketVSPackage_UnitTests.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\IronRacketVSPackage_UnitTests.pdb
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\IronRacketVSPackage.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\Microsoft.VSSDK.TestHostFramework.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\Microsoft.VSSDK.UnitTestLibrary.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\IronRacketVSPackage.pdb
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\bin\Debug\Microsoft.VSSDK.TestHostFramework.pdb
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\obj\Debug\IronRacketVSPackage_UnitTests.csprojResolveAssemblyReference.cache
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\obj\Debug\IronRacketVSPackage_UnitTests.dll
+C:\Users\ahendrix\Documents\GitHub\IronPlot\VisualStudio\IronRacketVSPackage\IronRacketVSPackage\IronRacketVSPackage_UnitTests\obj\Debug\IronRacketVSPackage_UnitTests.pdb

@@ -4,3 +4,4 @@ C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\IronPl
 C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\IronPlot\IronRacketVSPackage\0.1\Templates\\MyExtFile.plot
 C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\IronPlot\IronRacketVSPackage\0.1\Templates\\IronRacketVSPackage.vsdir
 C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\IronPlot\IronRacketVSPackage\0.1\\IronRacketVSPackage.pdb
+C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\IronPlot\IronRacketVSPackage\0.1\\Microsoft.VisualStudio.Data.dll
