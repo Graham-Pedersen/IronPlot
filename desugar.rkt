@@ -68,7 +68,7 @@
         [(or? exp) (desugar-or exp)] 
         [(if? exp) (desugar-if exp)]
         [(set!? exp) (desugar-set! exp)]
-        [(quasi-quote? exp) exp] ;; need to do
+        [(quasi-quote? exp) (desugar-quasi-quote 1 exp)] ;; need to do
         [(begin? exp) exp]
         [(atomic? exp) exp]
         [(function-call? exp) (desugar-func exp)]
@@ -121,7 +121,25 @@
      (error (format "strange value in quote: ~s~n" s-exp))]))
 
 
-(define (desugar-quasi-quote s-exp) s-exp)
+(define (desugar-quasi-quote n s-exp)
+  (match s-exp
+    [(list 'unquote exp)
+     (if (= n 1)
+         (desugar-exp exp)
+         (list 'list ''unquote 
+               (desugar-quasi-quote (- n 1) exp)))]
+    [`(quasiquote ,s-exp)
+     `(list 'quasiquote ,(desugar-quasi-quote (+ n 1) s-exp))]   
+    [(cons (list 'unquote-splicing exp) rest)
+     (if (= n 1)
+         `(append ,exp ,(desugar-quasi-quote n rest))
+         (cons (list 'unquote-splicing (desugar-quasi-quote (- n 1) exp))
+               (desugar-quasi-quote n rest)))]    
+    [`(,qq-exp1 . ,rest)
+     `(cons ,(desugar-quasi-quote n qq-exp1)
+            ,(desugar-quasi-quote n rest))]
+    [else 
+     (desugar-quote s-exp)]))
 
 (define (desugar-let exp) ;; `(let ((,vs ,es) ...) . ,body)
     (define vars (cadr exp))
