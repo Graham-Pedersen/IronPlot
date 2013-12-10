@@ -15,7 +15,7 @@ namespace DLR_Compiler
         //Regex patterns
         static String patternWhitespace = "[ \t\r\n]";
         static String patternNotWhitespaceOrParen = "[^ \t$()\r\n]";
-        static String patternMatchAtom = "[ \t\r\n]*[^ \t()\r\n]*[ \t\r\n]*";
+        static String patternMatchAtom = "[ \t\r\n]*[^ ()\t\r\n]+[ \t\r\n]*";
         static String patternMatchAtomNoWhiteSpace = "[^ \t()\r\n]*";
 
         static void Main(string[] args)
@@ -55,6 +55,7 @@ namespace DLR_Compiler
             {
                 if (s[index] == ')')
                 {
+                    index += 1;
                     break;
                 }
                 if (s[index] == '(')
@@ -65,7 +66,7 @@ namespace DLR_Compiler
                     values.Add(ret.Item1);
                     continue;
                 }
-                if (Regex.IsMatch(s[index].ToString(), patternWhitespace))
+                if (Regex.IsMatch(s[index].ToString(), patternNotWhitespaceOrParen))
                 {
                     Tuple<Atom_Node, int> ret = captureAtom(s, index);
                     index = ret.Item2;
@@ -74,19 +75,20 @@ namespace DLR_Compiler
                 }
                 index += 1;
             }
-
             return Tuple.Create<List_Node, int>(new List_Node(values), index);
         }
 
          static Tuple<Atom_Node, int> captureAtom(String s, int index)
          {
              String atom;
-             Regex r = new Regex(patternMatchAtom);
+             Regex r ;
+             
+             r = new Regex(patternMatchAtom);
              Match m = r.Match(s, index);
              atom = m.Value;
-
              r = new Regex(patternMatchAtomNoWhiteSpace);
              atom = r.Match(atom).Value;
+             
              return Tuple.Create<Atom_Node, int>(new Atom_Node(atom), m.Index + m.Length);
          }
 
@@ -118,7 +120,6 @@ namespace DLR_Compiler
         bool isAtom();
         List<Node> getList();
         void print(String s);
-
     }
 
     class Atom_Node : Node

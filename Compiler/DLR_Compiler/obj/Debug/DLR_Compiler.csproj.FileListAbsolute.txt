@@ -4,3 +4,9 @@ C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compi
 C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.pdb
 C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.exe
 C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.pdb
+C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe.config
+C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.pdb
+C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe
+C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.pdb
+C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.csprojResolveAssemblyReference.cache
+C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.exe
