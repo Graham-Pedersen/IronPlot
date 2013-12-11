@@ -93,12 +93,12 @@
         [`(if ,test ,exp1 ,exp2)
          `(if ,(desugar-exp test) ,(desugar-exp exp1) ,(desugar-exp exp2))]
         [`(set! ,v ,exp) `(set! ,v ,(desugar-exp exp))]
-        [`(quasiquote ,qq-exp) (desugar-quasiquote 1 qq-exp)]
+        [`(quasiquote ,qq-exp) (desugar-quasi-quote 1 qq-exp)]
         [`(begin . ,body) (desugar-body body)]
         [(? atomic?) exp]
         [`(,function . ,args) 
          `(,(desugar-exp function) ,@(map desugar-exp args))]
-        [else (displayln `(could not desugar expression ,@exp))]))
+	 [else (displayln `(could not desugar expression ,@exp))]))
  
 ;; --------- desugar helpers -------------
   
@@ -134,7 +134,75 @@
      (error (format "strange value in quote: ~s~n" s-exp))]))
 
 
-(define (desugar-quasiquote s-exp) s-exp)
+(define (desugar-quasi-quote n s-exp)
+  (match s-exp
+    [(list 'unquote exp)
+     (if (= n 1)
+         (desugar-exp exp)
+         (list 'list ''unquote 
+               (desugar-quasi-quote (- n 1) exp)))]
+    [`(quasiquote ,s-exp)
+     `(list 'quasiquote ,(desugar-quasi-quote (+ n 1) s-exp))]   
+    [(cons (list 'unquote-splicing exp) rest)
+     (if (= n 1)
+         `(append ,exp ,(desugar-quasi-quote n rest))
+         (cons (list 'unquote-splicing (desugar-quasi-quote (- n 1) exp))
+               (desugar-quasi-quote n rest)))]    
+    [`(,qq-exp1 . ,rest)
+     `(cons ,(desugar-quasi-quote n qq-exp1)
+            ,(desugar-quasi-quote n rest))]
+    [else 
+     (desugar-quote s-exp)]))
+
+(define (desugar-let exp) ;; `(let ((,vs ,es) ...) . ,body)
+    (define vars (cadr exp))
+    (define body (cddr exp))
+        (define var-getter 
+            (lambda (x)
+                (if (null? x)
+                    '()
+                    (cons (caar x) (var-getter (cdr x))))))
+    (define exp-getter 
+            (lambda (x)
+                (if (null? x)
+                    '()
+                    (cons (cadar x) (exp-getter (cdr x))))))
+
+    (define var-names (var-getter vars))
+    (define exps (exp-getter vars))
+  (displayln `(in let ,@body))
+    `((lambda ,var-names ,(desugar-body body))
+        ,@(map desugar-exp exps)))
+
+
+;; i love me some functional programming grahamammm
+
+(define (desugar-letrec exp) ;; `(letrec ((,vs ,es) ..) . ,body)
+  (define vars (car (cdr exp)))
+  (define body (cdr (cdr exp)))
+  (define get-var
+    (lambda (v)
+      (if (null? v)
+          '()
+          (car v))))
+  (define get-exp
+    (lambda (e)
+      (if (null? e)
+          '()
+          (cdr e))))
+  (desugar-exp
+   `(let ,(map (lambda (v) (list (get-var v) '(void))) vars)
+      ,@(map (lambda (v) `(set! ,(get-var v) ,@(get-exp v))) vars)
+      ,@body)))
+
+;; ------ desugaring lambda ------
+
+(define (desugar-lambda exp) ;; `(lambda ,params . ,body)
+  (match exp
+    [`(lambda ,params . ,body)
+     (displayln `(in lambda ,body))
+     `(lambda ,params ,(desugar-body body))]))
+
      
 ; ----- helper functions -----
                             
