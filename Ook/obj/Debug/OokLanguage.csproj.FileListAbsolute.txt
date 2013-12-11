@@ -1,0 +1,16 @@
+C:\Users\ahendrix\Desktop\C#\bin\Debug\OokLanguage.dll
+C:\Users\ahendrix\Desktop\C#\bin\Debug\OokLanguage.pdb
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Editor.dll
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Language.Intellisense.dll
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Shell.10.0.dll
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Settings.dll
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Editor.xml
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Language.Intellisense.xml
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Shell.10.0.xml
+C:\Users\ahendrix\Desktop\C#\bin\Debug\Microsoft.VisualStudio.Settings.xml
+C:\Users\ahendrix\Desktop\C#\obj\Debug\OokLanguage.csprojResolveAssemblyReference.cache
+C:\Users\ahendrix\Desktop\C#\obj\Debug\OokLanguage.dll
+C:\Users\ahendrix\Desktop\C#\obj\Debug\OokLanguage.pdb
+C:\Users\ahendrix\Desktop\C#\bin\Debug\OokLanguage.vsix
+C:\Users\ahendrix\Desktop\C#\bin\Debug\extension.vsixmanifest
+C:\Users\ahendrix\Desktop\C#\obj\Debug\extension.vsixmanifest
