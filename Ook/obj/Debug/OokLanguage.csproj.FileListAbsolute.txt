@@ -14,3 +14,5 @@ C:\Users\ahendrix\Desktop\C#\obj\Debug\OokLanguage.pdb
 C:\Users\ahendrix\Desktop\C#\bin\Debug\OokLanguage.vsix
 C:\Users\ahendrix\Desktop\C#\bin\Debug\extension.vsixmanifest
 C:\Users\ahendrix\Desktop\C#\obj\Debug\extension.vsixmanifest
+C:\Users\Scott\Documents\Repository\IronPlot\Ook\obj\Debug\OokLanguage.csprojResolveAssemblyReference.cache
+C:\Users\Scott\Documents\Repository\IronPlot\Ook\obj\Debug\OokLanguage.pdb
