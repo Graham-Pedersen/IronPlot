@@ -4,3 +4,4 @@ C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\None\O
 C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\None\OokLanguage\1.0\\Microsoft.VisualStudio.Shell.10.0.dll
 C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\None\OokLanguage\1.0\\extension.vsixmanifest
 C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\None\OokLanguage\1.0\\OokLanguage.pdb
+C:\Users\ahendrix\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\None\OokLanguage\1.0\\Microsoft.Data.ConnectionUI.dll
