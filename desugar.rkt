@@ -53,60 +53,73 @@
 ; desugar define statements of the form (define ,v ,exp)
 (define (desugar-define def)
     (match def
-        [`(define ,v ,exp) (displayln `(in define ,exp)) `(define ,v ,(desugar-exp exp))]
+        [`(define ,v ,exp) `(define ,v ,(desugar-exp exp))]
         [else (displayln `(cannot desugar define ,def))]))
 
 (define (desugar-exp exp)
- ;;(displayln `(in desugar-exp ,exp))
-    (cond
-        [(symbol? exp) exp]
-        [(quote?  exp) (desugar-quote exp)]
-        [(let?    exp) (desugar-let exp)]
-	[(letrec? exp) (desugar-letrec exp)]
-	[(lambda? exp) (desugar-lambda exp)]
-        [(and? exp) (desugar-and exp)]
-        [(or? exp) (desugar-or exp)] 
-        [(if? exp) (desugar-if exp)]
-        [(set!? exp) (desugar-set! exp)]
-        [(quasi-quote? exp) (desugar-quasi-quote 1 exp)] ;; need to do
-        [(begin? exp) exp]
-        [(atomic? exp) exp]
-        [(function-call? exp) (desugar-func exp)]
-        [else (displayln `(could not desugar expression ,@exp))]))
+    (match exp
+        [(? symbol?) exp]
+        [`(quote ,s-exp) (desugar-quote s-exp)]
+        [`(let ((,vs ,es) ...) . ,body)
+         `((lambda ,vs ,(desugar-body body)) ,@(map desugar-exp es))]
+
+        [`(letrec ((,vs ,es) ...) . ,body) 
+            (desugar-exp `(let ,(for/list ([v vs])
+                (list v '(void)))
+                ,@(map (λ (v e)
+                  `(set! ,v ,e))
+                vs es)
+         ,@body))]
+	    [`(lambda ,params . ,body) `(lambda ,params ,(desugar-body body))]
+        [`(cond) '(void)]
+        [`(cond (else ,exp)) (desugar-exp exp)]
+        [`(cond (,test ,exp)) 
+         `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
+        [`(cond (,test ,exp) ,rest ...) 
+         `(if ,(desugar-exp test) ,(desugar-exp exp) ,(desugar-exp `(cond . ,rest)))]
+        [`(and)     #t]
+        [`(or)      #f]
+        [`(and ,exp) (desugar-exp exp)]
+        [`(or ,exp) (desugar-exp exp)]
+        [`(and ,exp . ,rest) 
+         `(if ,(desugar-exp exp)
+              ,(desugar-exp `(and . ,rest)) #f)]
+        [`(or ,exp . ,rest) 
+            (define $t (gensym 't))
+            (desugar-exp `(let ((,$t ,exp)) 
+                            (if ,$t ,$t (or . ,rest))))]
+        [`(if ,test ,exp)
+         `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
+        [`(if ,test ,exp1 ,exp2)
+         `(if ,(desugar-exp test) ,(desugar-exp exp1) ,(desugar-exp exp2))]
+        [`(set! ,v ,exp) `(set! ,v ,(desugar-exp exp))]
+        [`(quasiquote ,qq-exp) (desugar-quasi-quote 1 qq-exp)]
+        [`(begin . ,body) (desugar-body body)]
+        [(? atomic?) exp]
+        [`(,function . ,args) 
+         `(,(desugar-exp function) ,@(map desugar-exp args))]
+	 [else (displayln `(could not desugar expression ,@exp))]))
  
 ;; --------- desugar helpers -------------
-   
+  
+
+
+;; desugar body of a lambda or begin
 (define (desugar-body body)
   (match body
     [`(,exp)
      (desugar-exp exp)]
+    
     [`(,(and (? not-define?) exps) ...)
      `(begin ,@(map desugar-exp exps))]
+    
     [`(,tops ... ,exp)
      (define defs (tops-to-defs tops))
      (desugar-exp (match defs
                     [`((define ,vs ,es) ...)
                      `(letrec ,(map list vs es) ,exp)]))]))
 
-;; define?
-(define (define? sx)
-  (match sx
-    [`(define . ,_) #t]
-    [else #f]))
 
-;; not-define?
-(define (not-define? sx)
-  (not (define? sx)))
-
-#|
-;; desugar body of a lambda or begin
-(define (desugar-body body) 
-  (cond ;; or should it just be body?
-    [(null? (cdr body)) (desugar-exp (car body))]  ;; case 1, just an expression, I think this is a valid check
-    [ ]  ;; case 2, a begin
-    [ ])) ;; case 3, contains definitions
-
-|#
 
 (define (desugar-quote s-exp)
   (cond
@@ -189,63 +202,21 @@
     [`(lambda ,params . ,body)
      (displayln `(in lambda ,body))
      `(lambda ,params ,(desugar-body body))]))
-     
 
-;; --------- functions ---------
+     
+; ----- helper functions -----
                             
 (define (function-def->var-def def)
     `(define ,(caadr def) (lambda ,(cdadr def) ,(caddr def))))
 
 
-;; ------------- transform function call -----
+(define (not-define? symbol)
+    (not (define? symbol)))
 
-(define (desugar-func exp)
-  `(,(desugar-exp (car exp))
-    ,@(map desugar-exp (cdr exp))))
-
-;; ----------- desugaring and/or ------------
-
-(define (desugar-or exp)
-  (displayln `(in or ,exp))
-  (match exp
-    [`(or) #f]
-    [`(or ,exp) (desugar-exp exp)]
-    [`(or ,exp . ,rest) 
-     (define $t (gensym 't))
-     (desugar-exp 
-      `(let ((,$t ,exp))
-         (if ,$t ,$t (or . ,rest))))])) 
-
-
-(define (desugar-and exp)
-  (match exp
-    [`(and) #t]
-    [`(and ,exp) (desugar-exp exp)]
-    [`(and ,exp . ,rest) `(if ,(desugar-exp exp) ,(desugar-exp `(and . ,rest)) #f)]))
-
-;; ---------- desugaring if ---------------
-
-(define (desugar-if exp)
-  (cond
-    [(null? (cdr (cdr (cdr exp)))) ;; `(if ,test ,exp)
-     `(if ,(desugar-exp (car (cdr exp)))
-          ,(desugar-exp (cdr (cdr exp)))
-          (void))]
-    [else ;; `(if ,test ,exp1 ,exp2)
-     `(if ,(desugar-exp (car (cdr exp))) ;; test
-          ,(desugar-exp (car (cdr (cdr exp)))) ;; exp1
-          ,(desugar-exp (cdr (cdr (cdr exp)))))]))
-
-
-;; ------------ desugaring/transforming set! ---------
-
-(define (desugar-set! exp) ;; `(set! ,v ,exp)
-  
-  (match exp
-    [`(set! ,v ,exp2)
-     `(set! ,v ,(desugar-exp exp2))]))
-
-; ----- matching helper functions -----
+(define (define? symbol)
+    (match symbol
+        [`(define . ,_) #t]
+        [else           #f]))
 
 ; aotmic-define? : term -> boolean
 (define (atomic-define? def)
@@ -260,92 +231,18 @@
 
 ; matches `(define ,v ,exp)
 (define (var-def? exp)
-    (and (eq? 'define (car exp)) (not (list? (cadr exp)))))
-
-; matchs any quoted list
-(define (quote? exp)
-        (eq? 'quote (car exp)))
-
-(define (let? exp)
-  (and (eq? 'let (car exp))
-       (list? (car (cdr exp)))
-       (not (null? (cdr (cdr exp))))))
-
-(define (letrec? exp)
-  (match exp
-    [`(letrec ((,vs ,es) ...) . ,body) #t]
-    [else #f]))
-
-;; matches lambda I think
-(define (lambda? exp)
-  (match exp
-    [`(lambda ,params . ,body) #t]
-    [else #f]))
-  #|
-  (and (eq? 'lambda (car exp))
-       (list? (car (cdr exp)))
-       (not (null? (cdr (cdr exp))))))
-|#
-
-(define (begin? exp)
-  (match exp
-    [`(begin . ,body) #t]
-    [else #f]))
-
-(define (quasi-quote? exp)
-  (match exp
-  [`(quasi-quote ,qq-exp) #t]
-  [else #f]))
-
-(define (and? exp) ;; check that the first element of the list is and
-  (match exp
-    [`(and) #t]
-    [`(and ,exp) #t]
-    [`(and ,exp . ,rest) #t]
-    [else #f]))
-
-(define (or? exp)
-  (match exp
-    [`(or) #t]
-    [`(or ,exp) #t]
-    [`(or ,exp . ,rest) #t]
-    [else #f]))
-
-(define (if? exp)
-  (or (and (eq? 'if (car exp)) ;; matches `(if ,test ,exp)
-          (not (null? (cdr exp)))
-          (not (null? (cdr (cdr exp))))
-          (null? (cdr (cdr (cdr exp))))) 
-      
-      (and (eq? 'if (car exp)) ;; matches `(if ,test ,exp ,exp2)
-          (not (null? (cdr exp)))
-          (not (null? (cdr (cdr exp))))
-          (not (null? (cdr (cdr (cdr exp)))))
-          (null? (cdr (cdr (cdr (cdr exp))))))))
-
-(define (set!? exp)
-  (and (eq? 'set! (car exp))
-       (not (null? (cdr exp)))
-       (not (null? (cdr (cdr exp))))
-       (null? (cdr (cdr (cdr exp))))))
-
-
-;; not sure what else to check for
-(define (function-call? exp)
-  (and (not (null? (car exp)))
-       (not (null? (cdr exp)))))
-    
+    (and (eq? 'define (car exp)) (not (list? (cadr exp)))))    
     
 
 ; matches any atomic
 (define (atomic? exp)
-  (cond
-    [(number? exp)   #t]
-    [(string? exp)   #t]
-    [(boolean? exp)  #t]
-    [(eq? 'lambda (car exp))  #t]
-    [(eq? 'quote (car exp)) #t]
-    [(eq? 'void (car exp))       #t]
+  (match exp
+    [`(lambda . ,_)     #t]
+    [(? number?)   #t]
+    [(? string?)   #t]
+    [(? boolean?)  #t]
+    [`(quote . ,_) #t]
+    ['(void)       #t]
     [else          #f]))
 
 (define (partition-k pred list k)
