@@ -31,8 +31,9 @@ namespace DLR_Compiler
             {
                 using (StreamReader sr = new StreamReader(filename))
                 {
-                    List_Node topLevelForms = captureList(sr.ReadToEnd(), 0).Item1;
-                    topLevelForms.print();
+                    ListNode topLevelForms = captureList(sr.ReadToEnd(), 0).Item1;
+                    //topLevelForms.print();
+                    Emit_DLR_Tree(topLevelForms);
                 }
             }
             catch (EndOfStreamException)
@@ -42,13 +43,57 @@ namespace DLR_Compiler
             Console.ReadKey();
         }
 
-        static Expression Emit_DLR_Tree(List<String> topLevels)
+        static Expression Emit_DLR_Tree(ListNode topLevels)
         {
             List<Expression> topLevelExpressions = new List<Expression>();
             return Expression.Block();   
         }
 
-        static Tuple<List_Node, int> captureList(string s, int index)
+        static Expression match(Node tree)
+        {
+            if (tree.isLeaf())
+            {
+                bool matchedAtom; 
+                return matchAtom(tree, out matchedAtom);
+            }
+            return Expression.Block();
+        }
+
+        // matches an atom returning a constant expression
+        static Expression matchAtom(Node atom, out bool isAtom)
+        {
+           
+            String value = atom.getValue();
+            if (value == "#t")
+            {
+                isAtom = true;
+                return Expression.Constant(true, typeof(bool));
+            }
+            if (value == "#f")
+            {
+                isAtom = true;
+                return Expression.Constant(false, typeof(bool));
+            }
+            int number;
+            if (Int32.TryParse(value, out number))
+            {
+                isAtom = true;
+                return Expression.Constant(int.Parse(value), typeof(int));
+            }
+            //TODO make this understand how scheme does litearl lists aka '(blah blag) vs 'blah
+            if (value[0] == '\'')
+            {
+                isAtom = true;
+                return Expression.Constant(value, typeof(String));
+            }
+            //TODO add support for void
+
+            isAtom = false;
+            return null;
+
+        }
+
+        static Tuple<ListNode, int> captureList(string s, int index)
         {
             List<Node> values = new List<Node>();
             while (index < s.Length)
@@ -61,24 +106,24 @@ namespace DLR_Compiler
                 if (s[index] == '(')
                 {
                     index += 1;
-                    Tuple<List_Node, int> ret = captureList(s, index);
+                    Tuple<ListNode, int> ret = captureList(s, index);
                     index = ret.Item2;
                     values.Add(ret.Item1);
                     continue;
                 }
                 if (Regex.IsMatch(s[index].ToString(), patternNotWhitespaceOrParen))
                 {
-                    Tuple<Atom_Node, int> ret = captureAtom(s, index);
+                    Tuple<LeafNode, int> ret = captureAtom(s, index);
                     index = ret.Item2;
                     values.Add(ret.Item1);
                     continue;
                 }
                 index += 1;
             }
-            return Tuple.Create<List_Node, int>(new List_Node(values), index);
+            return Tuple.Create<ListNode, int>(new ListNode(values), index);
         }
 
-         static Tuple<Atom_Node, int> captureAtom(String s, int index)
+        static Tuple<LeafNode, int> captureAtom(String s, int index)
          {
              String atom;
              Regex r ;
@@ -89,7 +134,7 @@ namespace DLR_Compiler
              r = new Regex(patternMatchAtomNoWhiteSpace);
              atom = r.Match(atom).Value;
              
-             return Tuple.Create<Atom_Node, int>(new Atom_Node(atom), m.Index + m.Length);
+             return Tuple.Create<LeafNode, int>(new LeafNode(atom), m.Index + m.Length);
          }
 
         static Expression MatchVariableDefines(String s)
@@ -115,22 +160,22 @@ namespace DLR_Compiler
 
     interface Node 
     {
-        String getAtom();
+        String getValue();
         bool isList();
-        bool isAtom();
+        bool isLeaf();
         List<Node> getList();
         void print(String s);
     }
 
-    class Atom_Node : Node
+    class LeafNode : Node
     {
         private String value;
-        public Atom_Node(String atom)
+        public LeafNode(String atom)
         {
             value = atom;
         }
 
-        public String getAtom()
+        public String getValue()
         {
             return value;
         }
@@ -144,7 +189,7 @@ namespace DLR_Compiler
         {
             return false;
         }
-        public bool isAtom()
+        public bool isLeaf()
         {
             return true;
         }
@@ -154,15 +199,15 @@ namespace DLR_Compiler
         }
     }
 
-    class List_Node : Node
+    class ListNode : Node
     {
         List<Node> values;
-        public List_Node(List<Node> _values)
+        public ListNode(List<Node> _values)
         {
             values = _values;
         }
 
-        public string getAtom()
+        public string getValue()
         {
             throw new NotImplementedException();
         }
@@ -172,7 +217,7 @@ namespace DLR_Compiler
             return true;
         }
 
-        public bool isAtom()
+        public bool isLeaf()
         {
             return false;
         }
