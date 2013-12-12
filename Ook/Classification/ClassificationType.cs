@@ -12,22 +12,27 @@ namespace OokLanguage
         /// Defines the "ordinary" classification type.
         /// </summary>
         [Export(typeof(ClassificationTypeDefinition))]
-        [Name("ook!")]
-        internal static ClassificationTypeDefinition ookExclamation = null;
+        [Name("define")]
+        internal static ClassificationTypeDefinition IRDefine = null;
 
         /// <summary>
         /// Defines the "ordinary" classification type.
         /// </summary>
         [Export(typeof(ClassificationTypeDefinition))]
-        [Name("ook?")]
-        internal static ClassificationTypeDefinition ookQuestion = null;
+        [Name("car")]
+        internal static ClassificationTypeDefinition IRCar = null;
 
         /// <summary>
         /// Defines the "ordinary" classification type.
         /// </summary>
         [Export(typeof(ClassificationTypeDefinition))]
-        [Name("ook.")]
-        internal static ClassificationTypeDefinition ookPeriod = null;
+        [Name("cdr")]
+        internal static ClassificationTypeDefinition IRCdr = null;
+
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name(";")]
+        internal static ClassificationTypeDefinition IRComment = null;
 
         #endregion
     }

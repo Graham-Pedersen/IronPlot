@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation
-// All rights reserved
-
-namespace OokLanguage
+﻿namespace OokLanguage
 {
     using System;
     using System.Collections.Generic;
