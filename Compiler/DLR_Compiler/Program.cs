@@ -38,7 +38,10 @@ namespace DLR_Compiler
                     Expression makeEnv = Expression.New(typeof(Environment));
                     ParameterExpression env = Expression.Variable(typeof(Environment), "env");
                     Expression assign = Expression.Assign(env, makeEnv);
+
                     List<Expression> program = new List<Expression>();
+                    
+
                     Expression code = Expression.Block(new ParameterExpression[] { env }, new Expression[] {assign, match(topLevelForms)});
 
                     Console.WriteLine(Expression.Lambda<Func<int>>(code).Compile()());
@@ -75,17 +78,10 @@ namespace DLR_Compiler
                     {
                         expressionList.Add(match(n));
                     }
-                    return consEnviLambda(Expression.Block(expressionList));
+                    ParameterExpression env = Expression.Variable(typeof(Environment), "env");
+                    return Expression.Block(new ParameterExpression[] { env }, expressionList);
                 }
             }
-        }
-
-        static LambdaExpression consEnviLambda(BlockExpression body)
-        {
-            return Expression.Lambda<Func<Expression>>(
-                body, 
-                new ParameterExpression[] { Expression.Parameter(typeof(Environment), "env") });
-
         }
 
         // This matches an expression of some type
@@ -133,7 +129,11 @@ namespace DLR_Compiler
                         typeof(Environment).GetMethod("add", new Type[] { typeof(String), typeof(int) }),
                         Expression.Constant(tree.values[1].getValue()),
                         var);
-                    return Expression.Block(new[] { var }, Expression.Assign(var, match(tree.values[2])));
+                    Expression check = Expression.Call(
+                        envExpression,
+                        typeof(Environment).GetMethod("lookup", new Type[] { typeof(String) }),
+                        Expression.Constant("x"));
+                    return Expression.Block(new[] { var }, Expression.Assign(var, match(tree.values[2])), check);
                 case "lambda":
                     throw new NotImplementedException();
                 case "cons":
