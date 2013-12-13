@@ -13,7 +13,7 @@ namespace DLR_Compiler
     {
 
         //Regex patterns
-        static String patternWhitespace = "[ \t\r\n]";
+        //static String patternWhitespace = "[ \t\r\n]";
         static String patternNotWhitespaceOrParen = "[^ \t$()\r\n]";
         static String patternMatchAtom = "[ \t\r\n]*[^ ()\t\r\n]+[ \t\r\n]*";
         static String patternMatchAtomNoWhiteSpace = "[^ \t()\r\n]*";
@@ -32,32 +32,141 @@ namespace DLR_Compiler
                 using (StreamReader sr = new StreamReader(filename))
                 {
                     ListNode topLevelForms = captureList(sr.ReadToEnd(), 0).Item1;
+                    
                     //topLevelForms.print();
-                    Emit_DLR_Tree(topLevelForms);
+
+                    Expression makeEnv = Expression.New(typeof(Environment));
+                    ParameterExpression env = Expression.Variable(typeof(Environment), "env");
+                    Expression assign = Expression.Assign(env, makeEnv);
+                    List<Expression> program = new List<Expression>();
+                    Expression code = Expression.Block(new ParameterExpression[] { env }, new Expression[] {assign, match(topLevelForms)});
+
+                    Console.WriteLine(Expression.Lambda<Func<int>>(code).Compile()());
                 }
             }
             catch (EndOfStreamException)
             {
-                Console.WriteLine("File does not exist");
+                throw new FileNotFoundException("File: does not exist");
             }
             Console.ReadKey();
         }
 
-        static Expression Emit_DLR_Tree(ListNode topLevels)
-        {
-            List<Expression> topLevelExpressions = new List<Expression>();
-            return Expression.Block();   
-        }
-
         static Expression match(Node tree)
         {
+            List<Expression> expressionList = new List<Expression>();
+
             if (tree.isLeaf())
             {
-                bool matchedAtom; 
-                return matchAtom(tree, out matchedAtom);
+                return matchLeaf(tree);
             }
-            return Expression.Block();
+            //we know that we have a list
+            else
+            {
+                ListNode list = (ListNode) tree;
+
+                if (list.values[0].isLeaf())
+                {
+                    return matchExpression((ListNode) tree);               
+                }
+                // if we have a list of lists we either have a body or a top level form...
+                else
+                {
+                    foreach (Node n in list.getList())
+                    {
+                        expressionList.Add(match(n));
+                    }
+                    return consEnviLambda(Expression.Block(expressionList));
+                }
+            }
         }
+
+        static LambdaExpression consEnviLambda(BlockExpression body)
+        {
+            return Expression.Lambda<Func<Expression>>(
+                body, 
+                new ParameterExpression[] { Expression.Parameter(typeof(Environment), "env") });
+
+        }
+
+        // This matches an expression of some type
+        static Expression matchExpression(ListNode tree)
+        {
+            switch (tree.values[0].getValue())
+            {
+
+                case "+":
+                    if (tree.values.Count != 3)
+                        throw new ParsingException("failed to parse plus for list " + tree.ToString());
+                    return Expression.Add(match(tree.values[1]), match(tree.values[2]));
+                case "-":
+                    if (tree.values.Count != 3)
+                        throw new ParsingException("failed to parse minus for list " + tree.ToString());
+                    return Expression.Subtract(match(tree.values[1]), match(tree.values[2]));
+                case "*":
+                    if (tree.values.Count != 3)
+                        throw new ParsingException("failed to parse times for list " + tree.ToString());
+                    return Expression.Multiply(match(tree.values[1]), match(tree.values[2]));
+                case "/":
+                    if (tree.values.Count != 3)
+                        throw new ParsingException("failed to parse divide for list " + tree.ToString());
+                    return Expression.Divide(match(tree.values[1]), match(tree.values[2]));
+                case "%":
+                    if (tree.values.Count != 3)
+                        throw new ParsingException("failed to parse mod for list " + tree.ToString());
+                    return Expression.Modulo(match(tree.values[1]), match(tree.values[2]));
+
+                case "equals":
+                    if (tree.values.Count != 3)
+                        throw new ParsingException("failed to parse equals for list " + tree.ToString());
+                    return Expression.Equal(match(tree.values[1]), match(tree.values[2]));
+                case "if":
+                    throw new NotImplementedException();
+                case "define":
+                    if (tree.values.Count != 3 || tree.values[1].isList())
+                        throw new ParsingException("failed to parse define");
+                    //TODO make this id the type with reflection
+                    ParameterExpression var = Expression.Parameter(typeof(int), tree.values[1].getValue());
+                    Expression envExpression = Expression.Variable(typeof(Environment), "env");
+                    //Console.WriteLine(Expression.Constant(tree.values[1].getValue()).Type.ToString());
+                    Expression call = Expression.Call(
+                        envExpression,
+                        typeof(Environment).GetMethod("add", new Type[] { typeof(String), typeof(int) }),
+                        Expression.Constant(tree.values[1].getValue()),
+                        var);
+                    return Expression.Block(new[] { var }, Expression.Assign(var, match(tree.values[2])));
+                case "lambda":
+                    throw new NotImplementedException();
+                case "cons":
+                    throw new NotImplementedException();
+                case "car":
+                    throw new NotImplementedException();
+                case "cdr":
+                    throw new NotImplementedException();
+
+            }
+        
+            throw new NotImplementedException();
+        }
+
+        static Expression matchLeaf(Node leaf)
+        {
+            bool matchedAtom;
+            Expression e;
+            e = matchAtom(leaf, out matchedAtom);
+            if (matchedAtom)
+            {
+                return e;
+            }
+            else
+            {
+                return Expression.Block( new ParameterExpression[] { Expression.Parameter(typeof(Environment), "env")},
+                            Expression.Call(
+                            Expression.Variable(typeof(Environment), "env"),
+                            typeof(Environment).GetMethod("lookup", new Type[] { typeof(String)}),
+                            Expression.Constant(leaf.getValue())));
+            }
+        }
+
 
         // matches an atom returning a constant expression
         static Expression matchAtom(Node atom, out bool isAtom)
@@ -113,7 +222,7 @@ namespace DLR_Compiler
                 }
                 if (Regex.IsMatch(s[index].ToString(), patternNotWhitespaceOrParen))
                 {
-                    Tuple<LeafNode, int> ret = captureAtom(s, index);
+                    Tuple<LeafNode, int> ret = captureLeaf(s, index);
                     index = ret.Item2;
                     values.Add(ret.Item1);
                     continue;
@@ -123,7 +232,7 @@ namespace DLR_Compiler
             return Tuple.Create<ListNode, int>(new ListNode(values), index);
         }
 
-        static Tuple<LeafNode, int> captureAtom(String s, int index)
+        static Tuple<LeafNode, int> captureLeaf(String s, int index)
          {
              String atom;
              Regex r ;
@@ -195,13 +304,18 @@ namespace DLR_Compiler
         }
         public void print(String s)
         {
-            Console.WriteLine(s + this.value);
+            Console.WriteLine(s +  this.ToString());
+        }
+
+        public override String ToString()
+        {
+            return this.value;
         }
     }
 
     class ListNode : Node
     {
-        List<Node> values;
+        public List<Node> values;
         public ListNode(List<Node> _values)
         {
             values = _values;
@@ -233,6 +347,16 @@ namespace DLR_Compiler
             {
                 n.print(s + "  ");
             }
+        }
+
+        public override String ToString()
+        {
+            String ret = "";
+            foreach (Node n in values)
+            {
+                ret += n.ToString() + "\n";
+            }
+            return ret;
         }
 
         public void print()
