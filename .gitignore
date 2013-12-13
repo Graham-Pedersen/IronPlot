@@ -13,6 +13,8 @@ desugar
 8
 9
 10
+# custom stoff added by Andrew #
+*.suo
 
 # Compiled source #
 ###################

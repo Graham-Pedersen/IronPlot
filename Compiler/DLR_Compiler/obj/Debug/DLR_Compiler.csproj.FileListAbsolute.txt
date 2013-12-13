@@ -10,3 +10,4 @@ C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.ex
 C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.pdb
 C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.csprojResolveAssemblyReference.cache
 C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.exe
+C:\Users\Scott\Documents\Repository\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe.config

@@ -7,6 +7,6 @@ namespace OokLanguage
 {
     public enum OokTokenTypes
     {
-       OokExclaimation, OokQuestion, OokPeriod
+       IRDefine, IRCdr, IRCar, IRComment
     }
 }

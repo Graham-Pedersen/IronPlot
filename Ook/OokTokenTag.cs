@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation
-// All rights reserved
-
-namespace OokLanguage
+﻿namespace OokLanguage
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +10,7 @@ namespace OokLanguage
     using Microsoft.VisualStudio.Utilities;
 
     [Export(typeof(ITaggerProvider))]
-    [ContentType("ook!")]
+    [ContentType("IronRacket")]
     [TagType(typeof(OokTokenTag))]
     internal sealed class OokTokenTagProvider : ITaggerProvider
     {
@@ -44,9 +41,10 @@ namespace OokLanguage
         {
             _buffer = buffer;
             _ookTypes = new Dictionary<string, OokTokenTypes>();
-            _ookTypes["ook!"] = OokTokenTypes.OokExclaimation;
-            _ookTypes["ook."] = OokTokenTypes.OokPeriod;
-            _ookTypes["ook?"] = OokTokenTypes.OokQuestion;
+            _ookTypes["define"] = OokTokenTypes.IRDefine;
+            _ookTypes["car"] = OokTokenTypes.IRCar;
+            _ookTypes["cdr"] = OokTokenTypes.IRCdr;
+            _ookTypes[";"] = OokTokenTypes.IRComment;
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged
