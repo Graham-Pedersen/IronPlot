@@ -11,3 +11,5 @@ C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.pd
 C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.csprojResolveAssemblyReference.cache
 C:\Users\Graham\project\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.exe
 C:\Users\Scott\Documents\Repository\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe.config
+C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\SimpleSchemeParser.pdb
+C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\SimpleSchemeParser.dll
