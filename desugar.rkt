@@ -58,50 +58,74 @@
 
 (define (desugar-exp exp)
     (match exp
-        [(? symbol?) exp]
-        [`(quote ,s-exp) (desugar-quote s-exp)]
-        [`(let ((,vs ,es) ...) . ,body)
-         `((lambda ,vs ,(desugar-body body)) ,@(map desugar-exp es))]
+      [(? symbol?) exp]
+      [`(quote ,s-exp) (desugar-quote s-exp)]
+      [`(let ((,vs ,es) ...) . ,body)
+       `((lambda ,vs ,(desugar-body body)) ,@(map desugar-exp es))]
+      
+      [`(letrec ((,vs ,es) ...) . ,body) 
+       (desugar-exp `(let ,(for/list ([v vs])
+                             (list v '(void)))
+                       ,@(map (λ (v e)
+                                `(set! ,v ,e))
+                              vs es)
+                       ,@body))]
+      [`(lambda ,params . ,body) `(lambda ,params ,(desugar-body body))]
+      [`(cond) '(void)]
+      [`(cond (else ,exp)) (desugar-exp exp)]
+      [`(cond (,test ,exp)) 
+       `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
+      [`(cond (,test ,exp) ,rest ...) 
+       `(if ,(desugar-exp test) ,(desugar-exp exp) ,(desugar-exp `(cond . ,rest)))]
+      [`(and)     #t]
+      [`(or)      #f]
+      [`(and ,exp) (desugar-exp exp)]
+      [`(or ,exp) (desugar-exp exp)]
+      [`(and ,exp . ,rest) 
+       `(if ,(desugar-exp exp)
+            ,(desugar-exp `(and . ,rest)) #f)]
+      [`(or ,exp . ,rest) 
+       (define $t (gensym 't))
+       (desugar-exp `(let ((,$t ,exp)) 
+                       (if ,$t ,$t (or . ,rest))))]
+      [`(if ,test ,exp)
+       `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
+      [`(if ,test ,exp1 ,exp2)
+       `(if ,(desugar-exp test) ,(desugar-exp exp1) ,(desugar-exp exp2))]
+      [`(set! ,v ,exp) `(set! ,v ,(desugar-exp exp))]
+      [`(quasiquote ,qq-exp) (desugar-quasi-quote 1 qq-exp)]
+      [`(begin . ,body) (desugar-body body)]
+      [`(first ,exp) `(car ,exp)]
+      [`(rest ,exp) `(cdr ,exp)]
+      [`(+ ,farg ,sarg . ,rest) (if (null? rest) ;; added today, need to test
+                                    `(+ ,farg ,sarg)
+                                    `(+ ,farg ,(desugar-exp `(+ ,sarg ,@rest))))]
+      [`(* ,farg ,sarg . ,rest) (if (null? rest) ;; added today , need to test
+                                    `(* ,farg ,sarg)
+                                    `(* ,farg ,(desugar-exp `(* ,sarg ,@rest))))]
+      [`(/ ,farg ,sarg . ,rest) ;;(if (null? rest) ;; added today , need to test
+                                  ;;   `(/ ,farg ,sarg)
+                                     (foldl (lambda (v a) `(/ ,a
+                                                              ,(desugar-exp v)))
+                                            `(/ ,(desugar-exp farg)
+                                                ,(desugar-exp sarg))
+                                            rest)]
+      [`(- ,farg ,sarg . ,rest) ;;(if (null? rest) ;; added today, need to test
+                                 ;;  `(- ,farg ,sarg)
+                                   (foldl (lambda (v a) `(- ,a
+                                                              ,(desugar-exp v)))
+                                            `(- ,(desugar-exp farg)
+                                                ,(desugar-exp sarg))
+                                            rest)]
+      [`(list . ,rest) (foldr (lambda (x a) `(cons ,(desugar-exp x) ,a)) '() rest)] ;; needs testing 
+                                   
+      [(? atomic?) exp]
+      [`(,function . ,args) 
+       `(,(desugar-exp function) ,@(map desugar-exp args))]
+      [else (displayln `(could not desugar expression ,@exp))]))
 
-        [`(letrec ((,vs ,es) ...) . ,body) 
-            (desugar-exp `(let ,(for/list ([v vs])
-                (list v '(void)))
-                ,@(map (λ (v e)
-                  `(set! ,v ,e))
-                vs es)
-         ,@body))]
-	    [`(lambda ,params . ,body) `(lambda ,params ,(desugar-body body))]
-        [`(cond) '(void)]
-        [`(cond (else ,exp)) (desugar-exp exp)]
-        [`(cond (,test ,exp)) 
-         `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
-        [`(cond (,test ,exp) ,rest ...) 
-         `(if ,(desugar-exp test) ,(desugar-exp exp) ,(desugar-exp `(cond . ,rest)))]
-        [`(and)     #t]
-        [`(or)      #f]
-        [`(and ,exp) (desugar-exp exp)]
-        [`(or ,exp) (desugar-exp exp)]
-        [`(and ,exp . ,rest) 
-         `(if ,(desugar-exp exp)
-              ,(desugar-exp `(and . ,rest)) #f)]
-        [`(or ,exp . ,rest) 
-            (define $t (gensym 't))
-            (desugar-exp `(let ((,$t ,exp)) 
-                            (if ,$t ,$t (or . ,rest))))]
-        [`(if ,test ,exp)
-         `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
-        [`(if ,test ,exp1 ,exp2)
-         `(if ,(desugar-exp test) ,(desugar-exp exp1) ,(desugar-exp exp2))]
-        [`(set! ,v ,exp) `(set! ,v ,(desugar-exp exp))]
-        [`(quasiquote ,qq-exp) (desugar-quasi-quote 1 qq-exp)]
-        [`(begin . ,body) (desugar-body body)]
-        [(? atomic?) exp]
-        [`(,function . ,args) 
-         `(,(desugar-exp function) ,@(map desugar-exp args))]
-	 [else (displayln `(could not desugar expression ,@exp))]))
- 
 ;; --------- desugar helpers -------------
-  
+
 
 
 ;; desugar body of a lambda or begin
