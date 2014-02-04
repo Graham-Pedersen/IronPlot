@@ -43,6 +43,7 @@ namespace IRLanguage
 
             return new IRClassifier(buffer, IRTagAggregator, ClassificationTypeRegistry) as ITagger<T>;
         }
+
     }
 
     internal sealed class IRClassifier : ITagger<ClassificationTag>

@@ -62,6 +62,7 @@
             foreach (SnapshotSpan curSpan in spans)
             {
                 ITextSnapshotLine containingLine = curSpan.Start.GetContainingLine();
+                
                 int curLoc = containingLine.Start.Position;
                 string[] tokens = containingLine.GetText().ToLower().Split(' ');
 
