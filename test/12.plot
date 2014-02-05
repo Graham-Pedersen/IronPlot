@@ -1,3 +1,6 @@
-(define x 3)
-(define y 2)
-(+ x y)
+(define fact (lambda (x)
+	(if (equal? 1 x)
+		1
+		(* x (fact (- x 1)))))) 
+(define result (fact 5))
+(displayln result)
