@@ -1,6 +1,4 @@
-﻿// Copyright (c) Microsoft Corporati
-// All rights reserved
-
+﻿
 namespace IRLanguage
 {
     using Microsoft.VisualStudio.Text;
@@ -25,7 +23,7 @@ namespace IRLanguage
         internal static ContentTypeDefinition IRContentType = null;
 
         [Export]
-        [FileExtension(".plottt")]
+        [FileExtension(".plot")]
         [ContentType("IronRacket")]
         internal static FileExtensionToContentTypeDefinition IRFileType = null;
 

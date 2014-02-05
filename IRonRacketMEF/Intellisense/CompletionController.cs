@@ -31,7 +31,7 @@ namespace IRLanguage
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
             IWpfTextView view = AdaptersFactory.GetWpfTextView(textViewAdapter);
-            Debug.Assert(view != null);
+           // Debug.Assert(view != null);
 
             CommandFilter filter = new CommandFilter(view, CompletionBroker);
 
