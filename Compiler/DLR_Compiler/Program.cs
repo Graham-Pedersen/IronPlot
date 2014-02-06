@@ -15,6 +15,7 @@ namespace DLR_Compiler
 {
     class Program
     {
+        static ParameterExpression voidSingleton;
 
         static void Main(string[] args)
         {
@@ -36,21 +37,37 @@ namespace DLR_Compiler
             var env = Expression.Variable(typeof(Environment), "env");
             var assign = Expression.Assign(env, makeEnv);
 
+            //set up a single instance of type void
+            voidSingleton = Expression.Variable(typeof(ObjBox), "void");
+            Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
+
+            Expression initVoidObjBox = Expression.New(
+                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
+                new Expression[] { Expression.Convert(Expression.New(typeof(voidObj).GetConstructor(new Type[] { })), typeof(Object)), voidType});
+
+            Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
                     
             //Add the environment to the start of the program
             List<Expression> program = new List<Expression>();
             program.Add(env);
             program.Add(assign);
+            program.Add(assignVoid);
+
+            Expression ret = Expression.Convert(accessValue(matchTopLevel(topLevelForms, env)), typeof(Object));
 
             //Match and add the rest of the program
-            program.Add(matchTopLevel(topLevelForms, env));
+            program.Add(
+                Expression.Call(
+                null, 
+                typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }), 
+                    Expression.Call(ret, typeof(Object).GetMethod("ToString"))));
 
             //Wrap the program into a block expression
-            Expression code = Expression.Block(new ParameterExpression[] { env }, program);
+            Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
             //Put the block expression into a lambda function and invoke it
             Expression.Lambda<Action>(code).Compile()();
 
-            //TODO change to either output into .exe .dll or invoke automatically (interpret)
+            //TODO change to either output into .exe .dll or invoke automatically
             Console.ReadKey();
         }
 
@@ -70,7 +87,7 @@ namespace DLR_Compiler
                 //define expression
                 if (list.values[0].isLeaf() && list.values[0].getValue() == "define" )
                 {
-                    return DefineExpr(list, env);
+                    return defineExpr(list, env);
                 }
                 bool parsed = false;
                 var ret = matchExpression(list, env, out parsed);
@@ -113,7 +130,10 @@ namespace DLR_Compiler
                 ListNode list = (ListNode) tree;
 
                 if (list.values[0].isList())
+                {
                     throw new ParsingException();
+                    //autoApplyLambda(list, env);
+                }
 
                 //perform a function lookup first because in scheme you can overwrite language keywords
 
@@ -138,7 +158,6 @@ namespace DLR_Compiler
                     case "equal?":
                         return equalExpr(list, env);
 
-
                     case "not":
                         if (list.values.Count != 2)
                             throw new ParsingException("wrong number of arguments supplied for not expression");
@@ -150,6 +169,10 @@ namespace DLR_Compiler
                     case "if":
                         return ifExpr(list, env);
 
+                    //TODO extend environment and fix this
+                    case "set!":
+                        return defineExpr(list, env);
+
                     case "cons":
                         throw new NotImplementedException();
 
@@ -158,10 +181,7 @@ namespace DLR_Compiler
 
                     case "cdr":
                         throw new NotImplementedException();
-
-                    case "set":
-                        throw new NotImplementedException();
-
+                    
                     case "begin":
                         return beginExpr(list, env);
 
@@ -176,6 +196,13 @@ namespace DLR_Compiler
             {
                 return matchLeaf(tree, env);
             }
+        }
+
+        private static void autoApplyLambda(ListNode list, Expression env)
+        {
+            Expression lamb = lambdaExpr((ListNode)list.values[0], env);
+
+            throw new NotImplementedException();
         }
 
         private static Expression beginExpr(ListNode list, Expression env)
@@ -197,12 +224,18 @@ namespace DLR_Compiler
 
         private static Expression displayExpr(ListNode list, Expression env)
         {
+            List<Expression> block = new List<Expression>();
+
             if (list.values.Count != 2)
                 throw new ParsingException("wrong number of arguments passed to displayln");
 
             Expression print = Expression.Convert(accessValue(matchExpression(list.values[1], env)), typeof(Object));
             Expression toStr = Expression.Call(print, typeof(Object).GetMethod("ToString"));
-            return Expression.Call(null, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }), toStr);
+            Expression println = Expression.Call(null, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }), toStr);
+            block.Add(println);
+            block.Add(voidSingleton);
+
+            return Expression.Block( block );
         }
 
         private static Expression equalExpr(ListNode tree, Expression env)
@@ -433,7 +466,7 @@ namespace DLR_Compiler
                 new Expression[] { Expression.Convert(result, typeof(Object)), type });
         }
 
-        private static Expression DefineExpr(ListNode tree, Expression env)
+        private static Expression defineExpr(ListNode tree, Expression env)
         {
             //TODO check variable names are a legal scheme variable name
             if (tree.values.Count != 3 || tree.values[1].isList() || tree.values[1].getValue().GetType() != typeof(String))
@@ -594,7 +627,12 @@ namespace DLR_Compiler
 
                 isAtom = true;
             }
-            //TODO add support for void
+            else if (value == "void")
+            {
+
+                isAtom = true;
+                matchedExpr = voidSingleton;
+            }
 
             return matchedExpr;
         }

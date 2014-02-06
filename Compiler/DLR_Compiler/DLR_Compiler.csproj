@@ -44,10 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompilerLib.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="ParsingException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RacketLib.cs" />
     <Compile Include="RuntimeException.cs" />
   </ItemGroup>
   <ItemGroup>

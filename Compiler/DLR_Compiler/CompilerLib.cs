@@ -48,9 +48,25 @@ namespace DLR_Compiler
             throw new NotImplementedException();
         }
 
+        public static Type voidType()
+        {
+            return typeof(voidObj);
+        }
+
         public static T cast<T>(object o)
         {
             return (T)o;
+        }
+
+
+    }
+
+    class voidObj
+    {
+        public voidObj() { }
+        public override string ToString()
+        {
+            return "";
         }
     }
 }
