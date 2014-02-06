@@ -55,13 +55,17 @@ namespace IRLanguage
             var line = triggerPoint.GetContainingLine();
             SnapshotPoint start = triggerPoint;
 
+            //string text = line.GetText().ToLower();
+            
+            //FileState.IntelliSense_filterer.Filter_list(completions, text);
+
             while (start > line.Start && !char.IsWhiteSpace((start - 1).GetChar()))
             {
                 start -= 1;
             }
 
             var applicableTo = snapshot.CreateTrackingSpan(new SnapshotSpan(start, triggerPoint), SpanTrackingMode.EdgeInclusive);
-
+            //List<Completion> completions = new List<Completion>(); 
             completionSets.Add(new CompletionSet("All", "All", applicableTo, completions, Enumerable.Empty<Completion>()));
         }
 

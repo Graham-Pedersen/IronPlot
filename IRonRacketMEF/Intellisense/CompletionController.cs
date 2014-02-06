@@ -68,7 +68,7 @@ namespace IRLanguage
             int hresult = VSConstants.S_OK;
 
             // 1. Pre-process
-            if (pguidCmdGroup == VSConstants.VSStd2K)
+          if (pguidCmdGroup == VSConstants.VSStd2K)
             {
                 switch ((VSConstants.VSStd2KCmdID)nCmdID)
                 {
@@ -99,8 +99,10 @@ namespace IRLanguage
                     {
                         case VSConstants.VSStd2KCmdID.TYPECHAR:
                             char ch = GetTypeChar(pvaIn);
-                            if (ch == ' ')
+                            if (ch == '(')
                                 StartSession();
+                            else if (ch == ' ')
+                                Cancel();
                             else if (_currentSession != null)
                                 Filter();
                             break;
@@ -118,6 +120,21 @@ namespace IRLanguage
         {
             if (_currentSession == null)
                 return;
+
+
+            //because its fucking impossible to overload these methods
+            List<Completion> comp = new List<Completion>();
+            foreach (Completion c in _currentSession.SelectedCompletionSet.Completions)
+                comp.Add(c);
+
+
+
+
+           // SnapshotPoint caret = //TextView.Caret.Position.BufferPosition;
+            //ITextSnapshot snapshot = caret.Snapshot;
+            //string s = snapshot.TextBuffer.ToString();
+               // ITextBuffer.ITextSnapshot.TextBuffer
+            FileState.IntelliSense_filterer.Filter_list(comp,s);
 
             _currentSession.SelectedCompletionSet.SelectBestMatch();
             _currentSession.SelectedCompletionSet.Recalculate();
@@ -154,7 +171,7 @@ namespace IRLanguage
         {
             if (_currentSession != null)
                 return false;
-
+            //Caret.
             SnapshotPoint caret = TextView.Caret.Position.BufferPosition;
             ITextSnapshot snapshot = caret.Snapshot;
 
@@ -188,6 +205,20 @@ namespace IRLanguage
             return Next.QueryStatus(pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
     }
+
+    public class CompleteSet : CompletionSet
+    {
+        public override void Recalculate()
+        {
+            base.Recalculate();
+        }
+        public override void SelectBestMatch()
+        {
+            base.SelectBestMatch();
+        }
+    }
+
+
 
     #endregion
 }
