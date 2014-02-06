@@ -26,8 +26,155 @@ namespace IRLanguage
         {
             this.DisplayName = "define"; //human readable version of the name
             this.ForegroundColor = Colors.BlueViolet;
+            this.IsBold = true;
         }
     }
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "let")]
+    [Name("IRLet")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRLet : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRLet()
+        {
+            this.DisplayName = "let"; //human readable version of the name
+            this.ForegroundColor = Colors.ForestGreen;
+            this.IsBold = true;
+        }
+    }
+
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "letrec")]
+    [Name("IRLetrec")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRLetrec : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRLetrec()
+        {
+            this.DisplayName = "letrec"; //human readable version of the name
+            this.ForegroundColor = Colors.Peru;
+            this.IsBold = true;
+        }
+    }
+
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "cond")]
+    [Name("IRCond")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRCond : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRCond()
+        {
+            this.DisplayName = "cond"; //human readable version of the name
+            this.ForegroundColor = Colors.Purple;
+            this.IsBold = true;
+        }
+    }
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "and")]
+    [Name("IRAnd")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRAnd : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRAnd()
+        {
+            this.DisplayName = "and"; //human readable version of the name
+            this.ForegroundColor = Colors.SteelBlue;
+            this.IsBold = true;
+        }
+    }
+
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "or")]
+    [Name("IROr")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IROr : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IROr()
+        {
+            this.DisplayName = "or"; //human readable version of the name
+            this.ForegroundColor = Colors.Bisque;
+            this.IsBold = true;
+        }
+    }
+
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "set!")]
+    [Name("IRSetbang")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRSetbang : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRSetbang()
+        {
+            this.DisplayName = "set!"; //human readable version of the name
+            this.ForegroundColor = Colors.Tomato;
+            this.IsBold = true;
+        }
+    }
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "if")]
+    [Name("IRIf")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRIf : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRIf()
+        {
+            this.DisplayName = "if"; //human readable version of the name
+            this.ForegroundColor = Colors.Blue;
+            this.IsBold = true;
+        }
+    }
+
+
 
     /// <summary>
     /// Defines an editor format for the OrdinaryClassification type that has a purple background
@@ -49,6 +196,7 @@ namespace IRLanguage
         {
             this.DisplayName = "car"; //human readable version of the name
             this.ForegroundColor = Colors.Green;
+            this.IsBold = true;
         }
     }
 
@@ -72,6 +220,7 @@ namespace IRLanguage
         {
             this.DisplayName = "cdr"; //human readable version of the name
             this.ForegroundColor = Colors.Orange;
+            this.IsBold = true;
         }
     }
 
@@ -94,6 +243,7 @@ namespace IRLanguage
         {
             this.DisplayName = "comment"; //human readable version of the name
             this.ForegroundColor = Colors.Red;
+            this.IsBold = true;
         }
     }
 
@@ -113,6 +263,7 @@ namespace IRLanguage
         {
             this.DisplayName = "lambda"; //human readable version of the name
             this.ForegroundColor = Colors.YellowGreen;
+            this.IsBold = true;
         }
     }
 
@@ -136,6 +287,8 @@ namespace IRLanguage
         {
             this.DisplayName = "cons"; //human readable version of the name
             this.ForegroundColor = Colors.SkyBlue;
+            this.IsBold = true;
+            
         }
     }
 

@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) Microsoft Corporati
+// All rights reserved
+
 namespace IRLanguage
 {
     using Microsoft.VisualStudio.Text;
@@ -41,7 +43,6 @@ namespace IRLanguage
 
             return new IRClassifier(buffer, IRTagAggregator, ClassificationTypeRegistry) as ITagger<T>;
         }
-
     }
 
     internal sealed class IRClassifier : ITagger<ClassificationTag>
@@ -63,6 +64,13 @@ namespace IRLanguage
             _IRTypes[IRTokenTypes.IRComment] = typeService.GetClassificationType(";");
             _IRTypes[IRTokenTypes.IRLambda] = typeService.GetClassificationType("lambda");
             _IRTypes[IRTokenTypes.IRCons] = typeService.GetClassificationType("cons");
+            _IRTypes[IRTokenTypes.IRCond] = typeService.GetClassificationType("cond");
+            _IRTypes[IRTokenTypes.IRIf] = typeService.GetClassificationType("if");
+            _IRTypes[IRTokenTypes.IRLet] = typeService.GetClassificationType("let");
+            _IRTypes[IRTokenTypes.IRLetrec] = typeService.GetClassificationType("letrec");
+            _IRTypes[IRTokenTypes.IROr] = typeService.GetClassificationType("or");
+            _IRTypes[IRTokenTypes.IRAnd] = typeService.GetClassificationType("and");
+            _IRTypes[IRTokenTypes.IRSetbang] = typeService.GetClassificationType("set!");
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged
