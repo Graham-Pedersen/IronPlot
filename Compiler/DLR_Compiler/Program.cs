@@ -13,19 +13,13 @@ using System.Reflection;
 
 namespace DLR_Compiler
 {
-    class Program
+    class DLR_Compiler
     {
         static ParameterExpression voidSingleton;
 
-        static void Main(string[] args)
+        static void compile(string filename)
         {
-            if (args.Length < 1)
-            {
-                PrintHelp();
-                return;
-            }
-            String filename = args[0];
-            Console.WriteLine("Compiling file " + args[0]);
+            Console.WriteLine("Compiling file " + filename);
             
             // make a new simple scheme parser
             SchemeParser ssp = new SchemeParser(filename);
@@ -53,7 +47,7 @@ namespace DLR_Compiler
             program.Add(assign);
             program.Add(assignVoid);
 
-            Expression ret = Expression.Convert(accessValue(matchTopLevel(topLevelForms, env)), typeof(Object));
+            Expression ret = accessValue(matchTopLevel(topLevelForms, env), typeof(Object));
 
             //Match and add the rest of the program
             program.Add(
@@ -83,17 +77,7 @@ namespace DLR_Compiler
             if (tree.isList())
             {
                 ListNode list = (ListNode)tree;
-
-                //define expression
-                if (list.values[0].isLeaf() && list.values[0].getValue() == "define" )
-                {
-                    return defineExpr(list, env);
-                }
-                bool parsed = false;
-                var ret = matchExpression(list, env, out parsed);
-                if (parsed)
-                    return ret;
-                else
+                if (list.getNestingLevel() == 0)
                 {
                     List<Expression> dlrTree = new List<Expression>();
                     foreach (Node n in ((ListNode)tree).getList())
@@ -102,25 +86,21 @@ namespace DLR_Compiler
                     }
                     return Expression.Block(dlrTree);
                 }
+                //define expression
+                if (list.values[0].isLeaf() && list.values[0].getValue() == "define" )
+                {
+                    return defineExpr(list, env);
+                }
+                /*
+                 * bool parsed = false;
+                var ret = matchExpression(list, env, out parsed);
+                if (parsed)
+                    return ret;
+                 */
             }
             return matchExpression(tree, env);
         }
 
-        static Expression matchExpression(Node tree, Expression env, out bool parsed)
-        {
-            Expression ret = null;
-            parsed = false;
-            try
-            {
-                ret = matchExpression(tree, env);
-                parsed = true;
-                return ret;
-            }
-            catch (ParsingException)
-            {
-                return ret;
-            }
-        }
 
         // This matches a list and converts it into an expression
         static Expression matchExpression(Node tree, Expression env)
@@ -131,14 +111,19 @@ namespace DLR_Compiler
 
                 if (list.values[0].isList())
                 {
-                    throw new ParsingException();
-                    //autoApplyLambda(list, env);
+                    return autoInvokeLambda(list, env);
                 }
 
                 //perform a function lookup first because in scheme you can overwrite language keywords
 
                 switch (list.values[0].getValue())
                 {
+
+                    case "callnet":
+                        return callNetExpr(list, env);
+
+                    case "typenet":
+                        return netTypeExpr(list, env);
 
                     case "+":
                         return addExpr(list, env);
@@ -171,16 +156,16 @@ namespace DLR_Compiler
 
                     //TODO extend environment and fix this
                     case "set!":
-                        return defineExpr(list, env);
+                        return setBangExpr(list, env);
 
                     case "cons":
-                        throw new NotImplementedException();
+                        return consExpr(list, env);
 
                     case "car":
-                        throw new NotImplementedException();
+                        return carExpr(list, env);
 
                     case "cdr":
-                        throw new NotImplementedException();
+                        return cdrExpr(list, env);
                     
                     case "begin":
                         return beginExpr(list, env);
@@ -188,6 +173,7 @@ namespace DLR_Compiler
                     case "displayln":
                         return displayExpr(list, env);
 
+                    //TODO add environment check and move above standard cases
                     default:
                         return invokeLambda(list, env);
                 }
@@ -198,11 +184,118 @@ namespace DLR_Compiler
             }
         }
 
-        private static void autoApplyLambda(ListNode list, Expression env)
+        private static Expression callNetExpr(ListNode list, Expression env)
         {
-            Expression lamb = lambdaExpr((ListNode)list.values[0], env);
-
+            if (list.values.Count != 2)
+                throw new ParsingException("could not parse .net call");
             throw new NotImplementedException();
+        }
+
+        private static Expression netTypeExpr(ListNode list, Expression env)
+        {
+            if (list.values.Count != 2)
+                throw new ParsingException("Could not parse .net type expression");
+            
+            Expression typelit = accessValue(matchExpression(list.values[2], env), typeof(String));
+
+            return Expression.Call(null, typeof(Type).GetMethod("GetType", new Type[] { typeof(String) }), typelit);
+        }
+            
+        private static Expression cdrExpr(ListNode list, Expression env)
+        {
+            if(list.values.Count != 2)
+            {
+                throw new ParsingException("failed to parse cdr");
+            }
+            Expression pair = accessValue(matchExpression(list.values[1], env), typeof(RacketPair));
+            return Expression.Call(pair, typeof(RacketPair).GetMethod("cdr"));
+        }
+
+        private static Expression carExpr(ListNode list, Expression env)
+        {
+            if (list.values.Count != 2)
+            {
+                throw new ParsingException("failed to parse car");
+            }
+            Expression pair = accessValue(matchExpression(list.values[1], env), typeof(RacketPair));
+            return Expression.Call(pair, typeof(RacketPair).GetMethod("car"));
+        }
+
+        private static Expression consExpr(ListNode list, Expression env)
+        {
+            if (list.values.Count != 3)
+                throw new ParsingException("Could not parse cons");
+
+            Expression first = matchExpression(list.values[1], env);
+            Expression rest = matchExpression(list.values[2], env);
+            Expression cons = Expression.New(
+                typeof(RacketPair).GetConstructor( 
+                    new Type[] { typeof(ObjBox), typeof(ObjBox) }), 
+                first, 
+                rest);
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
+            return wrapInObjBox(cons, type);
+            
+        }
+
+        private static Expression setBangExpr(ListNode list, Expression env)
+        {
+            List<Expression> block = new List<Expression>();
+
+            //TODO check variable names are a legal scheme variable name
+            if (list.values.Count != 3 || list.values[1].isList() || list.values[1].getValue().GetType() != typeof(String))
+                throw new ParsingException("failed to parse set!");
+
+            var name = Expression.Constant(list.values[1].getValue());
+
+            var rhs = matchExpression(list.values[2], env);
+
+            Expression set = Expression.Call(
+                env,
+                typeof(Environment).GetMethod("set"),
+                name,
+                Expression.Convert(rhs, typeof(ObjBox)));
+
+            block.Add(set);
+            block.Add(voidSingleton);
+            return Expression.Block(block);
+        }
+
+        private static Expression autoInvokeLambda(ListNode list, Expression env)
+        {
+            //first expression must be a lambda
+            Expression lambBox = lambdaExpr((ListNode)list.values[0], env);
+
+            //lets get the function wrapper out of the obj box
+            Expression lamb = accessValue(lambBox, typeof(FunctionHolder));
+
+            List<Expression> invokeLamb = new List<Expression>();
+
+            //Statement to make a List (it will hold the arguments)
+            Expression newObjList = Expression.New(typeof(List<Object>).GetConstructor(new Type[] { }));
+            ParameterExpression objList = Expression.Variable(typeof(List<Object>), "argList");
+            Expression assignExpr = Expression.Assign(objList, newObjList);
+
+            invokeLamb.Add(objList);
+            invokeLamb.Add(assignExpr);
+
+            // add each matched argument into our list of arguments
+            for (int i = 1; i < list.values.Count; i++)
+            {
+                invokeLamb.Add(Expression.Call(
+                    objList,
+                    typeof(List<Object>).GetMethod("Add", new Type[] { typeof(Object) }),
+                    Expression.Convert(matchExpression(list.values[i], env), typeof(Object))));
+            }
+
+            var invoke = Expression.Call(
+                lamb,
+                typeof(FunctionHolder).GetMethod("invoke"),
+                objList);
+
+            invokeLamb.Add(invoke);
+
+            return Expression.Block(new ParameterExpression[] { objList }, invokeLamb);
         }
 
         private static Expression beginExpr(ListNode list, Expression env)
@@ -216,7 +309,7 @@ namespace DLR_Compiler
             {
                 values.Add(list.values[i]);
             }
-            ListNode bodyLiterals = new ListNode(values);
+            ListNode bodyLiterals = new ListNode(values, 0);
 
             //TODO verify correctness of not making a new env
             return matchTopLevel(bodyLiterals, env);
@@ -229,7 +322,7 @@ namespace DLR_Compiler
             if (list.values.Count != 2)
                 throw new ParsingException("wrong number of arguments passed to displayln");
 
-            Expression print = Expression.Convert(accessValue(matchExpression(list.values[1], env)), typeof(Object));
+            Expression print = accessValue(matchExpression(list.values[1], env), typeof(Object));
             Expression toStr = Expression.Call(print, typeof(Object).GetMethod("ToString"));
             Expression println = Expression.Call(null, typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }), toStr);
             block.Add(println);
@@ -243,8 +336,8 @@ namespace DLR_Compiler
             if (tree.values.Count != 3)
                 throw new ParsingException("failed to parse equals for list " + tree.ToString());
 
-            Expression lhs = accessValue(matchExpression(tree.values[1], env));
-            Expression rhs = accessValue(matchExpression(tree.values[2], env));
+            Expression lhs = accessValue(matchExpression(tree.values[1], env), typeof(Object));
+            Expression rhs = accessValue(matchExpression(tree.values[2], env), typeof(Object));
 
             //Expression lhs = matchExpression(tree.values[1], env);
             //Expression rhs = matchExpression(tree.values[2], env);
@@ -279,7 +372,7 @@ namespace DLR_Compiler
 
             
             Expression ifThenElse = Expression.IfThenElse(
-                Expression.Convert(accessValue(matchExpression(list.values[1], env)), typeof(Boolean)),
+                accessValue(matchExpression(list.values[1], env), typeof(Boolean)),
                 ifTrue,
                 ifFalse);
 
@@ -307,11 +400,11 @@ namespace DLR_Compiler
                     Expression.Convert(matchExpression(tree.values[i], env), typeof(Object))));
             }
 
-            
-            Expression getFunction = accessValue(lookup(tree.values[0].getValue(), env));
+
+            Expression getFunction = accessValue(lookup(tree.values[0].getValue(), env), typeof(FunctionHolder));
   
             var invoke = Expression.Call(
-                Expression.Convert(getFunction, typeof(FunctionHolder)),
+                getFunction,
                 typeof(FunctionHolder).GetMethod("invoke"), 
                 objList);
 
@@ -366,7 +459,7 @@ namespace DLR_Compiler
             {
                 values.Add(tree.values[i]);
             }
-            ListNode bodyLiterals = new ListNode(values);
+            ListNode bodyLiterals = new ListNode(values, 0);
 
             //Add the body of the lambda to the expression tree
             body.Add(matchTopLevel(bodyLiterals, new_env));
@@ -392,8 +485,8 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = Expression.Convert(accessValue(matchExpression(tree.values[1], env)), typeof(int));
-            dynamic rhs = Expression.Convert(accessValue(matchExpression(tree.values[2], env)), typeof(int));
+            dynamic lhs = accessValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = accessValue(matchExpression(tree.values[2], env), typeof(int));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Divide(lhs, rhs);
 
@@ -408,8 +501,8 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = Expression.Convert(accessValue(matchExpression(tree.values[1], env)), typeof(int));
-            dynamic rhs = Expression.Convert(accessValue(matchExpression(tree.values[2], env)), typeof(int));
+            dynamic lhs = accessValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = accessValue(matchExpression(tree.values[2], env), typeof(int));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Modulo(lhs, rhs);
 
@@ -424,8 +517,8 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = Expression.Convert(accessValue(matchExpression(tree.values[1], env)), typeof(int));
-            dynamic rhs = Expression.Convert(accessValue(matchExpression(tree.values[2], env)), typeof(int));
+            dynamic lhs = accessValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = accessValue(matchExpression(tree.values[2], env), typeof(int));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Multiply(lhs, rhs);
 
@@ -440,8 +533,8 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = Expression.Convert(accessValue(matchExpression(tree.values[1], env)), typeof(int));
-            dynamic rhs = Expression.Convert(accessValue(matchExpression(tree.values[2], env)), typeof(int));
+            dynamic lhs = accessValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = accessValue(matchExpression(tree.values[2], env), typeof(int));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
 
             Expression result = Expression.Add(lhs, rhs);
@@ -456,8 +549,8 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = Expression.Convert(accessValue(matchExpression(tree.values[1], env)), typeof(int));
-            dynamic rhs = Expression.Convert(accessValue(matchExpression(tree.values[2], env)), typeof(int));
+            dynamic lhs = accessValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = accessValue(matchExpression(tree.values[2], env), typeof(int));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
 
             Expression result = Expression.Subtract(lhs, rhs);
@@ -468,6 +561,8 @@ namespace DLR_Compiler
 
         private static Expression defineExpr(ListNode tree, Expression env)
         {
+            List<Expression> block = new List<Expression>();
+            
             //TODO check variable names are a legal scheme variable name
             if (tree.values.Count != 3 || tree.values[1].isList() || tree.values[1].getValue().GetType() != typeof(String))
                 throw new ParsingException("failed to parse define");
@@ -482,12 +577,14 @@ namespace DLR_Compiler
                 name,
                 Expression.Convert(rhs, typeof(ObjBox)));
 
-            return add;
+            block.Add(add);
+            block.Add(voidSingleton);
+            return Expression.Block(block);
         }
 
 
         //unboxes the object allowing us to safley cast it at runtime
-        static Expression accessValue(Expression obj)
+        static Expression accessValue(Expression obj, Type type)
         {
             List<Expression> body = new List<Expression>();
 
@@ -502,15 +599,23 @@ namespace DLR_Compiler
                 typeof(Object),
                 Expression.Call(temp, typeof(ObjBox).GetMethod("getObj")));
 
-            body.Add(Expression.Call(
+           Expression invoke = Expression.Call(
                 castMethod, 
                 typeof(System.Reflection.MethodInfo).GetMethod("Invoke", new Type[] { typeof(Object), typeof(Object[]) }),
                 temp,
-                objArray));
+                objArray);
 
+            Expression cast = Expression.Convert(invoke, type);
+            body.Add(cast);
             return Expression.Block(new ParameterExpression[] { temp }, body);
         }
 
+        static Expression wrapInObjBox(Expression obj, Expression type)
+        {
+            return Expression.New(
+                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
+                    new Expression[] { Expression.Convert(obj, typeof(Object)), type });
+        }
 
         //DEPRECIATED DO NOT USE
         //Using reflection we dynamically generate a templated call to a method that lets us recover the type of any object at runtime
@@ -595,36 +700,32 @@ namespace DLR_Compiler
                 
                 // this expression is the same as calling typeof(Boolean);
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
-                matchedExpr = Expression.New(
-                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }), 
-                    new Expression[] {Expression.Convert(Expression.Constant(true), typeof(Object)), type } );
+                matchedExpr = wrapInObjBox(Expression.Constant(true), type);
                 isAtom = true;
             }
             else if (value == "#f")
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
-                matchedExpr = Expression.New(
-                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                    new Expression[] { Expression.Convert(Expression.Constant(false), typeof(Object)), type });
+                matchedExpr = wrapInObjBox(Expression.Constant(false), type);
                 isAtom = true;
             }
             else if (Int32.TryParse(value, out number))
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-                matchedExpr = Expression.New(
-                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                    new Expression[] { Expression.Convert(Expression.Constant(int.Parse(value)), typeof(Object)), type });
-
+                matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
+                isAtom = true;
+            }
+            else if (value == "'()")
+            {
+                Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
+                matchedExpr = wrapInObjBox(Expression.New(typeof(RacketPair).GetConstructor(new Type[] { })), type);
                 isAtom = true;
             }
             //TODO make this understand how scheme does litearal lists aka '(blah blag) vs 'blah
             else if (value[0] == '\'')
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
-                matchedExpr = Expression.New(
-                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                    new Expression[] { Expression.Convert(Expression.Constant(value, typeof(String)), typeof(Object)), type });
-
+                matchedExpr = wrapInObjBox(Expression.Constant(value, typeof(String)), type);
                 isAtom = true;
             }
             else if (value == "void")

@@ -11,16 +11,25 @@ namespace SimpleSchemeParser
         String getValue();
         bool isList();
         bool isLeaf();
+        bool isTopLevel();
         List<Node> getList();
         void print(String s);
+        int getNestingLevel();
     }
 
     public class LeafNode : Node
     {
         private String value;
-        public LeafNode(String atom)
+        private int nestingLevel;
+        public LeafNode(String atom, int _nestingLevel)
         {
             value = atom;
+            nestingLevel = _nestingLevel;
+        }
+
+        public int getNestingLevel()
+        {
+            return nestingLevel;
         }
 
         public String getValue()
@@ -41,6 +50,10 @@ namespace SimpleSchemeParser
         {
             return true;
         }
+        public bool isTopLevel()
+        {
+            return false;
+        }
         public void print(String s)
         {
             Console.WriteLine(s + this.ToString());
@@ -55,19 +68,31 @@ namespace SimpleSchemeParser
     public class ListNode : Node
     {
         public List<Node> values;
-        public ListNode(List<Node> _values)
+        private int nestingLevel;
+        public ListNode(List<Node> _values, int _nestingLevel)
         {
             values = _values;
+            nestingLevel = _nestingLevel;
+        }
+
+        public int getNestingLevel()
+        {
+            return nestingLevel;
         }
 
         public string getValue()
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public bool isList()
         {
             return true;
+        }
+
+        public bool isTopLevel()
+        {
+            return false;
         }
 
         public bool isLeaf()

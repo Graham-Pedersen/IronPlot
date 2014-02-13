@@ -61,6 +61,11 @@ namespace DLR_Compiler
         {
             env.Add(name, value);
         }
+
+        public void set(String name, ObjBox newValue)
+        {
+            env[name] = newValue;
+        }
     }
 
    public class FunctionHolder

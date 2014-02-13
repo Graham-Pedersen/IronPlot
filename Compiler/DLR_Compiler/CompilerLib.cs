@@ -53,12 +53,15 @@ namespace DLR_Compiler
             return typeof(voidObj);
         }
 
+        public static Type pairType()
+        {
+            return typeof(RacketPair);
+        }
+
         public static T cast<T>(object o)
         {
             return (T)o;
         }
-
-
     }
 
     class voidObj
