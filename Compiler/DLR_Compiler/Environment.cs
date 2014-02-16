@@ -61,23 +61,28 @@ namespace DLR_Compiler
         {
             env.Add(name, value);
         }
+
+        public void set(String name, ObjBox newValue)
+        {
+            env[name] = newValue;
+        }
     }
 
    public class FunctionHolder
     {
-        int count;
+        //int count;
         public Delegate func;
         public FunctionHolder(Delegate _func)
         {
             func = _func;
-            count = 0;
+            //count = 0;
         }
 
         public dynamic invoke(List<Object> arguments)
         {
-            count += 1;
+            //count += 1;
             //Console.WriteLine("Got called");
-            Console.WriteLine("Count is: " + count.ToString());
+            //Console.WriteLine("Count is: " + count.ToString());
             return func.DynamicInvoke(arguments.ToArray());
         }
     }

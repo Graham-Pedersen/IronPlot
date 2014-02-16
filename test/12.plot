@@ -1,6 +1,1 @@
-(define fact (lambda (x)
-	(if (equal? 1 x)
-		1
-		(* x (fact (- x 1)))))) 
-(define result (fact 5))
-(displayln result)
+(cons 1 (cons 2 (cons 3 '())))

@@ -4,50 +4,68 @@
 
 #lang racket
 
-
+ 
 ; Entry Point
-
+ ;; add begin to top level
 (define (desugar-input)
-    (define program (read-input))
-    (set! program (tops-to-defs program)) ;; convert tops into defines  
-    (set! program (map desugar-define program)) ;; desugar the defines now
-    (set! program (partition-k 
-                    atomic-define?
-                    program
-                    (lambda (atomic complex)
-                        (define bindings
-                            (for/list ([c complex])
-                                (match c
-                                    [`(define ,v ,complex)
-                                     `(,v (void))])))
-                        (define sets
-                            (for/list ([c complex])
-                                (match c
-                                    [`(define ,v ,complex)
-                                    `(set! ,v ,complex)])))
-                    (append atomic (list `(let ,bindings ,sets))))))
-    (displayln (pretty-format program 40)))
+;; (define program (read-input))
+  (define out (void))
+  (define program (read-input (open-input-file (command-line
+                   #:args (filename output)
+                   (begin
+                     (set! out (open-output-file output #:exists 'replace))
+                   filename)) #:mode 'text)))
+  (set! program (desugar-tops program)) ;; convert tops into defines  
+  (set! program (map desugar-define program)) ;; desugar the defines now
+  (set! program (partition-k 
+                 atomic-define?
+                 program
+                 (lambda (atomic complex)
+                   (define bindings
+                     (for/list ([c complex])
+                       (match c
+                         [`(define ,v ,complex)
+                          `(,v (void))])))
+                   (define sets
+                     (for/list ([c complex])
+                       (match c
+                         [`(define ,v ,complex)
+                          `(set! ,v ,complex)])))
+                   (append atomic (list (desugar-exp `(let ,bindings ,@sets)))))))
+  (write (car program) out))
+;; (displayln (pretty-format program 40)))
 
 
 ; Helper Functions
 
 ; reads all input from std in into a list
-(define (read-input)
-    (define line (read))
+(define (read-input [file (current-input-port)])
+    (define line (read file))
     (if (eof-object? line)
         '()
-        (cons line (read-input))))
+        (cons line (read-input file))))
     
 
-; Desugaring Functions
+; desugar top level begins, hope this is correct
+(define (splice-begin-forms tops)
+  (define (splice-begin top)
+    (match top
+      [`(begin . ,forms) `(begin-top . ,forms)]
+      [else (displayln `(cannot desugar begin))]))
+  (map splice-begin tops))
+       ; Desugaring Functions
 
-(define (tops-to-defs tops)
+(define (desugar-tops tops)
     (define (top-to-def top)
-        (cond 
-            [(function-def? top) (function-def->var-def top)]
-            [(var-def? top) top]
-            [else `(define ,(gensym '_) ,top)]))
-    (map top-to-def tops))
+        (match top
+            [`(define (,name ,params ...) . ,body)
+             (function-def->var-def top)]
+            [`(define ,var ,exp)
+             `(define ,var ,exp)]
+            [`(begin . ,forms)
+             `(begin-top . ,forms)]
+            [exp `(define ,(gensym '_) ,exp)]))
+    (map top-to-def tops)) ;; map is putting in list...... problem with program wrapped in parens
 
 
 ; desugar define statements of the form (define ,v ,exp)
@@ -138,7 +156,7 @@
      `(begin ,@(map desugar-exp exps))]
     
     [`(,tops ... ,exp)
-     (define defs (tops-to-defs tops))
+     (define defs (desugar-tops tops))
      (desugar-exp (match defs
                     [`((define ,vs ,es) ...)
                      `(letrec ,(map list vs es) ,exp)]))]))
@@ -194,7 +212,6 @@
 
     (define var-names (var-getter vars))
     (define exps (exp-getter vars))
-  (displayln `(in let ,@body))
     `((lambda ,var-names ,(desugar-body body))
         ,@(map desugar-exp exps)))
 
@@ -261,7 +278,8 @@
 ; matches any atomic
 (define (atomic? exp)
   (match exp
-    [`(lambda . ,_)     #t]
+    [`(begin-top . ,_)#t]
+    [`(lambda . ,_)#t]
     [(? number?)   #t]
     [(? string?)   #t]
     [(? boolean?)  #t]
