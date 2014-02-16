@@ -1,0 +1,15 @@
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\bin\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.dll
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\bin\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.pdb
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\bin\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.pkgdef
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\bin\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.vsix
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\bin\Debug\extension.vsixmanifest
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\CustomProject.csprojResolveAssemblyReference.cache
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.Resources.resources
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.VSPackage.resources
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.VisualStudio.Package.Project.resources
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\CustomProject.csproj.GenerateResource.Cache
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.dll
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.pdb
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.pkgdef
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\Microsoft.VisualStudio.Project.Samples.CustomProject.latest.pkgdef
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\CustomProject\Src\obj\Debug\extension.vsixmanifest
