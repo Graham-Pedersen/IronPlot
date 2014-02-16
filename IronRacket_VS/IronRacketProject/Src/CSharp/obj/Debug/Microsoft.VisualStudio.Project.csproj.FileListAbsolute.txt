@@ -1,0 +1,9 @@
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\bin\Debug\Microsoft.VisualStudio.Project.dll
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\bin\Debug\Microsoft.VisualStudio.Project.pdb
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\bin\Debug\Microsoft.VisualStudio.Project.dll.CodeAnalysisLog.xml
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\bin\Debug\Microsoft.VisualStudio.Project.dll.lastcodeanalysissucceeded
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\obj\Debug\Microsoft.VisualStudio.Project.csprojResolveAssemblyReference.cache
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\obj\Debug\Microsoft.VisualStudio.Project.VisualStudio.Project.resources
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\obj\Debug\Microsoft.VisualStudio.Project.csproj.GenerateResource.Cache
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\obj\Debug\Microsoft.VisualStudio.Project.dll
+C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\obj\Debug\Microsoft.VisualStudio.Project.pdb

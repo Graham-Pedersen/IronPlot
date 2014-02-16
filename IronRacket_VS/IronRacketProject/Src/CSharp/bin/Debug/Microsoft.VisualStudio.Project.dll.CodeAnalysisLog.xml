@@ -1,0 +1,888 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="c:\program files (x86)\microsoft visual studio 11.0\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
+<FxCopReport Version="11.0">
+ <Targets>
+  <Target Name="C:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\bin\Debug\Microsoft.VisualStudio.Project.dll">
+   <Modules>
+    <Module Name="microsoft.visualstudio.project.dll">
+     <Namespaces>
+      <Namespace Name="Microsoft.VisualStudio.Project">
+       <Types>
+        <Type Name="ActiveConfigurationChangedEventArgs" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.ctor(Microsoft.VisualStudio.Shell.Interop.IVsHierarchy)" Kind="Method" Static="False" Accessibility="Assembly" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Certainty="75" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="StructuresEnums.cs" Line="522">'ActiveConfigurationChangedEventArgs.ActiveConfigurationChangedEventArgs(IVsHierarchy)' appears to have no upstream public or protected callers.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="AssemblyReferenceNode" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#IsAlreadyAdded(Microsoft.VisualStudio.Project.ReferenceNode&amp;)" Kind="Method" Static="False" Accessibility="FamilyOrAssembly" ExternallyVisible="True">
+           <Messages>
+            <Message Id="0#" TypeName="ParameterNamesShouldMatchBaseDeclaration" Category="Microsoft.Naming" CheckId="CA1725" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="AssemblyReferenceNode.cs" Line="295">In member 'AssemblyReferenceNode.IsAlreadyAdded(out ReferenceNode)', change parameter name 'existingReference' to 'existingEquivalentNode' in order to match the identifier as it has been declared in 'ReferenceNode.IsAlreadyAdded(out ReferenceNode)'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="BuildDependency" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.ctor(Microsoft.VisualStudio.Project.ProjectNode,System.Guid)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Mgr" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="BuildDependency.cs" Line="58">In method 'BuildDependency.BuildDependency(ProjectNode, Guid)', correct the spelling of 'Mgr' in parameter name 'projectMgr' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ComReferenceNode" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.ctor(Microsoft.VisualStudio.Project.ProjectNode,Microsoft.VisualStudio.Shell.Interop.VSCOMPONENTSELECTORDATA,System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ComReferenceNode.cs" Line="201">Replace method 'ComReferenceNode.ComReferenceNode(ProjectNode, VSCOMPONENTSELECTORDATA, string)' with an overload that supplies all default arguments.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#EmbedInteropTypes" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#get_EmbedInteropTypes()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+             <Messages>
+              <Message Id="System.Boolean.TryParse(System.String,System.Boolean@)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+               <Issue Name="TryParse" Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ComReferenceNode.cs" Line="134">'ComReferenceNode.EmbedInteropTypes.get()' calls 'bool.TryParse(string, out bool)' but does not explicitly check whether the conversion succeeded. Either use the return value in a conditional statement or verify that the call site expects that the out argument will be set to the default value when the conversion fails.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#IsAlreadyAdded(Microsoft.VisualStudio.Project.ReferenceNode&amp;)" Kind="Method" Static="False" Accessibility="FamilyOrAssembly" ExternallyVisible="True">
+           <Messages>
+            <Message Id="0#" TypeName="ParameterNamesShouldMatchBaseDeclaration" Category="Microsoft.Naming" CheckId="CA1725" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ComReferenceNode.cs" Line="264">In member 'ComReferenceNode.IsAlreadyAdded(out ReferenceNode)', change parameter name 'existingReference' to 'existingEquivalentNode' in order to match the identifier as it has been declared in 'ReferenceNode.IsAlreadyAdded(out ReferenceNode)'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ComReferenceProperties" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Messages>
+          <Message TypeName="ComVisibleTypesShouldBeCreatable" Category="Microsoft.Interoperability" CheckId="CA1409" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+           <Issue Certainty="90" Level="Error">Provide a public default constructor for 'ComReferenceProperties' if it should be COM-creatable or mark the type as ComVisible(false).</Issue>
+          </Message>
+         </Messages>
+        </Type>
+        <Type Name="ConfigProvider" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ProjectMgr" Kind="Property" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Mgr" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ConfigProvider.cs" Line="94">Correct the spelling of 'Mgr' in member name 'ConfigProvider.ProjectMgr' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="GlobalProperty" Kind="Enum" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#DevEnvDir" Kind="Field" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Dir" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Dir' in member name 'GlobalProperty.DevEnvDir' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#FxCopDir" Kind="Field" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Dir" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Dir' in member name 'GlobalProperty.FxCopDir' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#SolutionDir" Kind="Field" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Dir" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Dir' in member name 'GlobalProperty.SolutionDir' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="HierarchyNode" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ExecCommandIndependentOfSelection(System.Guid,System.UInt32,System.UInt32,System.IntPtr,System.IntPtr,Microsoft.VisualStudio.Project.CommandOrigin,System.Boolean&amp;)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="va" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="1545">In method 'HierarchyNode.ExecCommandIndependentOfSelection(Guid, uint, uint, IntPtr, IntPtr, CommandOrigin, out bool)', correct the spelling of 'va' in parameter name 'vaIn' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="1545">In method 'HierarchyNode.ExecCommandIndependentOfSelection(Guid, uint, uint, IntPtr, IntPtr, CommandOrigin, out bool)', correct the spelling of 'va' in parameter name 'vaOut' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ExecCommandThatDependsOnSelectedNodes(System.Guid,System.UInt32,System.UInt32,System.IntPtr,System.IntPtr,Microsoft.VisualStudio.Project.CommandOrigin,System.Collections.Generic.IList`1&lt;Microsoft.VisualStudio.Project.HierarchyNode&gt;,System.Boolean&amp;)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="va" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="1495">In method 'HierarchyNode.ExecCommandThatDependsOnSelectedNodes(Guid, uint, uint, IntPtr, IntPtr, CommandOrigin, IList&lt;HierarchyNode&gt;, out bool)', correct the spelling of 'va' in parameter name 'vaIn' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="1495">In method 'HierarchyNode.ExecCommandThatDependsOnSelectedNodes(Guid, uint, uint, IntPtr, IntPtr, CommandOrigin, IList&lt;HierarchyNode&gt;, out bool)', correct the spelling of 'va' in parameter name 'vaOut' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#InternalExecCommand(System.Guid,System.UInt32,System.UInt32,System.IntPtr,System.IntPtr,Microsoft.VisualStudio.Project.CommandOrigin)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="va" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="1620">In method 'HierarchyNode.InternalExecCommand(Guid, uint, uint, IntPtr, IntPtr, CommandOrigin)', correct the spelling of 'va' in parameter name 'vaIn' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="1620">In method 'HierarchyNode.InternalExecCommand(Guid, uint, uint, IntPtr, IntPtr, CommandOrigin)', correct the spelling of 'va' in parameter name 'vaOut' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ProjectMgr" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Mgr" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="304">Correct the spelling of 'Mgr' in member name 'HierarchyNode.ProjectMgr' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#SetProperty(System.Int32,System.Object)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DoNotCastUnnecessarily" Category="Microsoft.Performance" CheckId="CA1800" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="Parameter" Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="HierarchyNode.cs" Line="894">'value', a parameter, is cast to type 'string' multiple times in method 'HierarchyNode.SetProperty(int, object)'. Cache the result of the 'as' operator or direct cast in order to eliminate the redundant castclass instruction.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="IDEBuildLogger" Kind="Class" Accessibility="Assembly" ExternallyVisible="False">
+         <Messages>
+          <Message TypeName="TypesThatOwnDisposableFieldsShouldBeDisposable" Category="Microsoft.Design" CheckId="CA1001" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+           <Issue Name="NonBreaking" Certainty="95" Level="CriticalError">Implement IDisposable on 'IDEBuildLogger' because it creates members of the following IDisposable types: 'ServiceProvider'.</Issue>
+          </Message>
+         </Messages>
+         <Members>
+          <Member Name="#.ctor(Microsoft.VisualStudio.Shell.Interop.IVsOutputWindowPane,Microsoft.VisualStudio.Shell.TaskProvider,Microsoft.VisualStudio.Shell.Interop.IVsHierarchy)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="Dispose objects before losing scope" Category="Microsoft.Reliability" CheckId="CA2000" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Name="NonExceptionEdge" Certainty="75" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="IDEBuildLogger.cs" Line="174">In method 'IDEBuildLogger.IDEBuildLogger(IVsOutputWindowPane, TaskProvider, IVsHierarchy)', call System.IDisposable.Dispose on object 'this.serviceProvider' before all references to it are out of scope.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ServiceProvider" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="False">
+           <Accessors>
+            <Accessor Name="#get_ServiceProvider()" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="False">
+             <Messages>
+              <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+               <Issue Certainty="75" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="IDEBuildLogger.cs" Line="103">'IDEBuildLogger.ServiceProvider.get()' appears to have no upstream public or protected callers.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="IReferenceContainer" Kind="Interface" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AddReferenceFromSelectorData(Microsoft.VisualStudio.Shell.Interop.VSCOMPONENTSELECTORDATA,System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Error">Replace method 'IReferenceContainer.AddReferenceFromSelectorData(VSCOMPONENTSELECTORDATA, string)' with an overload that supplies all default arguments.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="MsBuildGeneratedItemType" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Messages>
+          <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+           <Issue Name="Type" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Ms' in type name 'MsBuildGeneratedItemType'.</Issue>
+          </Message>
+         </Messages>
+        </Type>
+        <Type Name="MsBuildTarget" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Messages>
+          <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+           <Issue Name="Type" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Ms' in type name 'MsBuildTarget'.</Issue>
+          </Message>
+         </Messages>
+        </Type>
+        <Type Name="NodeProperties" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#GetProperty(System.String,System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="def" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="NodeProperties.cs" Line="203">In method 'NodeProperties.GetProperty(string, string)', correct the spelling of 'def' in parameter name 'def' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="OutputGroup" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.ctor(System.String,System.String,Microsoft.VisualStudio.Project.ProjectNode,Microsoft.VisualStudio.Project.ProjectConfig)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="OutputGroup.cs" Line="71">In method 'OutputGroup.OutputGroup(string, string, ProjectNode, ProjectConfig)', correct the spelling of 'ms' in parameter name 'msBuildTargetName' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ProjectConfig" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ProjectMgr" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Mgr" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectConfig.cs" Line="98">Correct the spelling of 'Mgr' in member name 'ProjectConfig.ProjectMgr' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ProjectFactory" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#CanCreateProjectAsynchronously(System.Guid&amp;,System.String,System.UInt32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="filename" TypeName="CompoundWordsShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1702" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterShouldBeCompoundWord" Certainty="80" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="143">In member 'ProjectFactory.CanCreateProjectAsynchronously(ref Guid, string, uint)', the discrete term 'filename' in parameter name 'filename' should be expressed as a compound word, 'fileName'.</Issue>
+            </Message>
+            <Message Id="0#" TypeName="DoNotPassTypesByReference" Category="Microsoft.Design" CheckId="CA1045" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="50" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="143">Consider a design that does not require that 'rguidProjectID' be a reference parameter.</Issue>
+            </Message>
+            <Message Id="ID" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterAbbreviation" Certainty="85" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="143">In member 'ProjectFactory.CanCreateProjectAsynchronously(ref Guid, string, uint)', correct the casing of 'ID' in parameter name 'rguidProjectID' by changing it to 'Id'. 'Id' is an abbreviation and therefore is not subject to acronym casing guidelines.</Issue>
+            </Message>
+            <Message Id="rguid" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="143">In method 'ProjectFactory.CanCreateProjectAsynchronously(ref Guid, string, uint)', correct the spelling of 'rguid' in parameter name 'rguidProjectID' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+            <Message Id="flags" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterNoAlternate" Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="143">In member 'ProjectFactory.CanCreateProjectAsynchronously(ref Guid, string, uint)', replace the term 'flags' in parameter name 'flags' with an appropriate alternate or remove it entirely.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#CreateProjectAsync(System.Guid&amp;,System.String,System.String,System.String,System.UInt32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="filename" TypeName="CompoundWordsShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1702" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterShouldBeCompoundWord" Certainty="80" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="152">In member 'ProjectFactory.CreateProjectAsync(ref Guid, string, string, string, uint)', the discrete term 'filename' in parameter name 'filename' should be expressed as a compound word, 'fileName'.</Issue>
+            </Message>
+            <Message Id="0#" TypeName="DoNotPassTypesByReference" Category="Microsoft.Design" CheckId="CA1045" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="50" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="166">Consider a design that does not require that 'rguidProjectID' be a reference parameter.</Issue>
+            </Message>
+            <Message Id="ID" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterAbbreviation" Certainty="85" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="152">In member 'ProjectFactory.CreateProjectAsync(ref Guid, string, string, string, uint)', correct the casing of 'ID' in parameter name 'rguidProjectID' by changing it to 'Id'. 'Id' is an abbreviation and therefore is not subject to acronym casing guidelines.</Issue>
+            </Message>
+            <Message Id="psz" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="152">In method 'ProjectFactory.CreateProjectAsync(ref Guid, string, string, string, uint)', correct the spelling of 'psz' in parameter name 'pszName' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+            <Message Id="rguid" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="152">In method 'ProjectFactory.CreateProjectAsync(ref Guid, string, string, string, uint)', correct the spelling of 'rguid' in parameter name 'rguidProjectID' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+            <Message Id="flags" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterNoAlternate" Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="152">In member 'ProjectFactory.CreateProjectAsync(ref Guid, string, string, string, uint)', replace the term 'flags' in parameter name 'flags' with an appropriate alternate or remove it entirely.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#OnBeforeCreateProjectAsync(System.Guid&amp;,System.String,System.String,System.String,System.UInt32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="filename" TypeName="CompoundWordsShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1702" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterShouldBeCompoundWord" Certainty="80" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">In member 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)', the discrete term 'filename' in parameter name 'filename' should be expressed as a compound word, 'fileName'.</Issue>
+            </Message>
+            <Message Id="0#" TypeName="DoNotPassTypesByReference" Category="Microsoft.Design" CheckId="CA1045" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="50" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">Consider a design that does not require that 'rguidProjectID' be a reference parameter.</Issue>
+            </Message>
+            <Message Id="ID" TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterAbbreviation" Certainty="85" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">In member 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)', correct the casing of 'ID' in parameter name 'rguidProjectID' by changing it to 'Id'. 'Id' is an abbreviation and therefore is not subject to acronym casing guidelines.</Issue>
+            </Message>
+            <Message Id="psz" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">In method 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)', correct the spelling of 'psz' in parameter name 'pszName' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+            <Message Id="rguid" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">In method 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)', correct the spelling of 'rguid' in parameter name 'rguidProjectID' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+            <Message TypeName="MarkMembersAsStatic" Category="Microsoft.Performance" CheckId="CA1822" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">The 'this' parameter (or 'Me' in Visual Basic) of 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)' is never used. Mark the member as static (or Shared in Visual Basic) or use 'this'/'Me' in the method body or at least one property accessor, if appropriate.</Issue>
+            </Message>
+            <Message Id="filename" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">Parameter 'filename' of 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)' is never used. Remove the parameter or use it in the method body.</Issue>
+            </Message>
+            <Message Id="flags" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">Parameter 'flags' of 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)' is never used. Remove the parameter or use it in the method body.</Issue>
+            </Message>
+            <Message Id="location" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">Parameter 'location' of 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)' is never used. Remove the parameter or use it in the method body.</Issue>
+            </Message>
+            <Message Id="pszName" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">Parameter 'pszName' of 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)' is never used. Remove the parameter or use it in the method body.</Issue>
+            </Message>
+            <Message Id="rguidProjectID" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">Parameter 'rguidProjectID' of 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)' is never used. Remove the parameter or use it in the method body.</Issue>
+            </Message>
+            <Message Id="flags" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterNoAlternate" Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectFactory.cs" Line="148">In member 'ProjectFactory.OnBeforeCreateProjectAsync(ref Guid, string, string, string, uint)', replace the term 'flags' in parameter name 'flags' with an appropriate alternate or remove it entirely.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ProjectNode" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AddFileToMsBuild(System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="3421">Correct the spelling of 'Ms' in member name 'ProjectNode.AddFileToMsBuild(string)' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AddFolderToMsBuild(System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="3453">Correct the spelling of 'Ms' in member name 'ProjectNode.AddFolderToMsBuild(string)' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#CreateMsBuildFileItem(System.String,System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="4110">Correct the spelling of 'Ms' in member name 'ProjectNode.CreateMsBuildFileItem(string, string)' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#GetComponentPickerDirectories()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="TooGeneric" Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="6469">'ProjectNode.GetComponentPickerDirectories()' creates an exception of type 'ApplicationException', an exception type that is not sufficiently specific and should never be raised by user code. If this exception instance might be thrown, use a different exception type.</Issue>
+            </Message>
+            <Message Id="GetReferencePathsForTargetFramework" TypeName="Literals should be spelled correctly" Category="Microsoft.Naming" CheckId="CA2204" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="6469">Correct the spelling of the unrecognized token 'GetReferencePathsForTargetFramework' in the literal '"IVsComponentEnumeratorFactory4.GetReferencePathsForTargetFramework returned null..."'.</Issue>
+            </Message>
+            <Message Id="SCompEnumService" TypeName="Literals should be spelled correctly" Category="Microsoft.Naming" CheckId="CA2204" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="6462">Correct the spelling of the unrecognized token 'SCompEnumService' in the literal '"Missing the SCompEnumService service."'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#GetProjectOptions(System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="2213">Replace method 'ProjectNode.GetProjectOptions(string)' with an overload that supplies all default arguments.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#InteropSafeIVsSccProject2" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Scc" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Scc' in member name 'ProjectNode.InteropSafeIVsSccProject2' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#InteropSafeIVsUIHierWinClipboardHelperEvents" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Hier" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Hier' in member name 'ProjectNode.InteropSafeIVsUIHierWinClipboardHelperEvents' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#InvokeMsBuild(System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="3080">Correct the spelling of 'Ms' in member name 'ProjectNode.InvokeMsBuild(string)' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#OnTargetFrameworkMonikerChanged(Microsoft.VisualStudio.Project.ProjectOptions,System.Runtime.Versioning.FrameworkName,System.Runtime.Versioning.FrameworkName)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="options" TypeName="VariableNamesShouldNotMatchFieldNames" Category="Microsoft.Maintainability" CheckId="CA1500" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="Parameter" Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="2453">'options', a parameter declared in 'ProjectNode.OnTargetFrameworkMonikerChanged(ProjectOptions, FrameworkName, FrameworkName)', has the same name as an instance field on the type. Change the name of one of these items.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#RunWizard(Microsoft.VisualStudio.Project.HierarchyNode,System.String,System.String,System.IntPtr)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="ToRun" TypeName="CompoundWordsShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1702" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameterShouldBeDiscreteTerm" Certainty="80" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="1621">In member 'ProjectNode.RunWizard(HierarchyNode, string, string, IntPtr)', the compound word 'ToRun' in parameter name 'wizardToRun' exists as a discrete term. If your usage is intended to be single word, case it as 'Torun' or strip the first token entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#SetupProjectGlobalPropertiesThatAllProjectSystemsMustSet()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message Id="Microsoft.VisualStudio.Shell.Interop.IVsShell.GetProperty(System.Int32,System.Object@)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="HResultOrErrorCode" Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="6274">'ProjectNode.SetupProjectGlobalPropertiesThatAllProjectSystemsMustSet()' calls 'IVsShell.GetProperty(int, out object)' but does not use the HRESULT or error code that the method returns. This could lead to unexpected behavior in error conditions or low-resource situations. Use the result in a conditional statement, assign the result to a variable, or pass it as an argument to another method.</Issue>
+            </Message>
+            <Message Id="Microsoft.VisualStudio.Shell.Interop.IVsSolution.GetSolutionInfo(System.String@,System.String@,System.String@)" TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="HResultOrErrorCode" Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="6233">'ProjectNode.SetupProjectGlobalPropertiesThatAllProjectSystemsMustSet()' calls 'IVsSolution.GetSolutionInfo(out string, out string, out string)' but does not use the HRESULT or error code that the method returns. This could lead to unexpected behavior in error conditions or low-resource situations. Use the result in a conditional statement, assign the result to a variable, or pass it as an argument to another method.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#ShowRetargetingDialog()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message Id="SVsFrameworkRetargetingDlg" TypeName="Literals should be spelled correctly" Category="Microsoft.Naming" CheckId="CA2204" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="DependsOnFix">
+             <Issue Certainty="75" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ProjectNode.cs" Line="6538">Correct the spelling of the unrecognized token 'SVsFrameworkRetargetingDlg' in the literal '"Missing SVsFrameworkRetargetingDlg service."'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ReferenceContainerNode" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AddReferenceFromSelectorData(Microsoft.VisualStudio.Shell.Interop.VSCOMPONENTSELECTORDATA,System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ReferenceContainerNode.cs" Line="324">Replace method 'ReferenceContainerNode.AddReferenceFromSelectorData(VSCOMPONENTSELECTORDATA, string)' with an overload that supplies all default arguments.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#CreateComReferenceNode(Microsoft.VisualStudio.Shell.Interop.VSCOMPONENTSELECTORDATA,System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ReferenceContainerNode.cs" Line="567">Replace method 'ReferenceContainerNode.CreateComReferenceNode(VSCOMPONENTSELECTORDATA, string)' with an overload that supplies all default arguments.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#CreateFileComponent(Microsoft.VisualStudio.Shell.Interop.VSCOMPONENTSELECTORDATA,System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ReferenceContainerNode.cs" Line="429">Replace method 'ReferenceContainerNode.CreateFileComponent(VSCOMPONENTSELECTORDATA, string)' with an overload that supplies all default arguments.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#CreateReferenceNode(Microsoft.VisualStudio.Shell.Interop.VSCOMPONENTSELECTORDATA,System.String)" Kind="Method" Static="False" Accessibility="Family" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="75" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ReferenceContainerNode.cs" Line="388">Replace method 'ReferenceContainerNode.CreateReferenceNode(VSCOMPONENTSELECTORDATA, string)' with an overload that supplies all default arguments.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ReferenceNode" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#IsAlreadyAdded(Microsoft.VisualStudio.Project.ReferenceNode&amp;)" Kind="Method" Static="False" Accessibility="FamilyOrAssembly" ExternallyVisible="True">
+           <Messages>
+            <Message Id="0#" TypeName="AvoidOutParameters" Category="Microsoft.Design" CheckId="CA1021" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Certainty="50" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="ReferenceNode.cs" Line="295">Consider a design that does not require that 'existingEquivalentNode' be an out parameter.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="SettingsPage" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ProjectMgr" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Mgr" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="SettingsPage.cs" Line="107">Correct the spelling of 'Mgr' in member name 'SettingsPage.ProjectMgr' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="SingleFileGeneratorNodeProperties" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#CustomTool" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#set_CustomTool(System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="TestForEmptyStringsUsingStringLength" Category="Microsoft.Performance" CheckId="CA1820" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+               <Issue Name="IsNullOrEmpty" Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="NodeProperties.cs" Line="522">Replace the call to 'string.operator !=(string, string)' in 'SingleFileGeneratorNodeProperties.CustomTool.set(string)' with a call to 'String.IsNullOrEmpty'.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#CustomToolNamespace" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#set_CustomToolNamespace(System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="TestForEmptyStringsUsingStringLength" Category="Microsoft.Performance" CheckId="CA1820" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+               <Issue Name="IsNullOrEmpty" Certainty="95" Level="Warning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="NodeProperties.cs" Line="545">Replace the call to 'string.operator !=(string, string)' in 'SingleFileGeneratorNodeProperties.CustomToolNamespace.set(string)' with a call to 'String.IsNullOrEmpty'.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="TokenProcessor" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#ReplaceBetweenTokens(System.String&amp;,Microsoft.VisualStudio.Project.ReplaceBetweenPairToken)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="rp" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="MemberParameter" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="TokenProcessor.cs" Line="236">In method 'TokenProcessor.ReplaceBetweenTokens(ref string, ReplaceBetweenPairToken)', correct the spelling of 'rp' in parameter name 'rpBetweenToken' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="UIThread" Kind="Class" Accessibility="Assembly" ExternallyVisible="False">
+         <Members>
+          <Member Name="#IsUnitTest" Kind="Property" Static="True" Accessibility="Assembly" ExternallyVisible="False">
+           <Accessors>
+            <Accessor Name="#set_IsUnitTest(System.Boolean)" Kind="Method" Static="True" Accessibility="Assembly" ExternallyVisible="False">
+             <Messages>
+              <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+               <Issue Certainty="75" Level="Warning">'UIThread.IsUnitTest.set(bool)' appears to have no upstream public or protected callers.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Utilities" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#GetMsBuildPath(System.IServiceProvider)" Kind="Method" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="Utilities.cs" Line="87">Correct the spelling of 'Ms' in member name 'Utilities.GetMsBuildPath(IServiceProvider)' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#GetMsBuildPath(System.IServiceProvider,System.String)" Kind="Method" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Ms" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp" File="Utilities.cs" Line="99">Correct the spelling of 'Ms' in member name 'Utilities.GetMsBuildPath(IServiceProvider, string)' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="VsMenus" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#guidVsVbaPkg" Kind="Field" Static="True" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message Id="Vba" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="Breaking">
+             <Issue Name="Member" Certainty="75" Level="CriticalWarning">Correct the spelling of 'Vba' in member name 'VsMenus.guidVsVbaPkg' or remove it entirely if it represents any sort of Hungarian notation.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+      <Namespace Name="Microsoft.VisualStudio.Project.Automation">
+       <Types>
+        <Type Name="OAFileItem" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#DoSave(System.Boolean,System.String)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="InstantiateArgumentExceptionsCorrectly" Category="Microsoft.Usage" CheckId="CA2208" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="IncorrectParameterName" Certainty="95" Level="CriticalError" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\Automation" File="OAFileItem.cs" Line="344">Method 'OAFileItem.DoSave(bool, string)' passes 'fileName' as the 'paramName' argument to a 'ArgumentNullException' constructor. Replace this argument with one of the method's parameter names. Note that the provided parameter name should have the exact casing as declared on the method.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#get_IsOpen(System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InstantiateArgumentExceptionsCorrectly" Category="Microsoft.Usage" CheckId="CA2208" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="IncorrectParameterName" Certainty="95" Level="CriticalError" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\Automation" File="OAFileItem.cs" Line="292">Method 'OAFileItem.get_IsOpen(string)' passes 'viewKind' as the 'paramName' argument to a 'ArgumentException' constructor. Replace this argument with one of the method's parameter names. Note that the provided parameter name should have the exact casing as declared on the method.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#Open(System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InstantiateArgumentExceptionsCorrectly" Category="Microsoft.Usage" CheckId="CA2208" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="IncorrectParameterName" Certainty="95" Level="CriticalError" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\Automation" File="OAFileItem.cs" Line="200">Method 'OAFileItem.Open(string)' passes 'viewKind' as the 'paramName' argument to a 'ArgumentException' constructor. Replace this argument with one of the method's parameter names. Note that the provided parameter name should have the exact casing as declared on the method.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="OAProjectItems" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AddFolder(System.String,System.String)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InstantiateArgumentExceptionsCorrectly" Category="Microsoft.Usage" CheckId="CA2208" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="IncorrectParameterName" Certainty="95" Level="CriticalError" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\Automation" File="OAProjectItems.cs" Line="162">Method 'OAProjectItems.AddFolder(string, string)' passes 'kind' as the 'paramName' argument to a 'ArgumentException' constructor. Replace this argument with one of the method's parameter names. Note that the provided parameter name should have the exact casing as declared on the method.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#GetTemplateNoZip(System.String)" Kind="Method" Static="True" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message Id="System.String.Format(System.String,System.Object,System.Object,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="IFormatProviderAlternateString" Certainty="95" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\Automation" File="OAProjectItems.cs" Line="313">Because the behavior of 'string.Format(string, object, object, object)' could vary based on the current user's locale settings, replace this call in 'OAProjectItems.GetTemplateNoZip(string)' with a call to 'string.Format(IFormatProvider, string, params object[])'. If the result of 'string.Format(IFormatProvider, string, params object[])' will be displayed to the user, specify 'CultureInfo.CurrentCulture' as the 'IFormatProvider' parameter. Otherwise, if the result will be stored and accessed by software, such as when it is persisted to disk or to a database, specify 'CultureInfo.InvariantCulture'.</Issue>
+            </Message>
+            <Message Id="System.String.Equals(System.String,System.StringComparison)" TypeName="UseOrdinalStringComparison" Category="Microsoft.Globalization" CheckId="CA1309" Status="Active" Created="2014-02-05 01:29:36Z" FixCategory="NonBreaking">
+             <Issue Name="StringComparison" Certainty="75" Level="Error" Path="c:\Users\Scott\Documents\Compiler\mpfproj11-16810\Dev11\Src\CSharp\Automation" File="OAProjectItems.cs" Line="299">'OAProjectItems.GetTemplateNoZip(string)' passes 'StringComparison.InvariantCultureIgnoreCase' as the 'StringComparison' parameter to 'string.Equals(string, StringComparison)'. To perform a non-linguistic comparison, specify 'StringComparison.Ordinal' or 'StringComparison.OrdinalIgnoreCase' instead.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+ </Targets>
+ <Rules>
+  <Rule TypeName="AvoidOutParameters" Category="Microsoft.Design" CheckId="CA1021">
+   <Name>Avoid out parameters</Name>
+   <Description>Using out parameters might indicate a design flaw. Although there are legitimate times to use out parameters, their use frequently indicates a design that does not conform to the design guidelines for managed code.</Description>
+   <Resolution Name="Default">Consider a design that does not require that {0} be an out parameter.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182131(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="50">Warning</MessageLevel>
+   <File Name="designrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811">
+   <Name>Avoid uncalled private code</Name>
+   <Description>There is uncalled code that is not externally visible and is not a known runtime entry point. If this violation fires in error, please send a problem report to the Visual Studio Code Analysis team.</Description>
+   <Resolution Name="Default">{0} appears to have no upstream public or protected callers.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182264(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="performancerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="ComVisibleTypesShouldBeCreatable" Category="Microsoft.Interoperability" CheckId="CA1409">
+   <Name>COM visible types should be creatable</Name>
+   <Description>Types with no public default constructor are not COM-creatable. COM does not support parameterized object construction. A type was detected with a public parameterized constructor but no public default constructor. This type is not creatable by COM. If there is an alternate method for creating and passing object instances to COM clients (through a method on another type, for example), this might not be a problem.</Description>
+   <Resolution Name="Default">Provide a public default constructor for {0} if it should be COM-creatable or mark the type as ComVisible(false).</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182203(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="90">Error</MessageLevel>
+   <File Name="interoperabilityrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="CompoundWordsShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1702">
+   <Name>Compound words should be cased correctly</Name>
+   <Description>Avoid creating compound words from terms which exist in the dictionary as discrete terms. Do not create a compound word such as 'StopWatch' or 'PopUp'. These terms are recognized in the dictionary and should be cased as 'Stopwatch' and 'Popup'.</Description>
+   <Resolution Name="MemberParameterShouldBeCompoundWord">In member {0}, the discrete term '{1}' in parameter name {2} should be expressed as a compound word, '{3}'.</Resolution>
+   <Resolution Name="MemberParameterShouldBeDiscreteTerm">In member {0}, the compound word '{1}' in parameter name {2} exists as a discrete term. If your usage is intended to be single word, case it as '{3}' or strip the first token entirely if it represents any sort of Hungarian notation.</Resolution>
+   <Resolution Name="MemberShouldBeDiscreteTerm">The compound word '{0}' in member name {1} exists as a discrete term. If your usage is intended to be single word, case it as '{2}' or strip the first token entirely if it represents any sort of Hungarian notation.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/bb264474(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="80">Error</MessageLevel>
+   <File Name="namingrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="DefaultParametersShouldNotBeUsed" Category="Microsoft.Design" CheckId="CA1026">
+   <Name>Default parameters should not be used</Name>
+   <Description>Some programming languages do not support default parameters. Replace default parameters with method overloads that supply the default argument.</Description>
+   <Resolution Name="Default">Replace method {0} with an overload that supplies all default arguments.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182135(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">Error</MessageLevel>
+   <File Name="designrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="Dispose objects before losing scope" Category="Microsoft.Reliability" CheckId="CA2000">
+   <Name>Dispose objects before losing scope</Name>
+   <Description>If a disposable object is not explicitly disposed before all references to it are out of scope, the object will be disposed at some indeterminate time when the garbage collector runs the finalizer of the object. Because an exceptional event might occur that will prevent the finalizer of the object from running, the object should be explicitly disposed instead.</Description>
+   <Resolution Name="ExceptionEdge">In method {0}, object {1} is not disposed along all exception paths. Call System.IDisposable.Dispose on object {1} before all references to it are out of scope.</Resolution>
+   <Resolution Name="NonExceptionEdge">In method {0}, call System.IDisposable.Dispose on object {1} before all references to it are out of scope.</Resolution>
+   <Owner>RuleOwner</Owner>
+   <Url>http://msdn.microsoft.com/library/ms182289(VS.100).aspx</Url>
+   <Email />
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="dataflowrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="DoNotCastUnnecessarily" Category="Microsoft.Performance" CheckId="CA1800">
+   <Name>Do not cast unnecessarily</Name>
+   <Description>Avoid duplicate casts where possible, since there is a cost associated with them.</Description>
+   <Resolution Name="Local">{0}, a variable, is cast to type {1} multiple times in method {2}. Cache the result of the 'as' operator or direct cast in order to eliminate the redundant {3} instruction.</Resolution>
+   <Resolution Name="Parameter">{0}, a parameter, is cast to type {1} multiple times in method {2}. Cache the result of the 'as' operator or direct cast in order to eliminate the redundant {3} instruction.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182271(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Warning</MessageLevel>
+   <File Name="performancerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="DoNotIgnoreMethodResults" Category="Microsoft.Usage" CheckId="CA1806">
+   <Name>Do not ignore method results</Name>
+   <Description>The result of methods that return new instances of strings should be assigned to a variable and subsequently used. If the result of a method that creates a new object, such as String.ToLower(), is not assigned to a variable, the call is wasted.</Description>
+   <Resolution Name="HResultOrErrorCode">{0} calls {1} but does not use the HRESULT or error code that the method returns. This could lead to unexpected behavior in error conditions or low-resource situations. Use the result in a conditional statement, assign the result to a variable, or pass it as an argument to another method.</Resolution>
+   <Resolution Name="TryParse">{0} calls {1} but does not explicitly check whether the conversion succeeded. Either use the return value in a conditional statement or verify that the call site expects that the out argument will be set to the default value when the conversion fails.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182273(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Warning</MessageLevel>
+   <File Name="usagerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="DoNotPassTypesByReference" Category="Microsoft.Design" CheckId="CA1045">
+   <Name>Do not pass types by reference</Name>
+   <Description>Although there are legitimate times to use reference parameters, such use frequently indicates a design that does not conform to the design guidelines for managed code.</Description>
+   <Resolution Name="Default">Consider a design that does not require that {0} be a reference parameter.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182146(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="designrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201">
+   <Name>Do not raise reserved exception types</Name>
+   <Description>User code should not create and raise exceptions of certain types that are reserved by the runtime or which are of a too general exception type. Exception types that are too general include Exception, SystemException, and ApplicationException. Exception types that are reserved by the runtime include ThreadAbortException, OutOfMemoryException, ExecutionEngineException, and IndexOutOfRangeException.</Description>
+   <Resolution Name="Reserved">{0} creates an exception of type {1}, an exception type that is reserved by the runtime and should never be raised by managed code. If this exception instance might be thrown, use a different exception type.</Resolution>
+   <Resolution Name="TooGeneric">{0} creates an exception of type {1}, an exception type that is not sufficiently specific and should never be raised by user code. If this exception instance might be thrown, use a different exception type.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182338(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="usagerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="IdentifiersShouldBeCasedCorrectly" Category="Microsoft.Naming" CheckId="CA1709">
+   <Name>Identifiers should be cased correctly</Name>
+   <Description>Type, namespace, and member identifiers are Pascal-cased. Parameter identifiers are camel-cased. Two letter acronyms within these identifiers should be upper-cased, for example, use System.IO instead of System.Io. Acronyms of three or more letters should be Pascal-cased, for example, use System.Xml instead of System.XML. The pascal-casing convention capitalizes the first letter of each word, as in BackColor. The camel-casing convention formats the first letter of the first word in lowercase and capitalizes the first letter of all subsequent words, as in backgroundColor. Although it may be common practice for some two letter acronyms to not be fully capitalized, violations of this rule should not be excluded for this reason. For example, 'DbConnection', is common but incorrect; use DBConnection. A violation of this rule might be required for compatibility with existing, non-managed symbol schemes. In general, however, these symbols should not be visible outside the assembly that uses them.</Description>
+   <Resolution Name="Member">Correct the casing of '{0}' in member name {1} by changing it to '{2}'.</Resolution>
+   <Resolution Name="MemberAbbreviation">Correct the casing of '{0}' in member name {1} by changing it to '{2}'. '{2}' is an abbreviation and therefore is not subject to acronym casing guidelines.</Resolution>
+   <Resolution Name="MemberParameterAbbreviation">In member {0}, correct the casing of '{1}' in parameter name {2} by changing it to '{3}'. '{3}' is an abbreviation and therefore is not subject to acronym casing guidelines.</Resolution>
+   <Resolution Name="Type">Correct the casing of '{0}' in type name {1} by changing it to '{2}'.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182240(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="85">Error</MessageLevel>
+   <File Name="namingrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704">
+   <Name>Identifiers should be spelled correctly</Name>
+   <Description>The individual words that make up an identifier should not be abbreviated and should be spelled correctly. If this rule generates a false positive on a term that should be recognized, add the word to the FxCop custom dictionary.</Description>
+   <Resolution Name="Member">Correct the spelling of '{0}' in member name {1} or remove it entirely if it represents any sort of Hungarian notation.</Resolution>
+   <Resolution Name="MemberParameter">In method {0}, correct the spelling of '{1}' in parameter name {2} or remove it entirely if it represents any sort of Hungarian notation.</Resolution>
+   <Resolution Name="MemberParameterMoreMeaningfulName">In method {0}, consider providing a more meaningful name than parameter name {1}.</Resolution>
+   <Resolution Name="Type">Correct the spelling of '{0}' in type name {1}.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/bb264492(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">CriticalWarning</MessageLevel>
+   <File Name="namingrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="InstantiateArgumentExceptionsCorrectly" Category="Microsoft.Usage" CheckId="CA2208">
+   <Name>Instantiate argument exceptions correctly</Name>
+   <Description>String arguments passed to constructors of ArgumentException and its derived types should be correct. Types derived from ArgumentException have inconsistent constructor overloads with respect to the message and paramName parameters as compared to ArgumentException.</Description>
+   <Resolution Name="IncorrectParameterName">Method {0} passes '{1}' as the {2} argument to a {3} constructor. Replace this argument with one of the method's parameter names. Note that the provided parameter name should have the exact casing as declared on the method.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182347(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">CriticalError</MessageLevel>
+   <File Name="usagerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="Literals should be spelled correctly" Category="Microsoft.Naming" CheckId="CA2204">
+   <Name>Literals should be spelled correctly</Name>
+   <Description>This rule parses the literal string into words, tokenizing compound words, and checks the spelling of each word/token.</Description>
+   <Resolution Name="Default">Correct the spelling of the unrecognized token '{0}' in the literal '{1}'.</Resolution>
+   <Owner>RuleOwner</Owner>
+   <Url>http://msdn.microsoft.com/library/bb264488(VS.100).aspx</Url>
+   <Email />
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="dataflowrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="MarkMembersAsStatic" Category="Microsoft.Performance" CheckId="CA1822">
+   <Name>Mark members as static</Name>
+   <Description>Methods which do not access instance data or call instance methods can be marked as static (Shared in Visual Basic). After doing so, the compiler will emit non-virtual call sites to these members which will prevent a check at runtime for each call that ensures the current object pointer is non-null. This can result in a measurable performance gain for performance-sensitive code. In some cases, the failure to access the current object instance represents a correctness issue.</Description>
+   <Resolution Name="Default">The 'this' parameter (or 'Me' in Visual Basic) of {0} is never used. Mark the member as static (or Shared in Visual Basic) or use 'this'/'Me' in the method body or at least one property accessor, if appropriate.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms245046(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Warning</MessageLevel>
+   <File Name="performancerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="ParameterNamesShouldMatchBaseDeclaration" Category="Microsoft.Naming" CheckId="CA1725">
+   <Name>Parameter names should match base declaration</Name>
+   <Description>For usability reasons, parameter names in overridden methods should match those of the base declaration.</Description>
+   <Resolution Name="Default">In member {0}, change parameter name {1} to {2} in order to match the identifier as it has been declared in {3}.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182251(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="namingrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801">
+   <Name>Review unused parameters</Name>
+   <Description>Review parameters in non-virtual methods that are not used in the method body to ensure no correctness exists around failure to access them. Unused parameters incur maintenance and performance costs. Sometimes a violation of this rule can point to an implementation bug in the method (i.e. the parameter should actually have been used in the method body). Exclude warnings of this rule if the parameter has to exist because of backward compatibility.</Description>
+   <Resolution Name="Default">Parameter {0} of {1} is never used. Remove the parameter or use it in the method body.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182268(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Warning</MessageLevel>
+   <File Name="usagerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305">
+   <Name>Specify IFormatProvider</Name>
+   <Description>If an overload exists that takes an IFormatProvider argument, it should always be called in favor of an overload that does not. Some methods in the runtime convert a value to or from a string representation and take a string parameter that contains one or more characters, called format specifiers, which indicate how the value is to be converted. If the meaning of the format specifier varies by culture, a formatting object supplies the actual characters used in the string representation. In scenarios where sorting and comparison behavior should never change between cultures, specify CultureInfo.InvariantCulture, otherwise, specify CultureInfo.CurrentCulture.</Description>
+   <Resolution Name="IFormatProviderAlternateString">Because the behavior of {0} could vary based on the current user's locale settings, replace this call in {1} with a call to {2}. If the result of {2} will be displayed to the user, specify {3} as the 'IFormatProvider' parameter. Otherwise, if the result will be stored and accessed by software, such as when it is persisted to disk or to a database, specify {4}.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182190(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="globalizationrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="TestForEmptyStringsUsingStringLength" Category="Microsoft.Performance" CheckId="CA1820">
+   <Name>Test for empty strings using string length</Name>
+   <Description>To test for empty strings, check if String.Length is equal to zero. Constructs such as "".Equals(someString) and String.Empty.Equals(someString) are less efficient than testing the string length. Replace these with checks for someString.Length == 0.</Description>
+   <Resolution Name="IsNullOrEmpty">Replace the call to {0} in {1} with a call to 'String.IsNullOrEmpty'.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182279(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Warning</MessageLevel>
+   <File Name="performancerules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="TypesThatOwnDisposableFieldsShouldBeDisposable" Category="Microsoft.Design" CheckId="CA1001">
+   <Name>Types that own disposable fields should be disposable</Name>
+   <Description>Types that declare disposable members should also implement IDisposable. If the type does not own any unmanaged resources, do not implement a finalizer on it.</Description>
+   <Resolution Name="NonBreaking">Implement IDisposable on {0} because it creates members of the following IDisposable types: {1}.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182172(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">CriticalError</MessageLevel>
+   <File Name="designrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="UseOrdinalStringComparison" Category="Microsoft.Globalization" CheckId="CA1309">
+   <Name>Use ordinal StringComparison</Name>
+   <Description>For non-linguistic comparisons, StringComparison.Ordinal or StringComparison.OrdinalIgnoreCase should be used instead of the linguistically-sensitive StringComparison.InvariantCulture.</Description>
+   <Resolution Name="StringComparison">{0} passes '{1}' as the 'StringComparison' parameter to {2}. To perform a non-linguistic comparison, specify 'StringComparison.Ordinal' or 'StringComparison.OrdinalIgnoreCase' instead.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/bb385972(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">Error</MessageLevel>
+   <File Name="globalizationrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726">
+   <Name>Use preferred terms</Name>
+   <Description>Use preferred terms over deprecated alternates.</Description>
+   <Resolution Name="MemberNoAlternate">Replace the term '{0}' in member name {1} with an appropriate alternate or remove it entirely.</Resolution>
+   <Resolution Name="MemberParameterNoAlternate">In member {0}, replace the term '{1}' in parameter name {2} with an appropriate alternate or remove it entirely.</Resolution>
+   <Resolution Name="TypeNoAlternate">Replace the term '{0}' in type name {1} with an appropriate alternate or remove it entirely.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182258(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="namingrules.dll" Version="11.0.0.0" />
+  </Rule>
+  <Rule TypeName="VariableNamesShouldNotMatchFieldNames" Category="Microsoft.Maintainability" CheckId="CA1500">
+   <Name>Variable names should not match field names</Name>
+   <Description>Instance field and variable names should not be identical within the same scope.</Description>
+   <Resolution Name="Local">{0}, a variable declared in {1}, has the same name as an instance field on the type. Change the name of one of these items.</Resolution>
+   <Resolution Name="Parameter">{0}, a parameter declared in {1}, has the same name as an instance field on the type. Change the name of one of these items.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182216(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="maintainabilityrules.dll" Version="11.0.0.0" />
+  </Rule>
+ </Rules>
+ <Localized>
+  <String Key="Category">Category</String>
+  <String Key="Certainty">Certainty</String>
+  <String Key="CollapseAll">Collapse All</String>
+  <String Key="CheckId">Check Id</String>
+  <String Key="Error">Error</String>
+  <String Key="Errors">error(s)</String>
+  <String Key="ExpandAll">Expand All</String>
+  <String Key="Help">Help</String>
+  <String Key="Line">Line</String>
+  <String Key="Messages">message(s)</String>
+  <String Key="LocationNotStoredInPdb">[Location not stored in Pdb]</String>
+  <String Key="Project">Project</String>
+  <String Key="Resolution">Resolution</String>
+  <String Key="Rule">Rule</String>
+  <String Key="RuleFile">Rule File</String>
+  <String Key="RuleDescription">Rule Description</String>
+  <String Key="Source">Source</String>
+  <String Key="Status">Status</String>
+  <String Key="Target">Target</String>
+  <String Key="Warning">Warning</String>
+  <String Key="Warnings">warning(s)</String>
+  <String Key="ReportTitle">Code Analysis Report</String>
+ </Localized>
+</FxCopReport>
