@@ -10,11 +10,17 @@
 (define (desugar-input)
 ;; (define program (read-input))
   (define out (void))
+  (define file-out-name (void))
+  (define file-in-name (void))
   (define program (read-input (open-input-file (command-line
                    #:args (filename output)
                    (begin
+                     (set! file-out-name output)
+                     (set! file-in-name filename)
                      (set! out (open-output-file output #:exists 'replace))
                    filename)) #:mode 'text)))
+  (displayln file-out-name)
+  (displayln file-in-name)
   (set! program (desugar-tops program)) ;; convert tops into defines  
   (set! program (map desugar-define program)) ;; desugar the defines now
   (set! program (partition-k 
@@ -36,7 +42,6 @@
 ;; (displayln (pretty-format program 40)))
 
 
-; Helper Functions
 
 ; reads all input from std in into a list
 (define (read-input [file (current-input-port)])
