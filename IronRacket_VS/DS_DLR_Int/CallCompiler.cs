@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DLR_Compiler;
 
 namespace DS_DLR_Int
 {
@@ -19,11 +20,16 @@ namespace DS_DLR_Int
             D_exep = DLR_exep = string.Empty;
             CheckForCompiler();
             _name = @name;
-            if (!string.IsNullOrEmpty(D_exep) && !string.IsNullOrEmpty(DLR_exep))
+            if (!string.IsNullOrEmpty(D_exep))
             {
                 RunDesugar(name,name+".tmp");
                 RunDLR(name+".tmp");
             }
+        }
+
+        private static void RunDLR(string file)
+        {
+            DLR_Compiler.DLR_Compiler.compile(file);
         }
 
         private static void CheckForCompiler()
@@ -31,52 +37,35 @@ namespace DS_DLR_Int
             try
             {
                 //cwd = System.IO.Directory.GetCurrentDirectory();
-                D_exep = "C:\\Users\\Scotty\\Desktop\\Backup\\DS_DLR_Int";
-                if(File.Exists(D_exep + "\\Desugar.exe")){
-                    D_exep = D_exep+"\\Desugar.exe";
+                D_exep = @"C:\Users\Scott\Desktop";
+                if (File.Exists(D_exep + @"\desugar.exe"))
+                {
+                    D_exep = D_exep + @"\desugar.exe";
                 }
-                if(File.Exists(D_exep + "\\DLR.exe")){
-                    DLR_exep = D_exep + "\\DLR.exe";
-                }
-                else{
-                    throw new FileNotFoundException("Couldn't find DLR or Desugar !\n");
-                }
-            }
-            catch(IOException e){
-                throw e;
-            }
 
-        }
-
-        private void RunDLR(string inputtemp)
-        {
-            ProcessStartInfo Dlr = new ProcessStartInfo(DLR_exep, inputtemp);
-            Dlr.UseShellExecute = true;
-            Dlr.CreateNoWindow = false;
-            try
+            }
+            catch (IOException e)
             {
-                Process DlrEXE = Process.Start(Dlr);
-                DlrEXE.WaitForExit();
-                DlrEXE.Close();
-                File.Delete(inputtemp);
             }
-            catch (Exception e)
-            {
-
-            }
-        }
+        } 
 
         private void RunDesugar(string inputfile,string tempfile)
         {
             //Start the exe and forward standard output/error so we can parse etc.
-            ProcessStartInfo Desugar = new ProcessStartInfo(D_exep, inputfile + " "+tempfile);
-            Desugar.UseShellExecute = true;
+            ProcessStartInfo Desugar = new ProcessStartInfo(D_exep,  String.Format("\"{0}\" \"{1}\"", inputfile, tempfile));
+            Desugar.UseShellExecute = false;
             Desugar.CreateNoWindow = false;
-            //ffmpeg.RedirectStandardError = true;
-            //ffmpeg.RedirectStandardOutput = true;
+            Desugar.RedirectStandardError = true;
+            Desugar.RedirectStandardOutput = true;
+            
+          
             try
             {
                 Process DesugarEXE = Process.Start(Desugar);
+                StreamReader sr = DesugarEXE.StandardOutput;
+                StreamReader sr2 = DesugarEXE.StandardError;
+                string output=sr.ReadToEnd();
+                string output2 = sr2.ReadToEnd();
                 DesugarEXE.WaitForExit();
                 DesugarEXE.Close();
             }

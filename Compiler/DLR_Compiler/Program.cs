@@ -13,11 +13,11 @@ using System.Reflection;
 
 namespace DLR_Compiler
 {
-    class DLR_Compiler
+   public class DLR_Compiler
     {
         static ParameterExpression voidSingleton;
 
-        static void compile(string filename)
+        public static void compile(string filename)
         {
             Console.WriteLine("Compiling file " + filename);
             
@@ -62,7 +62,7 @@ namespace DLR_Compiler
             Expression.Lambda<Action>(code).Compile()();
 
             //TODO change to either output into .exe .dll or invoke automatically
-            Console.ReadKey();
+           // Console.ReadKey();
         }
 
        

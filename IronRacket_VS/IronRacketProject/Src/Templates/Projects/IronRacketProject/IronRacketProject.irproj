@@ -1,4 +1,4 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="CompileTarget" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Build</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
@@ -17,11 +17,30 @@
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
-  <Target Name="IronRacketProject">
-    <CompileTarget />
+  <Target Name="GetPath">
+    <GetFrameworkPath>
+      <Output
+          TaskParameter="C:\"
+          PropertyName="C:\" />
+    </GetFrameworkPath>
   </Target>
-  <Target Name = "Compile">
-    <Message Text="This is a test"/>
+  
+  
+  <Target Name="Hello">
+    <Message Text="Hello MSBuild" Importance="high"/>
   </Target>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="Build" DependsOnTargets="Hello">
+  </Target>
+  
+  <Target Name="CompileTarget">
+    <Message Text="This is a test!!" Importance="high"/>
+    <CompileTarget 
+       SourceFiles="$(MSBuildProjectDirectory)\@(Compile)"
+       />
+  </Target>
+  
+  
+  <Import Project="C:\Users\Scott\Desktop\test.targets"/>
+ 
+  <!--<Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />-->
 </Project>
