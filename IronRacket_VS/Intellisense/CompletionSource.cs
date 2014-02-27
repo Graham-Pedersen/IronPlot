@@ -43,10 +43,11 @@ namespace IRLanguage
                 new Completion("(car"),
                 new Completion("(cdr"),
                 new Completion("(lambda"),
-                new Completion("ffff"),
-
             };
-            
+
+            string text =  _buffer.CurrentSnapshot.GetText();
+           FileState.parsePlot.GetMethods(text,ref completions);
+
             ITextSnapshot snapshot = _buffer.CurrentSnapshot;
             var triggerPoint = (SnapshotPoint)session.GetTriggerPoint(snapshot);
 
