@@ -10,18 +10,12 @@
 (define (desugar-input)
 ;; (define program (read-input))
   (define out (void))
-  (define file-out-name (void))
-  (define file-in-name (void))
   (define program (read-input (open-input-file (command-line
                    #:args (filename output)
                    (begin
-                     (set! file-out-name output)
-                     (set! file-in-name filename)
                      (set! out (open-output-file output #:exists 'replace))
                    filename)) #:mode 'text)))
-  (displayln file-out-name)
-  (displayln file-in-name)
-  (set! program (desugar-tops program)) ;; convert tops into defines  
+  (set! program (desugar-tops program)) ;; desugar-tops
   (set! program (map desugar-define program)) ;; desugar the defines now
   (set! program (partition-k 
                  atomic-define?
@@ -31,12 +25,14 @@
                      (for/list ([c complex])
                        (match c
                          [`(define ,v ,complex)
-                          `(,v (void))])))
+                          `(,v (void))]
+                         [else (displayln "cannot desugar begin")])))
                    (define sets
                      (for/list ([c complex])
                        (match c
                          [`(define ,v ,complex)
-                          `(set! ,v ,complex)])))
+                          `(set! ,v ,complex)]
+                         [else (displayln "cannot desguar begin")])))
                    (append atomic (list (desugar-exp `(let ,bindings ,@sets)))))))
   (write (car program) out))
 ;; (displayln (pretty-format program 40)))
@@ -68,7 +64,7 @@
             [`(define ,var ,exp)
              `(define ,var ,exp)]
             [`(begin . ,forms)
-             `(begin-top . ,forms)]
+             `(begin-top ,@forms)]
             [exp `(define ,(gensym '_) ,exp)]))
     (map top-to-def tops)) ;; map is putting in list...... problem with program wrapped in parens
 
@@ -76,8 +72,9 @@
 ; desugar define statements of the form (define ,v ,exp)
 (define (desugar-define def)
     (match def
-        [`(define ,v ,exp) `(define ,v ,(desugar-exp exp))]
-        [else (displayln `(cannot desugar define ,def))]))
+      [`(define ,v ,exp) `(define ,v ,(desugar-exp exp))]
+      [`(begin-top . ,forms) `(begin-top ,@(map desugar-exp forms))]
+      [else (displayln `(cannot desugar define ,def))]))
 
 (define (desugar-exp exp)
     (match exp
@@ -268,6 +265,7 @@
 (define (atomic-define? def)
   (match def
     [`(define ,v ,exp) (atomic? exp)]
+    [`(begin-top . ,forms) #t] ;; for now just do this
     [else #f]))
 
 
@@ -283,7 +281,6 @@
 ; matches any atomic
 (define (atomic? exp)
   (match exp
-    [`(begin-top . ,_)#t]
     [`(lambda . ,_)#t]
     [(? number?)   #t]
     [(? string?)   #t]
@@ -293,11 +290,12 @@
     [else          #f]))
 
 (define (partition-k pred list k)
-  (if (not (pair? list))
+  (if (not (pair? list)) ;; check if empty
       (k '() '())
-      (partition-k pred (cdr list) (lambda (in out)
-        (if (pred (car list))
-            (k (cons (car list) in) out)
-            (k in (cons (car list) out)))))))
+      (partition-k pred (cdr list) 
+                   (lambda (in out)
+                     (if (pred (car list))
+                         (k (cons (car list) in) out)
+                         (k in (cons (car list) out)))))))
 
 (desugar-input)
