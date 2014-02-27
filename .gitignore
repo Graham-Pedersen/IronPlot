@@ -1,3 +1,9 @@
+#more custom stuff my scott
+*/obj/*
+*.cache
+*.txt
+*.sln
+
 # custom stuff added by graham #
 *~
 *.pdb
