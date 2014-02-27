@@ -1,5 +1,5 @@
 #more custom stuff my scott
-*/obj/*
+obj/
 *.cache
 *.txt
 *.sln
