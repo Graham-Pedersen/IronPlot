@@ -793,7 +793,7 @@ namespace DLR_Compiler
 
             bool matchedAtom;
             Expression e;
-            e = matchAtom(leaf, out matchedAtom);
+            e = matchAtom(leaf.getValue(), out matchedAtom);
             if (matchedAtom)
             {
                 return e;
@@ -805,13 +805,12 @@ namespace DLR_Compiler
         }
 
         // matches an atom returning a constant expression
-        static Expression matchAtom(Node atom, out bool isAtom)
+        static Expression matchAtom(String value, out bool isAtom)
         {
             Expression matchedExpr = null;
             isAtom = false;
             int number;
 
-            String value = atom.getValue();
             if (value == "#t")
             {
                 
@@ -830,12 +829,6 @@ namespace DLR_Compiler
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
                 matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
-                isAtom = true;
-            }
-            else if (value == "'()")
-            {
-                Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
-                matchedExpr = wrapInObjBox(Expression.New(typeof(RacketPair).GetConstructor(new Type[] { })), type);
                 isAtom = true;
             }
             //TODO make this understand how scheme does litearal lists aka '(blah blag) vs 'blah

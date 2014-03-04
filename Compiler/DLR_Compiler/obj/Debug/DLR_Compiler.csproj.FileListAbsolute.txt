@@ -13,3 +13,11 @@ C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\SimpleSch
 C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe.config
 C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe
 C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.exe
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe.config
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.pdb
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\bin\Debug\SimpleSchemeParser.dll
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\bin\Debug\SimpleSchemeParser.pdb
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.csprojResolveAssemblyReference.cache
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.exe
+C:\Users\Sarah\Documents\IronPlot\Compiler\DLR_Compiler\obj\Debug\DLR_Compiler.pdb
