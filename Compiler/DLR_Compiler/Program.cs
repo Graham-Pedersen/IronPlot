@@ -19,9 +19,10 @@ namespace DLR_Compiler
     {
         static ParameterExpression voidSingleton;
 
-        public static void Main()
+        public static void Main(string[] args)
         {
-            string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
+            //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
+            string filename = args[1];
             Console.WriteLine("Compiling file " + filename);
             
             // make a new simple scheme parser

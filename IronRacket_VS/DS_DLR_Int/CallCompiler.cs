@@ -22,7 +22,8 @@ namespace DS_DLR_Int
             if (!string.IsNullOrEmpty(D_exep))
             {
                 RunDesugar(name,name+".tmp");
-                RunDLR(name+".tmp");
+                Runcompiler(name + ".tmp");
+              //  RunDLR(name+".tmp");
             }
           //  if (File.Exists(@"C:\Users\Scott\Desktop\Foo.exe"))
            // {
@@ -49,7 +50,7 @@ namespace DS_DLR_Int
             try
             {
                 //cwd = System.IO.Directory.GetCurrentDirectory();
-                D_exep = @"C:\Users\Scott\Desktop";
+                D_exep = @"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler";
                 if (File.Exists(D_exep + @"\desugar.exe"))
                 {
                     D_exep = D_exep + @"\desugar.exe";
@@ -62,22 +63,22 @@ namespace DS_DLR_Int
         }
 
 
-     /*   private static void Runcompiler()
+        private static void Runcompiler(string inputfile)
         {
-            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\DLR_Compiler.exe");
-            comp.UseShellExecute = false;
+            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\"",inputfile));
+            comp.UseShellExecute = true;
             comp.CreateNoWindow = false;
             try
             {
-                Process DesugarEXE = Process.Start(comp);
-                DesugarEXE.WaitForExit();
-                DesugarEXE.Close();
+                Process Compile = Process.Start(comp);
+                Compile.WaitForExit();
+                Compile.Close();
             }
             catch (Exception e)
             {
 
             }
-           }*/
+           }
 
         private void RunDesugar(string inputfile,string tempfile)
         {
