@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DLR_Compiler;
 
 namespace DS_DLR_Int
 {
@@ -40,7 +39,9 @@ namespace DS_DLR_Int
 
         private static void RunDLR(string file)
         {
-            DLR_Compiler.DLR_Compiler.compile(file);
+
+            
+            //DLR_Compiler.DLR_Compiler.compile(file);
         }
 
         private static void CheckForCompiler()

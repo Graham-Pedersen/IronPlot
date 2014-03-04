@@ -83,7 +83,8 @@ namespace IRLanguage.FileState
             string[] tokens = text.Substring(start_index).Split(')');
             string TL_Function="";
             bool found = false;
-            for (int i = 0; i < tokens.Length; i++)
+            int i = 0;
+            for (; i < tokens.Length; i++)
             {
 
                 //TODO: we can probably do a indexof on the string to update the start_index before passing it to findEOFunction
@@ -107,8 +108,14 @@ namespace IRLanguage.FileState
             }
             if (found)
             {
+                if (text.IndexOf(tokens[i]) != -1)
+                {
+                    start_index = getEndOfFunction(text, text.IndexOf(tokens[i]));
+                    return TL_Function.Trim();
+                }
                 start_index = getEndOfFunction(text, start_index);
                 return TL_Function.Trim();
+
             }
             start_index = getEndOfFunction(text, start_index);
             return null;
