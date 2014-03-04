@@ -50,7 +50,7 @@ namespace DS_DLR_Int
             try
             {
                 //cwd = System.IO.Directory.GetCurrentDirectory();
-                D_exep = @"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler";
+                D_exep = @"C:\Users\Scott\Documents\Compiler\IronPlot";
                 if (File.Exists(D_exep + @"\desugar.exe"))
                 {
                     D_exep = D_exep + @"\desugar.exe";

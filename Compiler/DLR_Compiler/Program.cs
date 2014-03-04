@@ -845,10 +845,10 @@ namespace DLR_Compiler
                 matchedExpr = wrapInObjBox(Expression.Constant(value, typeof(String)), type);
                 isAtom = true;
             }
-            else if (value == "void")
+            else if (value == "void" || value == "(void)")
             {
-
                 isAtom = true;
+                Console.WriteLine("Returning void");
                 matchedExpr = voidSingleton;
             }
 
