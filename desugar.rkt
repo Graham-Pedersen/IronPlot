@@ -34,7 +34,7 @@
                           `(set! ,v ,complex)]
                          [else (displayln "cannot desguar begin")])))
                    (append atomic (list (desugar-exp `(let ,bindings ,@sets)))))))
-  (write (car program) out))
+  (write program out))
 ;; (displayln (pretty-format program 40)))
 
 

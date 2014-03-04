@@ -19,9 +19,10 @@ namespace DLR_Compiler
     {
         static ParameterExpression voidSingleton;
 
-        public static void Main()
+        public static void Main(string[] args)
         {
-            string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
+            //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
+            string filename = args[0];
             Console.WriteLine("Compiling file " + filename);
             
             // make a new simple scheme parser
@@ -60,8 +61,8 @@ namespace DLR_Compiler
 
             //Wrap the program into a block expression
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
-            Expression.Lambda<Action>(code).Compile()();
 
+            Expression.Lambda<Action>(code).Compile()();
             Console.ReadKey();
         }
 
@@ -143,6 +144,9 @@ namespace DLR_Compiler
 
                     case "%":
                         return modExpr(list, env);
+
+                    case "void":
+                        return voidSingleton;
 
                     case "equal?":
                         return equalExpr(list, env);
@@ -513,7 +517,6 @@ namespace DLR_Compiler
                     typeof(List<Object>).GetMethod("Add", new Type[] { typeof(Object) }),
                     Expression.Convert(matchExpression(tree.values[i], env), typeof(Object))));
             }
-
 
             Expression getFunction = unboxValue(lookup(tree.values[0].getValue(), env), typeof(FunctionHolder));
   
