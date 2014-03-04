@@ -64,7 +64,7 @@ namespace DLR_Compiler
 
         public void set(String name, ObjBox newValue)
         {
-            env[name] = newValue;
+            env.Add(name, newValue);
         }
     }
 
