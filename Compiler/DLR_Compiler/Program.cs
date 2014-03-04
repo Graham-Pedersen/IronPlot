@@ -848,7 +848,6 @@ namespace DLR_Compiler
             else if (value == "void" || value == "(void)")
             {
                 isAtom = true;
-                Console.WriteLine("Returning void");
                 matchedExpr = voidSingleton;
             }
 
