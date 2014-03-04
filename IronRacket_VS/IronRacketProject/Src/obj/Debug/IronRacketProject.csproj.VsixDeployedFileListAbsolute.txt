@@ -1,4 +1,0 @@
-C:\Users\Scott\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Microsoft\CustomProject\1.0\\Microsoft.VisualStudio.Project.Samples.CustomProject.dll
-C:\Users\Scott\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Microsoft\CustomProject\1.0\\Microsoft.VisualStudio.Project.Samples.CustomProject.pkgdef
-C:\Users\Scott\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Microsoft\CustomProject\1.0\\extension.vsixmanifest
-C:\Users\Scott\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Microsoft\CustomProject\1.0\\Microsoft.VisualStudio.Project.Samples.CustomProject.pdb

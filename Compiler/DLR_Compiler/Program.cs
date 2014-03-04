@@ -10,6 +10,8 @@ using SimpleSchemeParser;
 using System.Dynamic;
 using Microsoft.CSharp.RuntimeBinder;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Resources;
 
 namespace DLR_Compiler
 {
@@ -58,9 +60,7 @@ namespace DLR_Compiler
 
             //Wrap the program into a block expression
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
-            //Put the block expression into a lambda function and invoke it
             Expression.Lambda<Action>(code).Compile()();
-
             Console.ReadKey();
         }
 

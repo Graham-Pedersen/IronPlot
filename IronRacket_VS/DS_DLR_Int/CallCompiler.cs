@@ -25,7 +25,18 @@ namespace DS_DLR_Int
                 RunDesugar(name,name+".tmp");
                 RunDLR(name+".tmp");
             }
+          //  if (File.Exists(@"C:\Users\Scott\Desktop\Foo.exe"))
+           // {
+           // }
         }
+
+       /* private static InvokeBuiltExe(){
+      //      ProcessStartInfo Desugar = new ProcessStartInfo(@"C:\Users\Scott\Desktop\Foo.exe",  String.Format("\"{0}\" \"{1}\"", inputfile, tempfile));
+            Desugar.UseShellExecute = false;
+            Desugar.CreateNoWindow = false;
+            Desugar.RedirectStandardError = true;
+            Desugar.RedirectStandardOutput = true;
+        }*/
 
         private static void RunDLR(string file)
         {
@@ -47,7 +58,25 @@ namespace DS_DLR_Int
             catch (IOException e)
             {
             }
-        } 
+        }
+
+
+     /*   private static void Runcompiler()
+        {
+            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\DLR_Compiler.exe");
+            comp.UseShellExecute = false;
+            comp.CreateNoWindow = false;
+            try
+            {
+                Process DesugarEXE = Process.Start(comp);
+                DesugarEXE.WaitForExit();
+                DesugarEXE.Close();
+            }
+            catch (Exception e)
+            {
+
+            }
+           }*/
 
         private void RunDesugar(string inputfile,string tempfile)
         {
