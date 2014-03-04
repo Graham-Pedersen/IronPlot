@@ -34,9 +34,15 @@
                           `(set! ,v ,complex)]
                          [else (displayln "cannot desguar begin")])))
                    (append atomic (list (desugar-exp `(let ,bindings ,@sets)))))))
-  (write program out))
+  (write-output program out))
 ;; (displayln (pretty-format program 40)))
 
+(define (write-output program [file (current-output-port)])
+  (cond
+    [(empty? program) 
+     '()]
+    [else
+     (write (car program) file) (write-output (cdr program) file)]))
 
 
 ; reads all input from std in into a list
