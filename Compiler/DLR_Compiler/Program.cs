@@ -61,6 +61,7 @@ namespace DLR_Compiler
             //Wrap the program into a block expression
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
             Expression.Lambda<Action>(code).Compile()();
+
             Console.ReadKey();
         }
 
