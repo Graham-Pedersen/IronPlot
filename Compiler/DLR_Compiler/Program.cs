@@ -23,7 +23,7 @@ namespace DLR_Compiler
         {
             //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
             string filename = args[0];
-            Console.WriteLine("Compiling file " + filename);
+            //Console.WriteLine("Compiling file " + filename);
             
             // make a new simple scheme parser
             SchemeParser ssp = new SchemeParser(filename);
@@ -63,6 +63,7 @@ namespace DLR_Compiler
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
 
             Expression.Lambda<Action>(code).Compile()();
+            Console.WriteLine("5");
             Console.ReadKey();
         }
 
