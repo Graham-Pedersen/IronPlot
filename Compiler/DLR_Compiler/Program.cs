@@ -113,83 +113,89 @@ namespace DLR_Compiler
         {
             if (tree.isList())
             {
-                ListNode list = (ListNode) tree;
+                ListNode list = (ListNode)tree;
 
-                if (list.values[0].isList())
+                if (list.isLiteral)
+                {
+                    return matchLiteralList(list, env);
+                }
+
+                else if (list.values[0].isList())
                 {
                     return autoInvokeLambda(list, env);
                 }
-
-                //perform a function lookup first because in scheme you can overwrite language keywords
-
-                switch (list.values[0].getValue())
+                else
                 {
+                    //perform a function lookup first because in scheme you can overwrite language keywords
+                    switch (list.values[0].getValue())
+                    {
 
-                    case "netcall":
-                        return callNetExpr(list, env);
+                        case "netcall":
+                            return callNetExpr(list, env);
 
-                    case "netcons":
-                        return newNetObj(list, env);
+                        case "netcons":
+                            return newNetObj(list, env);
 
-                    case "+":
-                        return addExpr(list, env);
+                        case "+":
+                            return addExpr(list, env);
 
-                    case "-":
-                        return subExpr(list, env);
+                        case "-":
+                            return subExpr(list, env);
 
-                    case "*":
-                        return multExpr(list, env);
+                        case "*":
+                            return multExpr(list, env);
 
-                    case "/":
-                        return divExpr(list, env);
+                        case "/":
+                            return divExpr(list, env);
 
-                    case "%":
-                        return modExpr(list, env);
+                        case "%":
+                            return modExpr(list, env);
 
-                    case "void":
-                        return voidSingleton;
+                        case "void":
+                            return voidSingleton;
 
-                    case "equal?":
-                        return equalExpr(list, env);
+                        case "equal?":
+                            return equalExpr(list, env);
 
-                    case "not":
-                        return notExpr(list, env);
+                        case "not":
+                            return notExpr(list, env);
 
-                    case "lambda":
-                        return lambdaExpr(list, env);
+                        case "lambda":
+                            return lambdaExpr(list, env);
 
-                    case "if":
-                        return ifExpr(list, env);
+                        case "if":
+                            return ifExpr(list, env);
 
-                    //TODO extend environment and fix this
-                    case "set!":
-                        return setBangExpr(list, env);
+                        //TODO extend environment and fix this
+                        case "set!":
+                            return setBangExpr(list, env);
 
-                    case "cons":
-                        return consExpr(list, env);
+                        case "cons":
+                            return consExpr(list, env);
 
-                    case "car":
-                        return carExpr(list, env);
+                        case "car":
+                            return carExpr(list, env);
 
-                    case "cdr":
-                        return cdrExpr(list, env);
-                    
-                    case "begin":
-                        return beginExpr(list, env);
+                        case "cdr":
+                            return cdrExpr(list, env);
 
-                    case "displayln":
-                        return displayExpr(list, env);
+                        case "begin":
+                            return beginExpr(list, env);
 
-                    case "null?":
-                        return nullCheckExpr(list, env);
+                        case "displayln":
+                            return displayExpr(list, env);
 
-                    case "":
-                        return nullList(env);
-                        
+                        case "null?":
+                            return nullCheckExpr(list, env);
 
-                    //TODO add environment check and move above standard cases
-                    default:
-                        return invokeLambda(list, env);
+                        case "":
+                            return nullList(env);
+
+
+                        //TODO add environment check and move above standard cases
+                        default:
+                            return invokeLambda(list, env);
+                    }
                 }
             }
             else
@@ -428,7 +434,7 @@ namespace DLR_Compiler
             {
                 values.Add(list.values[i]);
             }
-            ListNode bodyLiterals = new ListNode(values, 0);
+            ListNode bodyLiterals = new ListNode(values, 0, false);
 
             //TODO verify correctness of not making a new env
             return matchTopLevel(bodyLiterals, env);
@@ -577,7 +583,7 @@ namespace DLR_Compiler
             {
                 values.Add(tree.values[i]);
             }
-            ListNode bodyLiterals = new ListNode(values, 0);
+            ListNode bodyLiterals = new ListNode(values, 0, false);
 
             //Add the body of the lambda to the expression tree
             body.Add(matchTopLevel(bodyLiterals, new_env));
@@ -789,12 +795,48 @@ namespace DLR_Compiler
             //return accessValue(lookup);
         }
 
+        static Expression matchLiteralList(ListNode tree, Expression env)
+        {
+
+            if (tree.values.Count == 0)
+            {
+                return voidSingleton;
+            }
+
+            Expression first;
+            Expression rest;
+
+            Node n = tree.values[0];
+            tree.values.RemoveAt(0);
+            rest = matchLiteralList(tree, env);
+            
+            if (n.isList()) // check if literal list
+            {
+                first = matchLiteralList((ListNode) n, env);
+            }
+            else // is atom
+            {
+                bool matchedAtom;
+                first = matchAtom(n.getValue(), out matchedAtom);
+                if(!matchedAtom)
+                    throw new RuntimeException("Could not parse literal list");
+            }
+
+            Expression cons = Expression.New(
+                typeof(RacketPair).GetConstructor(
+                    new Type[] { typeof(ObjBox), typeof(ObjBox) }),
+                first,
+                rest);
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
+            return wrapInObjBox(cons, type);
+        }
+
         static Expression matchLeaf(Node leaf, Expression env)
         {
 
             bool matchedAtom;
             Expression e;
-            e = matchAtom(leaf, out matchedAtom);
+            e = matchAtom(leaf.getValue(), out matchedAtom);
             if (matchedAtom)
             {
                 return e;
@@ -806,13 +848,13 @@ namespace DLR_Compiler
         }
 
         // matches an atom returning a constant expression
-        static Expression matchAtom(Node atom, out bool isAtom)
+        static Expression matchAtom(String value, out bool isAtom)
         {
+            
             Expression matchedExpr = null;
             isAtom = false;
             int number;
 
-            String value = atom.getValue();
             if (value == "#t")
             {
                 
@@ -833,18 +875,21 @@ namespace DLR_Compiler
                 matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
                 isAtom = true;
             }
-            else if (value == "'()")
-            {
-                Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
-                matchedExpr = wrapInObjBox(Expression.New(typeof(RacketPair).GetConstructor(new Type[] { })), type);
-                isAtom = true;
-            }
             //TODO make this understand how scheme does litearal lists aka '(blah blag) vs 'blah
             else if (value[0] == '\'')
             {
-                Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
-                matchedExpr = wrapInObjBox(Expression.Constant(value, typeof(String)), type);
-                isAtom = true;
+                if (Int32.TryParse(value[1].ToString(), out number))
+                {
+                    Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
+                    matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
+                    isAtom = true;
+                }
+                else // string case
+                {
+                    Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
+                    matchedExpr = wrapInObjBox(Expression.Constant(value, typeof(String)), type);
+                    isAtom = true;
+                }
             }
             else if (value == "void" || value == "(void)")
             {

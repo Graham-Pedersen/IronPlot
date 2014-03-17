@@ -67,14 +67,15 @@ namespace SimpleSchemeParser
 
     public class ListNode : Node
     {
+        public bool isLiteral;
         public List<Node> values;
         private int nestingLevel;
-        public ListNode(List<Node> _values, int _nestingLevel)
+        public ListNode(List<Node> _values, int _nestingLevel, bool _isLiteral)
         {
+            isLiteral = _isLiteral;
             values = _values;
             nestingLevel = _nestingLevel;
         }
-
         public int getNestingLevel()
         {
             return nestingLevel;

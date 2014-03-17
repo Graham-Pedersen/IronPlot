@@ -48,6 +48,11 @@ namespace DLR_Compiler
             }
             return rest;
         }
+
+        public override string ToString()
+        {
+            return "(" + value.getObj().ToString() + " " +  rest.getObj().ToString() + ")";
+        }
     }
 
     public class primeGener : System.Collections.IEnumerable
