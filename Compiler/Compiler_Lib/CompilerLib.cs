@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DLR_Compiler
+namespace CompilerLib
 {
-    static class TypeUtils
+    public static class TypeUtils
     {
         public static Type boolType()
         {
@@ -65,7 +65,7 @@ namespace DLR_Compiler
         }
     }
 
-    static class NetIneractLib
+    public static class NetIneractLib
     {
         public static ObjBox callConstruct(String s, ObjBox[] args)
         {
@@ -107,7 +107,7 @@ namespace DLR_Compiler
     }
 
 
-    class voidObj
+    public class voidObj
     {
         public voidObj() { }
         public override string ToString()

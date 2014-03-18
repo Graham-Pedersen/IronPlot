@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DLR_Compiler
+namespace CompilerLib
 {
-    class RacketPair
+    public class RacketPair
     {
         private ObjBox value;
         private ObjBox rest;

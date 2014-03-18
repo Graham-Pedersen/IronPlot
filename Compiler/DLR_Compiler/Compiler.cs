@@ -12,6 +12,7 @@ using Microsoft.CSharp.RuntimeBinder;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Resources;
+using CompilerLib;
 
 namespace DLR_Compiler
 {
@@ -30,8 +31,8 @@ namespace DLR_Compiler
             ListNode topLevelForms = ssp.parseFile();
 
             // these expressions will initalize the top level environment
-            var makeEnv = Expression.New(typeof(Environment));
-            var env = Expression.Variable(typeof(Environment), "env");
+            var makeEnv = Expression.New(typeof(CompilerLib.Environment));
+            var env = Expression.Variable(typeof(CompilerLib.Environment), "env");
             var assign = Expression.Assign(env, makeEnv);
 
             //set up a single instance of type void
@@ -127,7 +128,7 @@ namespace DLR_Compiler
                     case "netcall":
                         return callNetExpr(list, env);
 
-                    case "netcons":
+                    case "netnew":
                         return newNetObj(list, env);
 
                     case "+":
@@ -370,7 +371,7 @@ namespace DLR_Compiler
 
             Expression set = Expression.Call(
                 env,
-                typeof(Environment).GetMethod("set"),
+                typeof(CompilerLib.Environment).GetMethod("set"),
                 name,
                 Expression.Convert(rhs, typeof(ObjBox)));
 
@@ -536,9 +537,9 @@ namespace DLR_Compiler
 
             //make new environment
             var makeEnv = Expression.New(
-                typeof(Environment).GetConstructor(new Type[] { typeof(Environment) }),
+                typeof(CompilerLib.Environment).GetConstructor(new Type[] { typeof(CompilerLib.Environment) }),
                 env);
-            var new_env = Expression.Variable(typeof(Environment));
+            var new_env = Expression.Variable(typeof(CompilerLib.Environment));
             var assign = Expression.Assign(new_env, makeEnv);
 
             //Add the environment to the start of the body of the lambda
@@ -562,7 +563,7 @@ namespace DLR_Compiler
 
                 Expression addToEnv = Expression.Call(
                     new_env,
-                    typeof(Environment).GetMethod("add"),
+                    typeof(CompilerLib.Environment).GetMethod("add"),
                     name,
                     Expression.Convert(var, typeof(ObjBox)));
 
@@ -690,7 +691,7 @@ namespace DLR_Compiler
 
             Expression add = Expression.Call(
                 env,
-                typeof(Environment).GetMethod("add"),
+                typeof(CompilerLib.Environment).GetMethod("add"),
                 name,
                 Expression.Convert(rhs, typeof(ObjBox)));
 
@@ -776,7 +777,7 @@ namespace DLR_Compiler
             //Perform a variable lookup
             var lookup = Expression.Call(
                 env,
-                typeof(Environment).GetMethod("lookup", new Type[] { typeof(String) }),
+                typeof(CompilerLib.Environment).GetMethod("lookup", new Type[] { typeof(String) }),
                 Expression.Constant(str));
             /*
             var type = Expression.Call(

@@ -4,19 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DLR_Compiler
+namespace CompilerLib
 {
-    class RuntimeException : Exception
+    public class RuntimeException : Exception
     {
         public RuntimeException()
         {
         }
 
-        public  RuntimeException(String message)
+        public RuntimeException(String message)
             : base(message)
         { }
 
-        public  RuntimeException(String message, Exception inner)
+        public RuntimeException(String message, Exception inner)
             : base(message, inner)
         { }
     }

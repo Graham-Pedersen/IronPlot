@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DLR_Compiler
+namespace CompilerLib
 {
-    class ParsingException : Exception
+    public class ParsingException : Exception
     {
         public ParsingException()
         {

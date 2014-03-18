@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Dynamic;
 
-namespace DLR_Compiler
+namespace CompilerLib
 {
-    class Environment
+    public class Environment
     {
         Environment parent;
         Dictionary<String, ObjBox> env;
@@ -87,7 +87,7 @@ namespace DLR_Compiler
         }
     }
 
-    class ObjBox
+    public class ObjBox
     {
         private Object obj ;
         private Type type;
