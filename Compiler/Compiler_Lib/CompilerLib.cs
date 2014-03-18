@@ -31,7 +31,9 @@ namespace CompilerLib
 
         public static Type listType()
         {
-            throw new NotImplementedException();
+                // must implement because of literals
+            return typeof(RacketPair);
+         //   throw new NotImplementedException();
         }
 
         public static Type iNumType()
