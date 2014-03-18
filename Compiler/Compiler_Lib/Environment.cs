@@ -25,7 +25,7 @@ namespace CompilerLib
             env = new Dictionary<String, ObjBox>();
         }
 
-        public dynamic lookup(String name)
+        public ObjBox lookup(String name)
         {
             if (env.ContainsKey(name))
             {

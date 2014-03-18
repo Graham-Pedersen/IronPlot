@@ -25,68 +25,92 @@ namespace DLR_Compiler
             //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
             string filename = args[0];
             //Console.WriteLine("Compiling file " + filename);
-            
-            // make a new simple scheme parser
-            SchemeParser ssp = new SchemeParser(filename);
-            ListNode topLevelForms = ssp.parseFile();
 
-            // these expressions will initalize the top level environment
-            var makeEnv = Expression.New(typeof(CompilerLib.Environment));
-            var env = Expression.Variable(typeof(CompilerLib.Environment), "env");
-            var assign = Expression.Assign(env, makeEnv);
+            string mode = args[1];
 
             //set up a single instance of type void
             voidSingleton = Expression.Variable(typeof(ObjBox), "void");
             Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
 
-            Expression initVoidObjBox = Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(Expression.New(typeof(voidObj).GetConstructor(new Type[] { })), typeof(Object)), voidType});
+            if (mode == "repl")
+            {
+                repl();
+            }
+            else
+            {
+                // make a new simple scheme parser
+                SchemeParser ssp = new SchemeParser(filename);
+                ListNode topLevelForms = ssp.parseFile();
 
-            Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
-                    
-            //Add the environment to the start of the program
-            List<Expression> program = new List<Expression>();
-            program.Add(env);
-            program.Add(assign);
-            program.Add(assignVoid);
+                // these expressions will initalize the top level environment
+                var makeEnv = Expression.New(typeof(CompilerLib.Environment));
+                var env = Expression.Variable(typeof(CompilerLib.Environment), "env");
+                var assign = Expression.Assign(env, makeEnv);
 
-            Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
+                Expression initVoidObjBox = Expression.New(
+                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
+                    new Expression[] { Expression.Convert(Expression.New(typeof(voidObj).GetConstructor(new Type[] { })), typeof(Object)), voidType });
 
-            //Match and add the rest of the program
-            program.Add(
-                Expression.Call(
-                null, 
-                typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }), 
-                    Expression.Call(ret, typeof(Object).GetMethod("ToString"))));
+                Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
 
-            program.Add(Expression.Call(typeof(Console).GetMethod("ReadKey", new Type[] { })));
+                //Add the environment to the start of the program
+                List<Expression> program = new List<Expression>();
+                program.Add(env);
+                program.Add(assign);
+                program.Add(assignVoid);
 
-            //Wrap the program into a block expression
-            Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton}, program);
+                Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
 
+                //Match and add the rest of the program
+                program.Add(
+                    Expression.Call(
+                    null,
+                    typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }),
+                        Expression.Call(ret, typeof(Object).GetMethod("ToString"))));
 
+                //if the program is being compiled put a readkey in
+                if (mode == "compile")
+                {
+                    program.Add(Expression.Call(typeof(Console).GetMethod("ReadKey", new Type[] { })));
+                }
 
+                //Wrap the program into a block expression
+                Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
 
-            var asmName = new AssemblyName("Foo");
-            var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
-                (asmName, AssemblyBuilderAccess.RunAndSave);
-            var moduleBuilder = asmBuilder.DefineDynamicModule("Foo", "Foo.exe");
+                if (mode == "compile")
+                {
+                    var asmName = new AssemblyName("Foo");
+                    var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
+                        (asmName, AssemblyBuilderAccess.RunAndSave);
+                    var moduleBuilder = asmBuilder.DefineDynamicModule("Foo", "Foo.exe");
 
-            var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
-            var methodBuilder = typeBuilder.DefineMethod("Main",
-                MethodAttributes.Static, typeof(void), new[] { typeof(string) });
+                    var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
+                    var methodBuilder = typeBuilder.DefineMethod("Main",
+                        MethodAttributes.Static, typeof(void), new[] { typeof(string) });
 
-            Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
-           
-            typeBuilder.CreateType();
-            asmBuilder.SetEntryPoint(methodBuilder);
-            asmBuilder.Save("Foo.exe");
+                    Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
 
-            //Expression.Lambda<Action>(code).Compile()();
-            //Console.ReadKey();
+                    typeBuilder.CreateType();
+                    asmBuilder.SetEntryPoint(methodBuilder);
+                    asmBuilder.Save("Foo.exe");
+                }
+                else if (mode == "run")
+                {
+                    Expression.Lambda<Action>(code).Compile()();
+                    Console.ReadKey();
+                }
+            }
         }
 
+        static void repl()
+        {
+            string input = "";
+            while (true)
+            {
+                input += Console.ReadLine();
+                Console.WriteLine(input);
+            }
+        }
        
         /** match all top level forms in the form of:
          * 
@@ -156,6 +180,9 @@ namespace DLR_Compiler
                         case "new":
                             return newNetObj(list, env);
 
+                        case "typelist":
+                            return newTypeList(list, env);
+
                         case "+":
                             return addExpr(list, env);
 
@@ -208,9 +235,6 @@ namespace DLR_Compiler
                         case "null?":
                             return nullCheckExpr(list, env);
 
-                        case "":
-                            return nullList(env);
-
 
                         //TODO add environment check and move above standard cases
                         default:
@@ -222,6 +246,28 @@ namespace DLR_Compiler
             {
                 return matchLeaf(tree, env);
             }
+        }
+
+        private static Expression newTypeList(ListNode list, Expression env)
+        {
+            List<Expression> body = new List<Expression>();
+
+            Expression cons = Expression.New(typeof(typeListWrapper).GetConstructor(new Type[] { }));
+            ParameterExpression var = Expression.Parameter(typeof(typeListWrapper));
+            Expression assign = Expression.Assign(var, cons);
+
+            body.Add(assign);
+
+            for (int i = 1; i < list.values.Count; i++)
+            {
+                body.Add(Expression.Call(var, typeof(typeListWrapper).GetMethod("add"), Expression.Constant(list.values[i].getValue())));
+            }
+
+            body.Add(var);
+            Expression block = Expression.Block(new ParameterExpression[] { var }, body);
+
+            return wrapInObjBox(block, Expression.Call(null, typeof(TypeUtils).GetMethod("typeListType")));
+            
         }
 
         private static Expression notExpr(ListNode list, Expression env)
@@ -256,6 +302,7 @@ namespace DLR_Compiler
 
             for (int i = 3; i < list.values.Count; i++)
             {
+                Expression arg = matchExpression(list.values[i], env);
                 block.Add(
                     Expression.Call(
                         arr,
@@ -837,7 +884,7 @@ namespace DLR_Compiler
             else // is atom
             {
                 bool matchedAtom;
-                first = matchAtom(n.getValue(), out matchedAtom);
+                first = matchAtom('\'' + n.getValue(), out matchedAtom);
                 if(!matchedAtom)
                     throw new RuntimeException("Could not parse literal list");
             }
@@ -895,10 +942,9 @@ namespace DLR_Compiler
                 matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
                 isAtom = true;
             }
-            //TODO make this understand how scheme does litearal lists aka '(blah blag) vs 'blah
             else if (value[0] == '\'')
             {
-                if (Int32.TryParse(value[1].ToString(), out number))
+                if (Int32.TryParse(value.Substring(1), out number))
                 {
                     Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
                     matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
@@ -907,7 +953,7 @@ namespace DLR_Compiler
                 else // string case
                 {
                     Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
-                    matchedExpr = wrapInObjBox(Expression.Constant(value, typeof(String)), type);
+                    matchedExpr = wrapInObjBox(Expression.Constant(value.Substring(1), typeof(String)), type);
                     isAtom = true;
                 }
             }
