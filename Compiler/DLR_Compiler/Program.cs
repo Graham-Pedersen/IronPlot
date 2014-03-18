@@ -62,8 +62,25 @@ namespace DLR_Compiler
             //Wrap the program into a block expression
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
 
-            Expression.Lambda<Action>(code).Compile()();
-            Console.WriteLine("5");
+
+
+
+            var asmName = new AssemblyName("Foo");
+            var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
+                (asmName, AssemblyBuilderAccess.RunAndSave);
+            var moduleBuilder = asmBuilder.DefineDynamicModule("Foo", "Foo.exe");
+
+            var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
+            var methodBuilder = typeBuilder.DefineMethod("Main",
+                MethodAttributes.Static, typeof(void), new[] { typeof(string) });
+
+            Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
+           
+            typeBuilder.CreateType();
+            asmBuilder.SetEntryPoint(methodBuilder);
+            asmBuilder.Save("Foo.exe");
+
+           // Expression.Lambda<Action>(code).Compile()();
             Console.ReadKey();
         }
 
