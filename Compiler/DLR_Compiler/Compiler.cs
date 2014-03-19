@@ -65,9 +65,6 @@ namespace DLR_Compiler
             //Wrap the program into a block expression
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton}, program);
 
-
-
-
             var asmName = new AssemblyName("Foo");
             var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
                 (asmName, AssemblyBuilderAccess.RunAndSave);
