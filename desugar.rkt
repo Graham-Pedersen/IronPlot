@@ -97,6 +97,12 @@
                               vs es)
                        ,@body))]
       [`(lambda ,params . ,body) `(lambda ,params ,(desugar-body body))]
+      [`(when ,cond . ,body) `(if ,(desugar-exp cond) 
+                                  (begin ,@(map desugar-exp body))
+                                  (void))]
+      [`(unless ,cond . ,body) `(if ,(desugar-exp cond)
+                                    (void)
+                                    (begin ,@(map desugar-exp body)))]
       [`(cond) '(void)]
       [`(cond (else ,exp)) (desugar-exp exp)]
       [`(cond (,test ,exp)) 

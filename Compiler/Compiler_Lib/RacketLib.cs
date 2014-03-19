@@ -49,9 +49,58 @@ namespace CompilerLib
             return rest;
         }
 
-        public override string ToString()
+        public override String ToString()
         {
-            return "(" + value.getObj().ToString() + " " +  rest.getObj().ToString() + ")";
+            String lhs;
+            String rhs;
+
+            if (value.getType() == typeof(RacketPair))
+            {
+                lhs = ((RacketPair)value.getObj()).printList();
+            }
+            else { lhs = value.getObj().ToString(); }
+
+            if (rest.getType() == typeof(RacketPair))
+            {
+                rhs = ((RacketPair)rest.getObj()).printList();
+            }
+            else 
+            {
+                if (rest.getType() == typeof(voidObj))
+                {
+                    return lhs;
+                }
+                rhs = rest.getObj().ToString(); 
+            }
+
+            return "(" + lhs + " " +  rhs + ")";
+        }
+
+        public String printList()
+        {
+            String lhs;
+            String rhs;
+
+            if (value.getType() == typeof(RacketPair))
+            {
+                lhs = ((RacketPair)value.getObj()).printList();
+            }
+            else { lhs = value.getObj().ToString(); }
+
+            if (rest.getType() == typeof(RacketPair))
+            {
+                rhs = ((RacketPair)rest.getObj()).printList();
+            }
+            else 
+            {
+                if (rest.getType() == typeof(voidObj))
+                {
+                    return lhs;
+                } 
+                rhs = rest.getObj().ToString();
+            }
+
+            return lhs + " " +  rhs;
         }
     }
 
