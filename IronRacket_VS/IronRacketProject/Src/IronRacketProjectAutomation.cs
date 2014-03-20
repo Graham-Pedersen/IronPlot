@@ -6,14 +6,14 @@ using Microsoft.VisualStudio.Project.Automation;
 namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
 {
     [ComVisible(true)]
-    public class OAMyCustomProject : OAProject
+    public class OAIronRacketProject : OAProject
     {
         #region Constructors
         /// <summary>
         /// Public constructor.
         /// </summary>
         /// <param name="project">Custom project.</param>
-        public OAMyCustomProject(IronRacketProjectNode project)
+        public OAIronRacketProject(IronRacketProjectNode project)
             : base(project)
         {
         }
@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
 
     [ComVisible(true)]
     [Guid("D7EDB436-6F5A-4EF4-9E3F-67C15C2FA301")]
-    public class OAMyCustomProjectFileItem : OAFileItem
+    public class OAIronRacketProjectFileItem : OAFileItem
     {
         #region Constructors
         /// <summary>
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
         /// </summary>
         /// <param name="project">Automation project.</param>
         /// <param name="node">Custom file node.</param>
-        public OAMyCustomProjectFileItem(OAProject project, FileNode node)
+        public OAIronRacketProjectFileItem(OAProject project, FileNode node)
             : base(project, node)
         {
         }

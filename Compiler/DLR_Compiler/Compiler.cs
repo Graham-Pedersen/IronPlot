@@ -61,6 +61,8 @@ namespace DLR_Compiler
 
                 Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
 
+
+
                 //Match and add the rest of the program
                 program.Add(
                     Expression.Call(
@@ -83,7 +85,6 @@ namespace DLR_Compiler
                     var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
                         (asmName, AssemblyBuilderAccess.RunAndSave);
                     var moduleBuilder = asmBuilder.DefineDynamicModule("Foo", "Foo.exe");
-
                     var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
                     var methodBuilder = typeBuilder.DefineMethod("Main",
                         MethodAttributes.Static, typeof(void), new[] { typeof(string) });

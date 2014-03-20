@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
     public class IronRacketProjectFileNode : FileNode
     {
         #region Fields
-        private OAMyCustomProjectFileItem automationObject;
+        private OAIronRacketProjectFileItem automationObject;
         #endregion
 
         #region Constructors
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
         {
             if(automationObject == null)
             {
-                automationObject = new OAMyCustomProjectFileItem(this.ProjectMgr.GetAutomationObject() as OAProject, this);
+                automationObject = new OAIronRacketProjectFileItem(this.ProjectMgr.GetAutomationObject() as OAProject, this);
             }
 
             return automationObject;

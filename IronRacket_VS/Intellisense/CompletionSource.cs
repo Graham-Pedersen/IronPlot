@@ -45,7 +45,7 @@ namespace IRLanguage
                 new Completion("(lambda"),
             };
 
-            string text =  _buffer.CurrentSnapshot.GetText();
+           string text =  _buffer.CurrentSnapshot.GetText();
            FileState.parsePlot.GetMethods(text,ref completions);
 
             ITextSnapshot snapshot = _buffer.CurrentSnapshot;
@@ -63,7 +63,7 @@ namespace IRLanguage
             
             //FileState.IntelliSense_filterer.Filter_list(completions, text);
 
-            while (start > line.Start && !char.IsWhiteSpace((start - 1).GetChar()))
+            while (start > line.Start &&  (snapshot.Length > start) && (start).GetChar() != '(' && !char.IsWhiteSpace((start - 1).GetChar()))
             {
                 start -= 1;
             }

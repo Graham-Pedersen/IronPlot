@@ -19,14 +19,14 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
     public class IronRacketProjectNode : ProjectNode
     {
         #region Enum for image list
-        internal enum MyCustomProjectImageName
+        internal enum IronRacketProjectImageName
         {
             Project = 0,
         }
         #endregion
 
         #region Constants
-        internal const string ProjectTypeName = "IronRacketProject";
+        internal const string ProjectTypeName = "IronRacket Project";
         #endregion
 
         #region Fields
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
         {
             get
             {
-                return imageOffset + (int)MyCustomProjectImageName.Project;
+                return imageOffset + (int)IronRacketProjectImageName.Project;
             }
         }
 
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
         /// <returns>The automation object</returns>
         public override object GetAutomationObject()
         {
-            return new OAMyCustomProject(this);
+            return new OAIronRacketProject(this);
         }
 
         /// <summary>
