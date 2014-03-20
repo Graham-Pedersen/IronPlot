@@ -11,4 +11,4 @@
 		(begin (fizzbuzz current)
 		(iter (+ current 1) end))))
 		
-(iter 1 100)
+(displayln (iter 1 100))

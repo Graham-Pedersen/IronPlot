@@ -4,4 +4,4 @@
 			(* x (fact (- x 1))))))
 			
 (define result (fact 5))
-result
+(displayln result)

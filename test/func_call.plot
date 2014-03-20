@@ -1,4 +1,4 @@
 (define (add x y)
 	(+ x y))
 
-(add 1 2)
+(displayln (add 1 2))

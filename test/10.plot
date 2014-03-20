@@ -7,4 +7,4 @@
         (displayln (car l))
         (print-list (cdr l)))))
 
-(print-list l)
+(displayln (print-list l))

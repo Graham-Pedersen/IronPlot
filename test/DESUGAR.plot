@@ -6,4 +6,4 @@
 		(begin (displayln prime) (getPrimes primeList))
 		'())))
 		
-(getPrimes x)
+(displayln (getPrimes x))

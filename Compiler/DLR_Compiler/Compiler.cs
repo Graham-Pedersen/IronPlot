@@ -183,6 +183,18 @@ namespace DLR_Compiler
                         case "typelist":
                             return newTypeList(list, env);
 
+                        case "<":
+                            return lessThanExpr(list, env);
+
+                        case "<=":
+                            return lessThanEqualExpr(list, env);
+
+                        case ">":
+                            return gretThanExpr(list, env);
+
+                        case ">=":
+                            return gretThanEqualExpr(list, env);
+
                         case "+":
                             return addExpr(list, env);
 
@@ -228,6 +240,9 @@ namespace DLR_Compiler
 
                         case "begin":
                             return beginExpr(list, env);
+
+                        case "begin0":
+                            return begin0Expr(list, env);
 
                         case "displayln":
                             return displayExpr(list, env);
@@ -492,7 +507,7 @@ namespace DLR_Compiler
 
         private static Expression beginExpr(ListNode list, Expression env)
         {
-            if (list.values.Count < 2)
+            if (list.values.Count < 2) // i think it is okay ot have empty begin like (begin) but won't worry about that right now
                 throw new ParsingException("empty body in a begin expression");
 
             List<Node> values = new List<Node>();
@@ -505,6 +520,16 @@ namespace DLR_Compiler
 
             //TODO verify correctness of not making a new env
             return matchTopLevel(bodyLiterals, env);
+        }
+
+        private static Expression begin0Expr(ListNode list, Expression env)
+        {
+            if (list.values.Count < 2)
+                throw new ParsingException("empty body in a begin0 exprssion");
+
+            List<Node> values = new List<Node>();
+
+            return null;
         }
 
         private static Expression displayExpr(ListNode list, Expression env)
@@ -681,9 +706,7 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Divide(lhs, rhs);
 
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
         }
 
         private static Expression modExpr(ListNode tree, Expression env)
@@ -697,9 +720,7 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Modulo(lhs, rhs);
 
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
         }
 
         private static Expression multExpr(ListNode tree, Expression env)
@@ -713,9 +734,66 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Multiply(lhs, rhs);
 
-            return  Expression.New(
-                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                    new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
+        }
+
+        private static Expression lessThanExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse < for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.LessThan(lhs, rhs);
+
+            return wrapInObjBox(result, type);
+            
+        }
+
+        private static Expression lessThanEqualExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse < for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.LessThanOrEqual(lhs, rhs);
+
+            return wrapInObjBox(result, type);
+
+        }
+
+
+        private static Expression gretThanExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse > for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.GreaterThan(lhs, rhs);
+
+            return wrapInObjBox(result, type);
+        }
+
+        private static Expression gretThanEqualExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse > for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.GreaterThanOrEqual(lhs, rhs);
+
+            return wrapInObjBox(result, type);
         }
 
         private static Expression addExpr(ListNode tree, Expression env)
@@ -729,9 +807,7 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
 
             Expression result = Expression.Add(lhs, rhs);
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
         }
 
         private static Expression subExpr(ListNode tree, Expression env)
@@ -745,9 +821,8 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
 
             Expression result = Expression.Subtract(lhs, rhs);
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+
+            return wrapInObjBox(result, type);
         }
 
         private static Expression defineExpr(ListNode tree, Expression env)
@@ -947,7 +1022,7 @@ namespace DLR_Compiler
                 if (Int32.TryParse(value.Substring(1), out number))
                 {
                     Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-                    matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
+                    matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value.Substring(1))), type);
                     isAtom = true;
                 }
                 else // string case

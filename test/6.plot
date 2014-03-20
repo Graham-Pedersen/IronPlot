@@ -2,7 +2,7 @@
     
     (define (f x) 
       
-      (printf "f: ~s ~n" x)
+      (displayln "f: ~s ~n")
       (define (help x) x)
       
       (cond 
@@ -13,10 +13,10 @@
       
     (define x 20)
     
-    (and 1 2 3)
+    (displayln (and 1 2 3))
     
-    (or 1 2)
+    (displayln (or 1 2))
     
-    `(foo bar 3 ,(+ 1 2) ,@(list 'a 'b))
+    (displayln `(foo bar 3 ,(+ 1 2) ,@(list 'a 'b)))
     
-    (f x)
+    (displayln (f x))
