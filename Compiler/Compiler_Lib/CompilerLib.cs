@@ -103,10 +103,15 @@ namespace CompilerLib
                 objArray.Add(o.getObj());
             }
 
-            if (argTypes[0].Equals(typeof(typeListWrapper)))
+            if (argTypes.Count > 0 && argTypes[0].Equals(typeof(typeListWrapper)))
             {
                 return callGenConstruct(s, argTypes, objArray);
             }
+            if (t == null)
+            {
+                throw new RuntimeException("Could not resolve type: " + s);
+            }
+
             ConstructorInfo cons = t.GetConstructor(argTypes.ToArray());
             return new ObjBox(cons.Invoke(objArray.ToArray()), t);
         }
@@ -117,6 +122,11 @@ namespace CompilerLib
             argTypes.RemoveAt(0);
             typeListWrapper genTypes = (typeListWrapper)objArray[0];
             objArray.RemoveAt(0);
+
+            if (typeName[0] == '\'')
+            {
+                typeName = typeName.Substring(1);
+            }
 
             typeName += "`" + genTypes.typelist.Count();
             Type t = Type.GetType(typeName);
@@ -132,9 +142,84 @@ namespace CompilerLib
             return new ObjBox(cons.Invoke(objArray.ToArray()), t);
         }
 
-        public static ObjBox callMethod(ObjBox instance, String s, ObjBox[] args)
+        public static ObjBox callMethod(Object instance, MethodInfo m, List<Type> argTypes, List<Object> objArray)
         {
-            Type t = instance.getType();
+            if (m.ReturnType == typeof(void))
+            {
+                m.Invoke(instance, objArray.ToArray());
+                return new ObjBox(new voidObj(), typeof(voidObj));
+            }
+            else
+            {
+                return new ObjBox(m.Invoke(instance, objArray.ToArray()), m.ReturnType);
+            }
+        }
+
+        public static ObjBox callProperty(Object instance, PropertyInfo p, List<Type> argTypes, List<Object> objArray)
+        {
+            // we are setting this property
+            if (objArray.Count > 0 && objArray[0].ToString() == "set")
+            {
+                objArray.RemoveAt(0);
+                Object value = objArray[0];
+                objArray.RemoveAt(0);
+
+                if (objArray.Count > 0)
+                {
+                    p.SetValue(instance, value, objArray.ToArray());
+                }
+                else
+                {
+                    p.SetValue(instance, value);
+                }
+                return new ObjBox(new voidObj(), typeof(voidObj));
+            }
+            else
+            {
+                return new ObjBox(p.GetValue(instance, objArray.ToArray()), p.PropertyType);
+            }
+        }
+
+
+        public static ObjBox callField(Object instance, FieldInfo f, List<Type> argTypes, List<Object> objArray)
+        {
+            if (objArray.Count > 0 && objArray[0].ToString() == "set")
+            {
+                objArray.RemoveAt(0);
+                Object value = objArray[0];
+                f.SetValue(instance, value);
+                return new ObjBox(new voidObj(), typeof(voidObj));
+            }
+            else
+            {
+                return new ObjBox(f.GetValue(instance), f.FieldType);
+            }
+        }
+
+        public static ObjBox call(ObjBox wrapper, String s, ObjBox[] args)
+        {
+            Object instance = null;
+            Type t;
+            if (wrapper.getType() == (typeof(voidObj)))
+            {
+                String qualifiedName = s;
+                int index = qualifiedName.LastIndexOf('.');
+                s = qualifiedName.Substring(index + 1);
+                String typeName = qualifiedName.Substring(0, index);
+                t = Type.GetType(typeName);
+            }
+            else
+            {
+                t = wrapper.getType();
+                instance = wrapper.getObj();
+            }
+
+            if (t == null)
+            {
+                throw new RuntimeException("Could not resolve type: " + s);
+            }
+
+            // lets get all our object boxes into nice arrays
             List<Type> argTypes = new List<Type>();
             List<Object> objArray = new List<Object>();
             foreach (ObjBox o in args)
@@ -150,63 +235,25 @@ namespace CompilerLib
             // Case where we are calling a method
             if (m != null)
             {
-                if (m.ReturnType == typeof(void))
-                {
-                    m.Invoke(instance.getObj(), objArray.ToArray());
-                    return new ObjBox(new voidObj(), typeof(voidObj));
-                }
-                else
-                {
-                    return new ObjBox(m.Invoke(instance.getObj(), objArray.ToArray()), m.ReturnType);
-                }
+                return callMethod(instance, m, argTypes, objArray);
             }
 
             // they may be trying to access a field 
             if (f != null)
             {
-                if (objArray.Count > 0 && objArray[0].ToString() == "set")
-                {
-                    objArray.RemoveAt(0);
-                    Object value = objArray[0];
-                    f.SetValue(instance.getObj(), value);
-                    return new ObjBox(new voidObj(), typeof(voidObj));
-                }
-                else
-                {
-                    return new ObjBox(f.GetValue(instance.getObj()), f.FieldType);
-                }
+                return callField(instance, f, argTypes, objArray);
             }
-
+                
             // lets check if we are trying to set a property
             if (p != null)
             {
-                // we are setting this property
-                if (objArray.Count > 0 && objArray[0].ToString() == "set")
-                {
-                    objArray.RemoveAt(0);
-                    Object value = objArray[0];
-                    objArray.RemoveAt(0);
-
-                    if (objArray.Count > 0)
-                    {
-                        p.SetValue(instance.getObj(), value, objArray.ToArray());
-                    }
-                    else
-                    {
-                        p.SetValue(instance.getObj(), value);
-                    }
-                    return new ObjBox(new voidObj(), typeof(voidObj));
-                }
-                else
-                {
-                    return new ObjBox(p.GetValue(instance.getObj(), objArray.ToArray()), p.PropertyType);
-                }
+                return callProperty(instance, p, argTypes, objArray);
             }
             throw new RuntimeException("Could not resolve method or field: " + s);
         }
     }
 
-
+        
     public class voidObj
     {
         public voidObj() { }

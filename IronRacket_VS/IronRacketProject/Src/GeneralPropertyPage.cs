@@ -36,6 +36,8 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
         #endregion
 
         #region Properties
+      
+
         [ResourcesCategoryAttribute(Resources.AssemblyName)]
         [LocDisplayName(Resources.AssemblyName)]
         [ResourcesDescriptionAttribute(Resources.AssemblyNameDescription)]
@@ -234,6 +236,8 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
             this.ProjectMgr.SetProjectProperty("RootNamespace", this.defaultNamespace);
             this.ProjectMgr.SetProjectProperty("StartupObject", this.startupObject);
             this.ProjectMgr.SetProjectProperty("ApplicationIcon", this.applicationIcon);
+            this.ProjectMgr.SetProjectProperty("URL", "URL");
+            this.ProjectMgr.SetProjectProperty("WebSiteType", "WebSiteType");
 
             if (reloadRequired)
             {

@@ -33,7 +33,7 @@
   </Target>
   
   <Target Name="CompileTarget">
-    <Message Text="This is a test!!" Importance="high"/>
+    <Message Text="Building Your IronRacket Project" Importance="high"/>
     <CompileTarget 
        SourceFiles="$(MSBuildProjectDirectory)\@(Compile)"
        />

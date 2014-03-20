@@ -73,7 +73,18 @@ namespace SimpleSchemeParser
                     continue;
                     // check for literal list versus literal atom
                  //   Console.WriteLine("matched");
-
+                }
+                if (s[index] == '\"')
+                {   
+                    int start = index;
+                    index += 1;
+                    while (s[index] != '\"')
+                    {
+                        index += 1;
+                    }
+                    values.Add(new LeafNode(s.Substring(start, (index - start)), nesting));
+                    index += 1;
+                    continue;
                 }
                 if (s[index] == ')')
                 {
