@@ -1,5 +1,5 @@
 (define (zero? n)
-    (eq? 0 n))
+    (equal? 0 n))
 
 
 (letrec ([is-even? (lambda (n)
@@ -8,4 +8,4 @@
            [is-odd? (lambda (n)
                       (and (not (zero? n))
                            (is-even? (- n 1))))])
-    (is-odd? 11))
+    (displayln (is-odd? 11)))

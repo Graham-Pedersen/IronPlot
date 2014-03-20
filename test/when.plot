@@ -1,8 +1,8 @@
 (when #t 
-      (display "true") 
-      (display " and") 
-      (display " false"))
+      (displayln "true") 
+      (displayln "and") 
+      (displayln "false"))
 
 (when #f
-      (display "should not print"))
+      (displayln "should not print"))
 

@@ -7,7 +7,7 @@ namespace IRLanguage
 {
     public enum IRTokenTypes
     {
-       IRDefine, IRCdr, IRCar, IRComment, IRLambda, IRCons, IRSetbang, IRIf, IRAnd, IROr, IRCond, IRLet, IRLetrec, IRDefinevar
+       IRDefine, IRCdr, IRCar, IRComment, IRLambda, IRCons, IRSetbang, IRIf, IRAnd, IROr, IRCond, IRLet, IRLetrec, IRDefinevar, IRString, IRNew
        
     }
 }
