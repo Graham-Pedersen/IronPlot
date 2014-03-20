@@ -217,6 +217,9 @@ namespace DLR_Compiler
                         case "if":
                             return ifExpr(list, env);
 
+                        case "while":
+                            return whileExpr(list, env);
+
                         //TODO extend environment and fix this
                         case "set!":
                             return setBangExpr(list, env);
@@ -239,7 +242,6 @@ namespace DLR_Compiler
                         case "null?":
                             return nullCheckExpr(list, env);
 
-
                         //TODO add environment check and move above standard cases
                         default:
                             return invokeLambda(list, env);
@@ -251,6 +253,8 @@ namespace DLR_Compiler
                 return matchLeaf(tree, env);
             }
         }
+
+
 
         private static Expression newTypeList(ListNode list, Expression env)
         {
@@ -305,9 +309,29 @@ namespace DLR_Compiler
             Expression assign = Expression.Assign(arr, argArray);
             block.Add(assign);
 
-            for (int i = 2; i < list.values.Count; i++)
+            
+            Expression arg;
+            if (list.values.Count > 2)
             {
-                Expression arg = matchExpression(list.values[i], env);
+                if (list.values[2].isLeaf() && list.values[2].getValue() == "set")
+                {
+                    arg = wrapInObjBox(Expression.Constant("set"), Expression.Call(null, typeof(TypeUtils).GetMethod("strType")));
+                }
+                else
+                {
+                    arg = matchExpression(list.values[2], env);
+                }
+                block.Add(
+                 Expression.Call(
+                     arr,
+                     typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
+                     arg));
+            }
+
+
+            for (int i = 3; i < list.values.Count; i++)
+            {
+                arg = matchExpression(list.values[i], env);
                 block.Add(
                     Expression.Call(
                         arr,
@@ -338,14 +362,32 @@ namespace DLR_Compiler
             Expression assign = Expression.Assign(arr, argArray);
             block.Add(assign);
 
-            for (int i = 3; i < list.values.Count; i++)
+            if (list.values.Count > 3)
+            {
+                Expression arg;
+                if (list.values[3].isLeaf() && list.values[3].getValue() == "set")
+                {
+                    arg = wrapInObjBox(Expression.Constant("set"), Expression.Call(null, typeof(TypeUtils).GetMethod("strType")));
+                }
+                else
+                {
+                    arg = matchExpression(list.values[3], env);
+                } 
+                block.Add(
+                 Expression.Call(
+                     arr,
+                     typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
+                     arg));
+            }
+
+            for (int i = 4; i < list.values.Count; i++)
             {
                 Expression arg = matchExpression(list.values[i], env);
                 block.Add(
                     Expression.Call(
                         arr,
                         typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
-                         matchExpression(list.values[i], env)));
+                         arg));
             }
             Expression instance = matchExpression(list.values[1], env);
             Expression obj = aliasOrLiteralName(list.values[2], env);
@@ -626,6 +668,21 @@ namespace DLR_Compiler
                     new Expression[] { 
                         Expression.Convert(equal, typeof(Object)), 
                         Expression.Call(null, typeof(TypeUtils).GetMethod("boolType")) });
+        }
+
+        private static Expression whileExpr(ListNode list, Expression env)
+        {
+            if (list.values.Count != 3)
+            {
+                throw new ParsingException("Incorrect number of arguments supplied to While");
+            }
+
+            LabelTarget done = Expression.Label(typeof(ObjBox));
+            Expression test = unboxValue(matchExpression(list.values[1], env), typeof(Boolean));
+            Expression body = matchExpression(list.values[2], env);
+            Expression fi = Expression.IfThenElse(test, body, Expression.Break(done, voidSingleton));
+
+            return Expression.Block(new ParameterExpression[] { }, Expression.Loop(fi, done));
         }
 
         private static Expression ifExpr(ListNode list, Expression env)

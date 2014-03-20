@@ -27,14 +27,17 @@ namespace CompilerLib
 
         public Boolean check(String name)
         {
-            try
+            if (env.ContainsKey(name))
             {
-                lookup(name);
                 return true;
             }
-            catch
+            if (parent == null)
             {
                 return false;
+            }
+            else
+            {
+                return parent.check(name);
             }
         }
 
@@ -44,7 +47,7 @@ namespace CompilerLib
             {
                 return env[name];
             }
-            if(parent == null)
+            if (parent == null)
             {
                 throw new RuntimeException("variable reference to unscoped variable: " + name.ToString());
             }
@@ -81,7 +84,7 @@ namespace CompilerLib
         }
     }
 
-   public class FunctionHolder
+    public class FunctionHolder
     {
         //int count;
         public Delegate func;
@@ -102,10 +105,10 @@ namespace CompilerLib
 
     public class ObjBox
     {
-        private Object obj ;
+        private Object obj;
         private Type type;
         public System.Reflection.MethodInfo converter;
-        
+
         public ObjBox(Object _obj, Type _type)
         {
             this.obj = _obj;
