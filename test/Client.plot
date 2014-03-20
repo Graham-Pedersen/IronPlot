@@ -31,7 +31,7 @@
 			(begin
 				(set! key (scall System.Console.ReadKey #t))
 				(set! char (call key KeyChar))
-				(set! return (scall System.String.Concat return char))))
+				(set! return (scall System.String.Concat ret char))))
 		return))
 
 (define check_sock (lambda () '(not done)))
@@ -53,3 +53,4 @@
 (displayln (workloop))
 	
 
+	
