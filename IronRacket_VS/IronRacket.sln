@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronRacket", "IronRacket.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS_DLR_Integration", "DS_DLR_Int\DS_DLR_Integration.csproj", "{68C142DB-9D0E-44D3-811C-71A48B46ED15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronRacketProject", "..\..\Documents\Compiler\mpfproj11-16810\Dev11\Samples\CSharp\IronRacketProject\Src\IronRacketProject.csproj", "{F4ADEBDB-CD20-4532-B4E3-FE7424F5369C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronRacketProject", "IronRacketProject\Src\IronRacketProject.csproj", "{F4ADEBDB-CD20-4532-B4E3-FE7424F5369C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

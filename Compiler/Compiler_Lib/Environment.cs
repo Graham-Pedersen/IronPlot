@@ -25,6 +25,19 @@ namespace CompilerLib
             env = new Dictionary<String, ObjBox>();
         }
 
+        public Boolean check(String name)
+        {
+            try
+            {
+                lookup(name);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public ObjBox lookup(String name)
         {
             if (env.ContainsKey(name))

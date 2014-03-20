@@ -76,6 +76,19 @@ namespace SimpleSchemeParser
                     values.Add(ret.Item1);
                     continue;
                 }
+                if (s[index] == '\"')
+                {   
+                    int start = index;
+                    index += 1;
+                    while (s[index] != '\"')
+                    {
+                        index += 1;
+                    }
+                    values.Add(new LeafNode(s.Substring(start, (index - start)), nesting));
+                    index += 1;
+                    continue;
+
+                }
                 if (s[index] == ')')
                 {
                     index += 1;
