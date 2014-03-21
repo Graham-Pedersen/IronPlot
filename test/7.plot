@@ -22,5 +22,5 @@
 (displayln (fact x))
 (set! x 8)
 (displayln (fact x))
-(boring_fact 5)
+(displayln (boring_fact 5))
 

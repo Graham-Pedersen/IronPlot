@@ -178,11 +178,26 @@ namespace DLR_Compiler
                         case "call":
                             return callNetExpr(list, env);
 
+                        case "scall":
+                            return scallNetExpr(list, env);
+
                         case "new":
                             return newNetObj(list, env);
 
                         case "typelist":
                             return newTypeList(list, env);
+
+                        case "<":
+                            return lessThanExpr(list, env);
+
+                        case "<=":
+                            return lessThanEqualExpr(list, env);
+
+                        case ">":
+                            return gretThanExpr(list, env);
+
+                        case ">=":
+                            return gretThanEqualExpr(list, env);
 
                         case "+":
                             return addExpr(list, env);
@@ -230,6 +245,9 @@ namespace DLR_Compiler
                         case "begin":
                             return beginExpr(list, env);
 
+                        case "begin0":
+                            return begin0Expr(list, env);
+
                         case "displayln":
                             return displayExpr(list, env);
 
@@ -261,7 +279,9 @@ namespace DLR_Compiler
 
             for (int i = 1; i < list.values.Count; i++)
             {
-                body.Add(Expression.Call(var, typeof(typeListWrapper).GetMethod("add"), Expression.Constant(list.values[i].getValue())));
+                body.Add(
+                    Expression.Call(var, typeof(typeListWrapper).GetMethod("add"), 
+                    unboxValue(aliasOrLiteralName(list.values[i], env), typeof(String))));
             }
 
             body.Add(var);
@@ -287,7 +307,39 @@ namespace DLR_Compiler
             throw new NotImplementedException();
         }
 
-       //TODO make this understand static calls or split that into a different call
+        private static Expression scallNetExpr(ListNode list, Expression env)
+        {
+            List<Expression> block = new List<Expression>();
+            if (list.values.Count < 2)
+            {
+                throw new ParsingException("Failed to parse .net call expression");
+            }
+
+            ParameterExpression arr = Expression.Parameter(typeof(List<ObjBox>));
+            Expression argArray = Expression.New(typeof(List<ObjBox>).GetConstructor(new Type[] { }));
+            Expression assign = Expression.Assign(arr, argArray);
+            block.Add(assign);
+
+            for (int i = 2; i < list.values.Count; i++)
+            {
+                Expression arg = matchExpression(list.values[i], env);
+                block.Add(
+                    Expression.Call(
+                        arr,
+                        typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
+                         matchExpression(list.values[i], env)));
+            }
+            Expression obj = aliasOrLiteralName(list.values[1], env);
+            Expression callStr = unboxValue(obj, typeof(String));
+
+            block.Add(Expression.Call(null, typeof(NetIneractLib).GetMethod("call"),
+                wrapInObjBox(voidSingleton, Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"))),
+                callStr,
+                Expression.Call(arr, typeof(List<ObjBox>).GetMethod("ToArray"))));
+
+            return Expression.Block(new ParameterExpression[] { arr }, block);
+        }
+
         private static Expression callNetExpr(ListNode list, Expression env)
         {
             List<Expression> block = new List<Expression>();
@@ -310,14 +362,61 @@ namespace DLR_Compiler
                         typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
                          matchExpression(list.values[i], env)));
             }
-
             Expression instance = matchExpression(list.values[1], env);
-            Expression callStr = Expression.Constant(list.values[2].getValue(), typeof(String));
-            block.Add(Expression.Call(null, typeof(NetIneractLib).GetMethod("callMethod"), 
+            Expression obj = aliasOrLiteralName(list.values[2], env);
+            Expression callStr = unboxValue(obj, typeof(String));
+            block.Add(Expression.Call(null, typeof(NetIneractLib).GetMethod("call"), 
                 Expression.Convert(instance, typeof(ObjBox)), 
                 callStr,
                 Expression.Call(arr, typeof(List<ObjBox>).GetMethod("ToArray"))));
             return Expression.Block(new ParameterExpression[] { arr }, block);
+        }
+
+        // this checks if there is a variable in the environment
+        private static Expression aliasOrLiteralName(Node tree, Expression env)
+        {
+
+            if (tree.isList())
+            {
+                return matchExpression(tree, env);
+            }
+            
+            List<Expression> body = new List<Expression>();
+
+            ParameterExpression ret = Expression.Parameter(typeof(ObjBox));
+            ParameterExpression name = Expression.Parameter(typeof(String));
+
+            Expression isInEnv;
+            Expression f;
+            Expression t;
+            Expression isItStr;
+            Expression envQuery;
+
+            //lets get the name into expression form
+            Expression rhs = Expression.Constant(tree.getValue(), typeof(String));
+            Expression assign = Expression.Assign(name, rhs);
+            body.Add(assign);
+
+            envQuery = lookup(name, env);
+
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
+            f = Expression.Assign(ret, wrapInObjBox(name, type));
+            t = Expression.Assign(ret, envQuery);
+            isInEnv = checkEnv(name, env);
+            isItStr = Expression.Call(
+                        Expression.Call(envQuery, typeof(ObjBox).GetMethod("getType")),
+                        typeof(Object).GetMethod("Equals", new Type[] { typeof(Object) }),
+                        Expression.Constant(typeof(String), typeof(Type)));
+
+            Expression firstIf = Expression.IfThenElse(
+                isInEnv,
+                Expression.IfThenElse(isItStr, t, f),
+                f);
+
+            body.Add(firstIf);
+            body.Add(ret);
+
+            return Expression.Block(new ParameterExpression[] { name, ret }, body);
         }
 
         private static Expression newNetObj(ListNode list, Expression env)
@@ -341,8 +440,8 @@ namespace DLR_Compiler
                         typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
                          matchExpression(list.values[i], env)));
             }
-            
-            Expression type = Expression.Constant(list.values[1].getValue(), typeof(String));
+
+            Expression type = unboxValue(aliasOrLiteralName(list.values[1], env), typeof(String));
 
             block.Add(Expression.Call(null, typeof(NetIneractLib).GetMethod("callConstruct"), 
                 type, 
@@ -361,7 +460,7 @@ namespace DLR_Compiler
             Expression type = Expression.Call(rhs, typeof(ObjBox).GetMethod("getType"));
             Expression listType = Expression.Call(null, typeof(TypeUtils).GetMethod("listType"));
             
-            Expression test = Expression.Call(listType, typeof(Type).GetMethod("Equals"), type);
+            Expression test = Expression.Call(listType, typeof(Type).GetMethod("Equals", new Type[] { typeof(Type) }), type);
 
             Expression test2 = Expression.Call(unboxValue(rhs, typeof(RacketPair)), typeof(RacketPair).GetMethod("isNull"));
 
@@ -493,7 +592,7 @@ namespace DLR_Compiler
 
         private static Expression beginExpr(ListNode list, Expression env)
         {
-            if (list.values.Count < 2)
+            if (list.values.Count < 2) // i think it is okay ot have empty begin like (begin) but won't worry about that right now
                 throw new ParsingException("empty body in a begin expression");
 
             List<Node> values = new List<Node>();
@@ -506,6 +605,16 @@ namespace DLR_Compiler
 
             //TODO verify correctness of not making a new env
             return matchTopLevel(bodyLiterals, env);
+        }
+
+        private static Expression begin0Expr(ListNode list, Expression env)
+        {
+            if (list.values.Count < 2)
+                throw new ParsingException("empty body in a begin0 exprssion");
+
+            List<Node> values = new List<Node>();
+
+            return null;
         }
 
         private static Expression displayExpr(ListNode list, Expression env)
@@ -593,7 +702,7 @@ namespace DLR_Compiler
                     Expression.Convert(matchExpression(tree.values[i], env), typeof(Object))));
             }
 
-            Expression getFunction = unboxValue(lookup(tree.values[0].getValue(), env), typeof(FunctionHolder));
+            Expression getFunction = unboxValue(lookup(Expression.Constant(tree.values[0].getValue()), env), typeof(FunctionHolder));
   
             var invoke = Expression.Call(
                 getFunction,
@@ -682,9 +791,7 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Divide(lhs, rhs);
 
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
         }
 
         private static Expression modExpr(ListNode tree, Expression env)
@@ -698,9 +805,7 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Modulo(lhs, rhs);
 
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
         }
 
         private static Expression multExpr(ListNode tree, Expression env)
@@ -714,9 +819,66 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
             Expression result = Expression.Multiply(lhs, rhs);
 
-            return  Expression.New(
-                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                    new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
+        }
+
+        private static Expression lessThanExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse < for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.LessThan(lhs, rhs);
+
+            return wrapInObjBox(result, type);
+            
+        }
+
+        private static Expression lessThanEqualExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse < for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.LessThanOrEqual(lhs, rhs);
+
+            return wrapInObjBox(result, type);
+
+        }
+
+
+        private static Expression gretThanExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse > for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.GreaterThan(lhs, rhs);
+
+            return wrapInObjBox(result, type);
+        }
+
+        private static Expression gretThanEqualExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse > for list " + tree.ToString());
+
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+
+            Expression result = Expression.GreaterThanOrEqual(lhs, rhs);
+
+            return wrapInObjBox(result, type);
         }
 
         private static Expression addExpr(ListNode tree, Expression env)
@@ -730,9 +892,7 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
 
             Expression result = Expression.Add(lhs, rhs);
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+            return wrapInObjBox(result, type);
         }
 
         private static Expression subExpr(ListNode tree, Expression env)
@@ -746,9 +906,8 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
 
             Expression result = Expression.Subtract(lhs, rhs);
-            return Expression.New(
-                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                new Expression[] { Expression.Convert(result, typeof(Object)), type });
+
+            return wrapInObjBox(result, type);
         }
 
         private static Expression defineExpr(ListNode tree, Expression env)
@@ -845,14 +1004,13 @@ namespace DLR_Compiler
         }
 
         //Uses gets an objBox from the environment
-        //TODO returns null if the environment lacks the symbol
-        static Expression lookup(String str, Expression env)
+        static Expression lookup(Expression str, Expression env)
         {
             //Perform a variable lookup
             var lookup = Expression.Call(
                 env,
                 typeof(CompilerLib.Environment).GetMethod("lookup", new Type[] { typeof(String) }),
-                Expression.Constant(str));
+                str);
             /*
             var type = Expression.Call(
                 env,
@@ -861,6 +1019,16 @@ namespace DLR_Compiler
             */
             return lookup;
             //return accessValue(lookup);
+        }
+
+        static Expression checkEnv(Expression name, Expression env)
+        {
+            Expression check = Expression.Call(
+                env,
+                typeof(CompilerLib.Environment).GetMethod("check"),
+                name);
+
+            return check;
         }
 
         static Expression matchLiteralList(ListNode tree, Expression env)
@@ -911,7 +1079,7 @@ namespace DLR_Compiler
             }
             else
             {
-                return lookup(leaf.getValue(), env);
+                return lookup(Expression.Constant(leaf.getValue()), env);
             }
         }
 
@@ -943,12 +1111,21 @@ namespace DLR_Compiler
                 matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
                 isAtom = true;
             }
+            else if (value[0] == '\"')
+            {
+                value = value.Substring(1);
+                value = value.Substring(0, value.Length);
+
+                Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
+                matchedExpr = wrapInObjBox(Expression.Constant(value, typeof(String)), type);
+                isAtom = true;
+            }
             else if (value[0] == '\'')
             {
                 if (Int32.TryParse(value.Substring(1), out number))
                 {
                     Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-                    matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
+                    matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value.Substring(1))), type);
                     isAtom = true;
                 }
                 else // string case

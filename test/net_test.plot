@@ -10,5 +10,5 @@
 			(displayln (call l Item index))
 			(printList l (+ index 1) max))
 		(displayln '(end of list)))))
-
-(printList list 0 count)
+		
+(displayln (printList list 0 count))
