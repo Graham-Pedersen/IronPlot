@@ -61,7 +61,7 @@ namespace IRLanguage
             _IRTypes[IRTokenTypes.IRDefine] = typeService.GetClassificationType("define");
             _IRTypes[IRTokenTypes.IRCar] = typeService.GetClassificationType("car");
             _IRTypes[IRTokenTypes.IRCdr] = typeService.GetClassificationType("cdr");
-            _IRTypes[IRTokenTypes.IRComment] = typeService.GetClassificationType(";");
+            _IRTypes[IRTokenTypes.IRComment] = typeService.GetClassificationType("IRcomment");
             _IRTypes[IRTokenTypes.IRLambda] = typeService.GetClassificationType("lambda");
             _IRTypes[IRTokenTypes.IRCons] = typeService.GetClassificationType("cons");
             _IRTypes[IRTokenTypes.IRCond] = typeService.GetClassificationType("cond");
@@ -72,6 +72,8 @@ namespace IRLanguage
             _IRTypes[IRTokenTypes.IRAnd] = typeService.GetClassificationType("and");
             _IRTypes[IRTokenTypes.IRSetbang] = typeService.GetClassificationType("set!");
             _IRTypes[IRTokenTypes.IRDefinevar] = typeService.GetClassificationType("define_var");
+            _IRTypes[IRTokenTypes.IRNew] = typeService.GetClassificationType("new");
+            
         }
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged

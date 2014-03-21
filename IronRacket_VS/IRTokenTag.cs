@@ -47,7 +47,7 @@
             _IRTypes["define"] = IRTokenTypes.IRDefine;
             _IRTypes["car"] = IRTokenTypes.IRCar;
             _IRTypes["cdr"] = IRTokenTypes.IRCdr;
-            _IRTypes[";"] = IRTokenTypes.IRComment;
+            _IRTypes["IRcomment"] = IRTokenTypes.IRComment;
             _IRTypes["lambda"] = IRTokenTypes.IRLambda;
             _IRTypes["cons"] = IRTokenTypes.IRCons;
             _IRTypes["cond"] = IRTokenTypes.IRCond;
@@ -58,6 +58,8 @@
             _IRTypes["let"] = IRTokenTypes.IRLet;
             _IRTypes["letrec"] = IRTokenTypes.IRLetrec;
             _IRTypes["define_var"] = IRTokenTypes.IRDefinevar;
+            _IRTypes["new"] = IRTokenTypes.IRNew;
+            //_IRTypes["comment"] = IRTokenTypes.IRString;
 
 
 
@@ -68,6 +70,19 @@
             add { }
             remove { }
         }
+
+        private int nextIndexOf(string s)
+        {
+            for (int i = 1; i < s.Length; i++)
+            {
+                if (s[i] == '"')
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
 
         public IEnumerable<ITagSpan<IRTokenTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
@@ -86,25 +101,100 @@
                 foreach (string IRToken in tokens)
                 {
                     //IRToken.Trim();
+                    int len = 0;
+                    bool add = true;
+                    bool add2 = false;
                     if (Regex.IsMatch(IRToken, @"define\s[a-z]+"))
                     {
+
+                        
+                        bool set = add = false;
+                        string[] temptok = IRToken.Split(' ');
                         var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, IRToken.Length));
-                        if (tokenSpan.IntersectsWith(curSpan))
-                            yield return new TagSpan<IRTokenTag>(tokenSpan,
-                                                                  new IRTokenTag(_IRTypes["define_var"]));
-                        curLoc += IRToken.Length + 1;
-                        continue;
+                        if (temptok.Length >= 2)
+                        {
+                            len = IRToken.IndexOf(temptok[1]) + temptok[1].Length + 1;
+                            if (curLoc + len < curSpan.Snapshot.Length)
+                            {
+                                tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, len));
+                                set = true;
+                            }
+                            else { len = 0; }
+                        }
+
+
+                            if (tokenSpan.IntersectsWith(curSpan))
+                                yield return new TagSpan<IRTokenTag>(tokenSpan,
+                                                                      new IRTokenTag(_IRTypes["define_var"]));
+                        if (set)
+                        {
+                            add2 = true;
+                            add = true;
+                            //curLoc += len + 1;
+                                            
+                        }
+                        else
+                        {
+                            curLoc += IRToken.Length + 1;
+                        }
+                        
                     }
-                    if (_IRTypes.ContainsKey(IRToken.Trim()))
+                    else if (_IRTypes.ContainsKey(IRToken.Trim()))
                     {
                         var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, IRToken.Length));
                         if( tokenSpan.IntersectsWith(curSpan) ) 
                             yield return new TagSpan<IRTokenTag>(tokenSpan, 
                                                                   new IRTokenTag(_IRTypes[IRToken.Trim()]));
+                        curLoc += IRToken.Length + 1;
+                        add = false;
+                    }
+                    if (IRToken.Contains("\""))
+                    {
+                        string temp = IRToken.Substring(0);
+                        int lastindexof = 0;
+                        int t = 0;
+                        int location =0;
+                        if (temp.Contains("\""))
+                        {
+                        more:
+                            location = temp.IndexOf('\"');
+                            string temp2 = temp.Substring(location);    
+                            if ((lastindexof = nextIndexOf(temp.Substring(location))) <= 1)
+                            {
+                                curLoc += temp.Length;
+                                continue;
+                            }
+                            curLoc += t = (temp.IndexOf('"'));
+                            var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, lastindexof+1));
+                            yield return new TagSpan<IRTokenTag>(tokenSpan,
+                                                                  new IRTokenTag(_IRTypes["IRcomment"]));
+                            curLoc += lastindexof + 1;
+                            temp = temp.Substring(lastindexof+t+1);
+                            if (temp.Contains("\""))
+                            {
+                                goto more;
+                            }
+                            if (add2)
+                            {
+                                curLoc += temp.Length+1;
+                                continue;
+                            }
+                            curLoc += temp.Length;
+                            continue;
+                        }
+
                     }
 
                     //add an extra char location because of the space
-                    curLoc += IRToken.Length + 1;
+                    if (add)
+                    {           
+                           curLoc += IRToken.Trim().Length + 1;
+                           if (IRToken.Trim().Length != 0)
+                           {
+                               curLoc++;
+                           }
+                    }
+                    //if (add2) { curLoc += IRToken.Length + 2; }
                 }
             }
             
