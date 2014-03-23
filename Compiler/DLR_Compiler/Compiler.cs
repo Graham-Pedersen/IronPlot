@@ -175,6 +175,9 @@ namespace DLR_Compiler
                     switch (list.values[0].getValue())
                     {
 
+                        case "":
+                            return voidSingleton;
+
                         case "call":
                             return callNetExpr(list, env);
 
