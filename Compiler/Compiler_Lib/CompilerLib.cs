@@ -164,19 +164,24 @@ namespace CompilerLib
                 Object value = objArray[0];
                 objArray.RemoveAt(0);
 
-                if (objArray.Count > 0)
+                if (objArray.Count == 1)
                 {
-                    p.SetValue(instance, value, objArray.ToArray());
+                    p.SetValue(instance, value);
                 }
                 else
                 {
-                    p.SetValue(instance, value);
+                    p.SetValue(instance, value, objArray.ToArray());
                 }
                 return new ObjBox(new voidObj(), typeof(voidObj));
             }
             else
             {
-                return new ObjBox(p.GetValue(instance, objArray.ToArray()), p.PropertyType);
+                if (objArray.Count == 1)
+                {
+                    return new ObjBox(p.GetValue(instance, objArray.ToArray()), p.PropertyType);
+                }
+
+                return new ObjBox(p.GetValue(instance), p.PropertyType);
             }
         }
 
@@ -200,13 +205,16 @@ namespace CompilerLib
         {
             Object instance = null;
             Type t;
+            String qualifiedName;
+            String typeName;
             if (wrapper.getType() == (typeof(voidObj)))
             {
-                String qualifiedName = s;
-                int index = qualifiedName.LastIndexOf('.');
-                s = qualifiedName.Substring(index + 1);
-                String typeName = qualifiedName.Substring(0, index);
+                
+                int index = s.LastIndexOf('.');
+                qualifiedName = s.Substring(index + 1);
+                typeName = s.Substring(0, index);
                 t = Type.GetType(typeName);
+                s = qualifiedName;
             }
             else
             {

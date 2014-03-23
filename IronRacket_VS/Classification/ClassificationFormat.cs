@@ -46,7 +46,9 @@ namespace IRLanguage
         public IRDefinevar()
         {
             this.DisplayName = "define_var"; //human readable version of the name
-            this.ForegroundColor = Colors.Olive;
+            //36C99F
+            this.ForegroundColor = Colors.MediumTurquoise;//Color.FromRgb(0x36,0xC9,0x9F);
+            this.ForegroundOpacity = 100D;
             this.IsBold = true;
         }
     }
@@ -251,7 +253,7 @@ namespace IRLanguage
 
 
     [Export(typeof(EditorFormatDefinition))]
-    [ClassificationType(ClassificationTypeNames = "comment")]
+    [ClassificationType(ClassificationTypeNames = "IRcomment")]
     [Name("IRComment")]
     //this should be visible to the end user
     [UserVisible(false)]
@@ -264,9 +266,9 @@ namespace IRLanguage
         /// </summary>
         public IRComment()
         {
-            this.DisplayName = "comment"; //human readable version of the name
-            this.ForegroundColor = Colors.Red;
-            this.IsBold = true;
+            this.DisplayName = "IRcomment"; //human readable version of the name
+            this.ForegroundColor = Colors.Maroon;
+            this.IsBold = false;
         }
     }
 
@@ -314,6 +316,30 @@ namespace IRLanguage
             
         }
     }
+
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "new")]
+    [Name("IRNew")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRNew : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRNew()
+        {
+            this.DisplayName = "new"; //human readable version of the name
+            this.ForegroundColor = Colors.Blue;
+            this.IsBold = true;
+
+        }
+    }
+
+
 
 
 

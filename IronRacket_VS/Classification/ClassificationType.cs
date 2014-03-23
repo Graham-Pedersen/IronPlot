@@ -31,7 +31,7 @@ namespace IRLanguage
 
 
         [Export(typeof(ClassificationTypeDefinition))]
-        [Name(";")]
+        [Name("IRcomment")]
         internal static ClassificationTypeDefinition IRComment = null;
 
 
@@ -75,6 +75,10 @@ namespace IRLanguage
         [Export(typeof(ClassificationTypeDefinition))]
         [Name("define_var")]
         internal static ClassificationTypeDefinition IRDefinevar = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("new")]
+        internal static ClassificationTypeDefinition IRNew = null;
 
 
         #endregion
