@@ -19,6 +19,7 @@ namespace SimpleSchemeParser
 
     public class LeafNode : Node
     {
+        public bool isLiteral;
         private String value;
         private int nestingLevel;
         public LeafNode(String atom, int _nestingLevel)

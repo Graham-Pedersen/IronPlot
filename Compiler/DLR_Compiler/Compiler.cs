@@ -1150,7 +1150,6 @@ namespace DLR_Compiler
             Expression matchedExpr = null;
             isAtom = false;
             int number;
-
             if (value == "#t")
             {
                 
