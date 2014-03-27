@@ -314,9 +314,9 @@ namespace DLR_Compiler
         private static Expression scallNetExpr(ListNode list, Expression env)
         {
             List<Expression> block = new List<Expression>();
-            if (list.values.Count < 2)
+            if (list.values.Count < 3)
             {
-                throw new ParsingException("Failed to parse .net call expression");
+                throw new ParsingException("Failed to parse .net static call expression");
             }
 
             ParameterExpression arr = Expression.Parameter(typeof(List<ObjBox>));
@@ -326,15 +326,15 @@ namespace DLR_Compiler
 
             
             Expression arg;
-            if (list.values.Count > 2)
+            if (list.values.Count > 3)
             {
-                if (list.values[2].isLeaf() && list.values[2].getValue() == "set")
+                if (list.values[3].isLeaf() && list.values[3].getValue() == "set")
                 {
                     arg = wrapInObjBox(Expression.Constant("set"), Expression.Call(null, typeof(TypeUtils).GetMethod("strType")));
                 }
                 else
                 {
-                    arg = matchExpression(list.values[2], env);
+                    arg = matchExpression(list.values[3], env);
                 }
                 block.Add(
                  Expression.Call(
@@ -344,7 +344,7 @@ namespace DLR_Compiler
             }
 
 
-            for (int i = 3; i < list.values.Count; i++)
+            for (int i = 4; i < list.values.Count; i++)
             {
                 arg = matchExpression(list.values[i], env);
                 block.Add(
@@ -353,12 +353,15 @@ namespace DLR_Compiler
                         typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
                          matchExpression(list.values[i], env)));
             }
-            Expression obj = aliasOrLiteralName(list.values[1], env);
-            Expression callStr = unboxValue(obj, typeof(String));
+            Expression name = aliasOrLiteralName(list.values[1], env);
+            Expression target = aliasOrLiteralName(list.values[2], env);
+
+            Expression typeStr = unboxValue(name, typeof(String));
+            Expression targetStr = unboxValue(target, typeof(String));
 
             block.Add(Expression.Call(null, typeof(NetIneractLib).GetMethod("call"),
-                wrapInObjBox(voidSingleton, Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"))),
-                callStr,
+                wrapInObjBox(typeStr, Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"))),
+                targetStr,
                 Expression.Call(arr, typeof(List<ObjBox>).GetMethod("ToArray"))));
 
             return Expression.Block(new ParameterExpression[] { arr }, block);
@@ -387,7 +390,7 @@ namespace DLR_Compiler
                 else
                 {
                     arg = matchExpression(list.values[3], env);
-                } 
+                }
                 block.Add(
                  Expression.Call(
                      arr,
@@ -1082,7 +1085,7 @@ namespace DLR_Compiler
         {
             Expression check = Expression.Call(
                 env,
-                typeof(CompilerLib.Environment).GetMethod("check"),
+                typeof(CompilerLib.Environment).GetMethod("check", new Type[] { typeof(String) }),
                 name);
 
             return check;
