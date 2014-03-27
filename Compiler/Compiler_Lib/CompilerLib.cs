@@ -7,6 +7,17 @@ using System.Threading.Tasks;
 
 namespace CompilerLib
 {
+
+    public static class typeResolver
+    {   
+        List<Type> importTypes =  new List<Type>();
+        String DLL_ASSEMBLY_PATH = ", System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"  
+        public static void use(String s)
+        {
+            //try to resolve the type naked
+            //try the type as a fully qualified runtime reference
+        }
+    }
     public static class TypeUtils
     {
         public static Type boolType()

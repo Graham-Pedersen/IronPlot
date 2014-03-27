@@ -22,7 +22,6 @@ namespace DLR_Compiler
 
         public static void Main(string[] args)
         {
-
             if (args.Length != 3)
             {
                 throw new Exception("Compiler called with incorrect number of arguments!")
