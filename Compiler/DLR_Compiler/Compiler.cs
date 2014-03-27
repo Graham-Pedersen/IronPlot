@@ -24,7 +24,7 @@ namespace DLR_Compiler
         {
             if (args.Length != 3)
             {
-                throw new Exception("Compiler called with incorrect number of arguments!")
+                throw new Exception("Compiler called with incorrect number of arguments!");
             }
             //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
             string filename = args[0];
@@ -86,10 +86,10 @@ namespace DLR_Compiler
 
                 if (mode == "compile")
                 {
-                    var asmName = new AssemblyName("Foo");
+                    var asmName = new AssemblyName(outputName.Remove(outputName.IndexOf(".exe")));
                     var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
                         (asmName, AssemblyBuilderAccess.RunAndSave);
-                    var moduleBuilder = asmBuilder.DefineDynamicModule("Foo", "Foo.exe");
+                    var moduleBuilder = asmBuilder.DefineDynamicModule(outputName.Remove(outputName.IndexOf(".exe")), outputName);
                     var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
                     var methodBuilder = typeBuilder.DefineMethod("Main",
                         MethodAttributes.Static, typeof(void), new[] { typeof(string) });
@@ -98,7 +98,7 @@ namespace DLR_Compiler
 
                     typeBuilder.CreateType();
                     asmBuilder.SetEntryPoint(methodBuilder);
-                    asmBuilder.Save("Foo.exe");
+                    asmBuilder.Save(outputName);
                 }
                 else if (mode == "run")
                 {
