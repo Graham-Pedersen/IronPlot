@@ -175,6 +175,9 @@ namespace DLR_Compiler
                     switch (list.values[0].getValue())
                     {
 
+                        case "":
+                            return voidSingleton;
+
                         case "call":
                             return callNetExpr(list, env);
 
@@ -1150,7 +1153,6 @@ namespace DLR_Compiler
             Expression matchedExpr = null;
             isAtom = false;
             int number;
-
             if (value == "#t")
             {
                 

@@ -99,6 +99,7 @@ namespace CompilerLib
             //count += 1;
             //Console.WriteLine("Got called");
             //Console.WriteLine("Count is: " + count.ToString());
+            Console.WriteLine(arguments);
             return func.DynamicInvoke(arguments.ToArray());
         }
     }
