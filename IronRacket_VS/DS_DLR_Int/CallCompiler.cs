@@ -40,7 +40,7 @@ namespace DS_DLR_Int
                     Runcompiler(name);
                 }
 
-                System.IO.File.Copy(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", name.Substring(0, name.Length - 11)+"Compiler_Lib.dll");
+                System.IO.File.Copy(@"C:\Users\graha_000\Programing\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", name.Substring(0, name.Length - 11) + "Compiler_Lib.dll");
               //  RunDLR(name+".tmp");
             }
           //  if (File.Exists(@"C:\Users\Scott\Desktop\Foo.exe"))
@@ -68,7 +68,7 @@ namespace DS_DLR_Int
             try
             {
                 //cwd = System.IO.Directory.GetCurrentDirectory();
-                D_exep = @"C:\Users\Scott\Documents\Compiler\IronPlot";
+                D_exep = @"C:\Users\graha_000\Programing\IronPlot";
                 if (File.Exists(D_exep + @"\desugar.exe"))
                 {
                     D_exep = D_exep + @"\desugar.exe";
@@ -83,7 +83,7 @@ namespace DS_DLR_Int
 
         private static void Runcompiler(string inputfile)
         {
-            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1}",inputfile,"compile"));
+            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1}", inputfile, "compile"));
             comp.UseShellExecute = true;
             comp.CreateNoWindow = false;
             try

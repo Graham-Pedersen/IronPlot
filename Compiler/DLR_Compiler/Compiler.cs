@@ -22,11 +22,17 @@ namespace DLR_Compiler
 
         public static void Main(string[] args)
         {
+
+            if (args.Length != 3)
+            {
+                throw new Exception("Compiler called with incorrect number of arguments!")
+            }
             //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
             string filename = args[0];
             //Console.WriteLine("Compiling file " + filename);
 
             string mode = args[1];
+            string outputName = args[2];
 
             //set up a single instance of type void
             voidSingleton = Expression.Variable(typeof(ObjBox), "void");
