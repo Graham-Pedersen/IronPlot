@@ -25,7 +25,7 @@ namespace DS_DLR_Int
                         Runcompiler(s + ".tmp", Filename + ".exe");
                     }
                 }
-                System.IO.File.Copy(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", name.Substring(0, name.Length - 11)+"Compiler_Lib.dll");
+                System.IO.File.Copy(@"C:\Users\graha_000\Programing\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", name.Substring(0, name.Length - 11) + "Compiler_Lib.dll");
             }
          
 
@@ -33,7 +33,7 @@ namespace DS_DLR_Int
 
         private static void Runcompiler(string inputfile, string output_exe)
         {
-            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1} {2}",inputfile,"compile",output_exe));
+            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1} {2}", inputfile, "compile", output_exe));
             comp.UseShellExecute = true;
             comp.CreateNoWindow = false;
             try
@@ -51,7 +51,7 @@ namespace DS_DLR_Int
         private void RunDesugar(string inputfile,string tempfile)
         {
             //Start the exe and forward standard output/error so we can parse etc.
-            ProcessStartInfo Desugar = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\desugar.exe",  String.Format("\"{0}\" \"{1}\"", inputfile, tempfile));
+            ProcessStartInfo Desugar = new ProcessStartInfo(@"C:\Users\graha_000\Programing\IronPlot\desugar.exe", String.Format("\"{0}\" \"{1}\"", inputfile, tempfile));
             Desugar.UseShellExecute = false;
             Desugar.CreateNoWindow = false;
             Desugar.RedirectStandardError = true;

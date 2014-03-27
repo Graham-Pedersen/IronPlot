@@ -9,14 +9,41 @@ namespace CompilerLib
 {
 
     public static class typeResolver
-    {   
-        List<Type> importTypes =  new List<Type>();
-        String DLL_ASSEMBLY_PATH = ", System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"  
-        public static void use(String s)
+    {
+        static List<Type> importTypes;
+        static String DLL_ASSEMBLY_PATH;
+
+        static typeResolver()
+        {
+            importTypes = new List<Type>();
+            DLL_ASSEMBLY_PATH = ", System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089";
+        }
+
+        static void use(String s)
         {
             //try to resolve the type naked
+            Type t;
+            t = Type.GetType(s);
+            if (t != null)
+            {
+                importTypes.Add(t);
+                return;
+            }
             //try the type as a fully qualified runtime reference
+            t = Type.GetType(s + DLL_ASSEMBLY_PATH);
+            if (t != null)
+            {
+                importTypes.Add(t);
+                return;
+            }
+            throw new RuntimeException("Could not resolve using type:" + s);
         }
+
+        static void resolve(String typename)
+        {
+
+        }
+
     }
     public static class TypeUtils
     {

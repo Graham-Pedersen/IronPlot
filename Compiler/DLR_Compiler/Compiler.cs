@@ -143,7 +143,7 @@ namespace DLR_Compiler
                 {
                     return defineExpr(list, env);
                 }
-                else if (list.values[0].isLeaf() && list.values[0].getValue() == "netuse")
+                else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
                 {
                     return netImportStmt(list, env);
                 }
@@ -316,7 +316,11 @@ namespace DLR_Compiler
 
         private static Expression netImportStmt(ListNode list, Expression env)
         {
-            throw new NotImplementedException();
+            if(list.values.Count != 2)
+            {
+                throw new ParsingException("Could not parse using expression");
+            }
+            return Expression.Call(null, typeof(typeResolver).GetMethod("use"), Expression.Constant(list.values[1].getValue()));
         }
 
         private static Expression scallNetExpr(ListNode list, Expression env)
