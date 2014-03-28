@@ -1,4 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+    VS SDK Notes: This resx file contains the resources that will be consumed from your package by Visual Studio.
+    For example, Visual Studio will attempt to load resource '400' from this resource stream when it needs to
+    load your package's icon. Because Visual Studio will always look in the VSPackage.resources stream first for
+    resources it needs, you should put additional resources that Visual Studio will load directly into this resx 
+    file. 
+
+    Resources that you would like to access directly from your package in a strong-typed fashion should be stored 
+    in Resources.resx or another resx file.
+-->
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,67 +127,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Application" xml:space="preserve">
-    <value>Application</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="110" xml:space="preserve">
+    <value>IronRacket_ReplWindow</value>
   </data>
-  <data name="ApplicationIcon" xml:space="preserve">
-    <value>Application Icon</value>
+  <data name="112" xml:space="preserve">
+    <value>Information about my package</value>
   </data>
-  <data name="ApplicationIconDescription" xml:space="preserve">
-    <value>Templates\Projects\IronRacketProject\IronRacketProject.ico</value>
+  <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Package.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AssemblyName" xml:space="preserve">
-    <value>Assembly Name</value>
-  </data>
-  <data name="AssemblyNameDescription" xml:space="preserve">
-    <value>The name of the output file that will hold assembly metadata.</value>
-  </data>
-  <data name="DefaultNamespace" xml:space="preserve">
-    <value>Default Namespace</value>
-  </data>
-  <data name="DefaultNamespaceDescription" xml:space="preserve">
-    <value>Specifies the default namespace for added items, such as classes, that are added via the Add New Item Dialog Box.</value>
-  </data>
-  <data name="GeneralCaption" xml:space="preserve">
-    <value>General</value>
-  </data>
-  <data name="OutputFile" xml:space="preserve">
-    <value>Output File</value>
-  </data>
-  <data name="OutputFileDescription" xml:space="preserve">
-    <value>The name of the project's primary output file.</value>
-  </data>
-  <data name="OutputType" xml:space="preserve">
-    <value>Output Type</value>
-  </data>
-  <data name="OutputTypeDescription" xml:space="preserve">
-    <value>The type of application to build.</value>
-  </data>
-  <data name="Project" xml:space="preserve">
-    <value>Project</value>
-  </data>
-  <data name="ProjectFile" xml:space="preserve">
-    <value>Project File</value>
-  </data>
-  <data name="ProjectFileDescription" xml:space="preserve">
-    <value>The name of the file containing build, configuration, and other information about the project.</value>
-  </data>
-  <data name="ProjectFolder" xml:space="preserve">
-    <value>Project Folder</value>
-  </data>
-  <data name="ProjectFolderDescription" xml:space="preserve">
-    <value>The absolute location of the project.</value>
-  </data>
-  <data name="StartupObject" xml:space="preserve">
-    <value>Startup Object</value>
-  </data>
-  <data name="StartupObjectDescription" xml:space="preserve">
-    <value>The name of the class that contains the static Main method that you want called when you launch your application.</value>
-  </data>
-  <data name="TargetFrameworkMoniker" xml:space="preserve">
-    <value>Target Framework Moniker</value>
-  </data>
-  <data name="TargetFrameworkMonikerDescription" xml:space="preserve">
-    <value>The version of the Common Language Runtime to use for output assembly.</value>
+  <data name="301" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Images.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

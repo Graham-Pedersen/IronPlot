@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.Project.Samples.IronRacketProject
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\10.0")]
     [ProvideObject(typeof(GeneralPropertyPage))]
-    [ProvideProjectFactory(typeof(IronRacketProjectFactory), "IronRacket Project", "IronRacket Project Files (*.irproj);*.irproj", "irproj", "irproj", @"..\..\Templates\Projects\IronRacketProject", LanguageVsTemplate = "IronRacket", NewProjectRequireNewFolderVsTemplate = false)]
+    [ProvideProjectFactory(typeof(IronRacketProjectFactory), "IronRacket Project", "IronRacket Project Files (*.dll);*.dll;(*.irproj);*.irproj" ,"irproj", "irproj", @"..\..\Templates\Projects\IronRacketProject", LanguageVsTemplate = "IronRacket", NewProjectRequireNewFolderVsTemplate = false)]
     [ProvideProjectItem(typeof(IronRacketProjectFactory), "My Items", @"..\..\Templates\ProjectItems\IronRacketProject", 500)]
     [Guid(GuidStrings.guidCustomProjectPkgString)]
     public sealed class IronRacketProjectPackage : ProjectPackage

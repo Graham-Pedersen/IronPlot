@@ -83,6 +83,50 @@
             return -1;
         }
 
+        private char findNextTrigger(string line, ref int location)
+        {
+            for (int i = 0; i < line.Length; i++)
+            {
+                switch (line[i])
+                {
+                    case '(':
+                        location = i;
+                        return '(';
+                    case ';':
+                        location = i;
+                        return ';';
+                    case '"':
+                        location = i;
+                        return '"';
+                }
+            }
+            location = line.Length;
+            return '*';
+        }
+
+
+        private bool isKeyWord(string incoming){
+            if(_IRTypes.ContainsKey(incoming.Trim()) || (Regex.IsMatch(incoming, @"define\s[a-z]+"))){
+                return true;
+            }
+
+            return false;
+        }
+        
+        private TagSpan<IRTokenTag> generateSpan(string input, SnapshotSpan tokenSpan){
+            if (Regex.IsMatch(input, @"define\s[a-z]+"))
+            {
+                return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes["define_var"]));
+            }
+            return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes[input.Trim()]));
+        }
+
+        private TagSpan<IRTokenTag> generateCommentStringSpan(SnapshotSpan tokenSpan)
+        {
+            return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes["IRcomment"]));
+        }
+
+
 
         public IEnumerable<ITagSpan<IRTokenTag>> GetTags(NormalizedSnapshotSpanCollection spans)
         {
@@ -91,13 +135,92 @@
             {
                 ITextSnapshotLine containingLine = curSpan.Start.GetContainingLine();
                 int curLoc = containingLine.Start.Position;
-                string test = curSpan.GetText();
-                string test2 = spans.ToString();
                 string line = containingLine.GetText().ToLower();
-                Regex.Replace(line, @"\s+", "");
+                //Regex.Replace(line, @"\s+", "");
                 line = line.Replace("[", "(");
+
+                while (!line.Equals(String.Empty))
+                {
+                    int location = 0;
+                    char c = findNextTrigger(line, ref location);
+                    switch (c)
+                    {
+                        case '(':
+                            curLoc++;
+                            int location2 = 0;
+                            if (location + 1 > line.Length)
+                            {
+                                curLoc += location;
+                                line = line.Substring(location);
+                                break;
+                            }
+                            char trig = findNextTrigger(line.Substring(location+1), ref location2);
+                            string input = line.Substring(location+1, location2);
+                            curLoc += location;
+                            if (isKeyWord(input))
+                            { //remove (
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, input.Length));
+                                if (tokenSpan.IntersectsWith(curSpan))
+                                {
+                                    yield return generateSpan(input, tokenSpan);
+                                }
+                            }
+                            if (trig == '*')
+                            {
+                                curLoc += input.Length;
+                            }
+                            else
+                            {
+                                curLoc += location2;
+                            }
+                            line = line.Substring(location+location2+1);
+                            break;
+                        case ';':
+                            break;
+                        case '"':
+                            curLoc++;
+                            location2 = 0;
+                            if (location + 1 > line.Length)
+                            {
+                                curLoc += location;
+                                line = line.Substring(location);
+                                break;
+                            }
+                            trig = findNextTrigger(line.Substring(location + 1), ref location2);
+                            if (trig != '"')
+                            {
+                                curLoc += line.Length;
+                                line = String.Empty;
+                                break;
+                            }
+                            input = line.Substring(location + 1, location2);
+                            {//new scope
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, input.Length));
+                                if (tokenSpan.IntersectsWith(curSpan))
+                                {
+                                    yield return generateCommentStringSpan(tokenSpan);
+                                }
+                            }
+                            curLoc += location + location2;
+                            line = line.Substring(location+location2+1);
+                            break;
+                        case '*':
+                            curLoc += line.Length;
+                            line = String.Empty;
+                            break;
+                        default:
+                            throw new Exception();
+
+
+                    }
+                }
+            }
+
+                /*
                 string[] tokens = line.Split('(');
 
+
+               
                 foreach (string IRToken in tokens)
                 {
                     //IRToken.Trim();
@@ -197,7 +320,7 @@
                     //if (add2) { curLoc += IRToken.Length + 2; }
                 }
             }
-            
+         */   
         }
     }
 }

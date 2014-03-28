@@ -14,21 +14,39 @@ namespace DS_DLR_Int
         private static string D_exep;
         private static string DLR_exep;
 
+
+        private bool ServerExample(string path){
+            if (File.Exists(path)){
+                Runcompiler(path);
+                System.IO.File.Move(path.Substring(0, path.Length - 11) + "Foo.exe", path.Substring(0, path.Length - 11)+"Server.exe");
+                Runcompiler(path.Substring(0, path.Length - 11)+"Client.plot");
+                System.IO.File.Move(path.Substring(0, path.Length - 11) + "Foo.exe", path.Substring(0, path.Length - 11) + "Client.exe");
+                return true;
+            }
+            return false;
+        }
+
         public CallCompiler(string name){
             //writer = new StreamWriter("dlr_tmp.tmp");
-            D_exep = DLR_exep = string.Empty;
-            CheckForCompiler();
-            _name = @name;
-            if (!string.IsNullOrEmpty(D_exep))
-            {
-                RunDesugar(name,name+".tmp");
-                Runcompiler(name + ".tmp");
+            //D_exep = DLR_exep = string.Empty;
+            //CheckForCompiler();
+          //  if (!string.IsNullOrEmpty(D_exep))
+         //   {
+                //RunDesugar(name,name+".tmp");
+                if(name.Contains("Server")){
+                    ServerExample(name);
+                }
+                else{
+                    Runcompiler(name);
+                }
+
+                System.IO.File.Copy(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", name.Substring(0, name.Length - 11)+"Compiler_Lib.dll");
               //  RunDLR(name+".tmp");
             }
           //  if (File.Exists(@"C:\Users\Scott\Desktop\Foo.exe"))
            // {
            // }
-        }
+        //}
 
        /* private static InvokeBuiltExe(){
       //      ProcessStartInfo Desugar = new ProcessStartInfo(@"C:\Users\Scott\Desktop\Foo.exe",  String.Format("\"{0}\" \"{1}\"", inputfile, tempfile));
@@ -65,7 +83,7 @@ namespace DS_DLR_Int
 
         private static void Runcompiler(string inputfile)
         {
-            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\"",inputfile));
+            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1}",inputfile,"compile"));
             comp.UseShellExecute = true;
             comp.CreateNoWindow = false;
             try
