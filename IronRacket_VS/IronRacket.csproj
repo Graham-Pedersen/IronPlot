@@ -225,7 +225,7 @@
   <ItemGroup>
     <Compile Include="Classification\ClassificationFormat.cs" />
     <Compile Include="Classification\ClassificationType.cs" />
-    <Compile Include="Classification\IRClassifier.cs" />
+    <Compile Include="IRClassifier.cs" />
     <Compile Include="FileState\parsePlot.cs" />
     <Compile Include="FileState\plotFile.cs" />
     <Compile Include="FileState\plotFileParsed.cs" />
@@ -237,6 +237,9 @@
     <Compile Include="IRTokenTag.cs" />
     <Compile Include="IRTokenTypes.cs" />
     <Compile Include="FileState\IR_IT_Filter.cs" />
+    <Compile Include="ParenMatch\BraceMatchProvider.cs" />
+    <Compile Include="ParenMatch\BraceTag.cs" />
+    <Compile Include="ParenMatch\IRMatchProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
