@@ -18,9 +18,9 @@ namespace DS_DLR_Int
 
                 foreach (string s in files)
                 {
-                    if (s.Contains(".plot"))
+                    if (s.Contains(".plot") && !s.Contains(".tmp"))
                     {
-                        string Filename = Path.GetFileName(s);
+                        string Filename = Path.GetFileNameWithoutExtension(s);
                         RunDesugar(s, s + ".tmp");
                         Runcompiler(s + ".tmp", Filename + ".exe");
                     }
