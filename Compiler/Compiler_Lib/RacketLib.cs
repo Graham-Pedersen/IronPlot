@@ -6,6 +6,39 @@ using System.Threading.Tasks;
 
 namespace CompilerLib
 {
+    public static class FunctionLib
+    {
+        public static ObjBox Map(FunctionHolder function, List<RacketPair> lists)
+        {
+            List<ObjBox> returnedValues = new List<ObjBox>();
+            List<Object> args = new List<Object>();
+            while(! lists[0].isNull())
+            {
+                args.Clear();
+                for(int i = 0; i < lists.Count; i++)
+                {
+                    
+                    args.Add(lists[i].car());
+                    ObjBox rest = lists[i].cdr();
+                    if (rest.getType() == typeof(voidObj))
+                    {
+                        break;
+                    }
+                    lists[i] = (RacketPair) rest.getObj();
+                    /*
+                    else
+                    {
+                        throw new RuntimeException("Inproper list passed to map!");
+                    } */
+                }
+                returnedValues.Add(function.invoke(args));
+            }
+            
+            return new ObjBox(new RacketPair(returnedValues), typeof(RacketPair));
+        }
+    }
+
+
     public class RacketPair
     {
         private ObjBox value;
@@ -28,7 +61,22 @@ namespace CompilerLib
 
         public Boolean isNull()
         {
-            return Null;
+            return Null || value.getType() == typeof(voidObj);
+        }
+
+        public RacketPair(List<ObjBox> list)
+        {
+            if (list.Count == 0)
+            {
+                value = null;
+                rest = null;
+                Null = true;
+                return;
+            }
+            value = list[0];
+            Null = false;
+            list.RemoveAt(0);
+            rest = new ObjBox(new RacketPair(list), typeof(RacketPair));
         }
 
         public ObjBox car()

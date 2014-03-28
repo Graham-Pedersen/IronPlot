@@ -260,6 +260,9 @@ namespace DLR_Compiler
                         case "null?":
                             return nullCheckExpr(list, env);
 
+                        case "map":
+                            return mapExpr(list, env);
+
                         //TODO add environment check and move above standard cases
                         default:
                             return invokeLambda(list, env);
@@ -662,6 +665,81 @@ namespace DLR_Compiler
             return null;
         }
 
+        private static Expression mapExpr(ListNode list, Expression env)
+        {
+            int mapCount = list.values.Count;
+            if (mapCount < 3)
+                throw new ParsingException("map, not enough arguments provided");
+
+            // 1. function is user defined
+            // 2. function is built in
+            // 3. function is a lambda
+
+            Node function = list.values[1];
+        //    Expression lambda;
+            Expression fun;
+            List<Expression> body = new List<Expression>();
+
+            // init for lists from map
+            ParameterExpression arr = Expression.Parameter(typeof(List<RacketPair>));
+            Expression argArray = Expression.New(typeof(List<RacketPair>).GetConstructor(new Type[] { }));
+            Expression assign = Expression.Assign(arr, argArray);
+            body.Add(assign);
+
+            if (function.isList()) // lambda case 
+            {
+                ListNode l = (ListNode)function;
+                if (!l.values[0].getValue().Equals("lambda")) // should be lambda, just check that it is
+                    throw new ParsingException("not a lambda, but should be");
+                if (l.values.Count != 3)
+                    throw new ParsingException("bad syntax, lambda");
+                ListNode parameters = (ListNode)l.values[1]; // parameters,
+                int count = parameters.values.Count;
+                if (count == 0)
+                    throw new ParsingException("number of parameters does not match number of lists given");
+                int listCount = mapCount - 2;
+                if (listCount != count)
+                    throw new ParsingException("number of lists does not match expected number of arguments");
+                int paramLength = -1;
+                // check list lengths are the same
+                for (int i = 2; i < mapCount; i++)
+                {
+                    ListNode l2 = (ListNode)list.values[i];
+                    int l2Length = l2.values.Count;
+                    if (paramLength == -1)
+                    {
+                        paramLength = l2Length;
+                    }
+                    else if (paramLength != l2Length)
+                    {
+                        throw new ParsingException("All lists must have same size");
+                    }               
+                }
+                fun = unboxValue(lambdaExpr(l, env), typeof(FunctionHolder));
+            }
+            else
+            {
+                fun = unboxValue(lookup(Expression.Constant(function.getValue()), env), typeof(FunctionHolder));
+                // graham will fix this by changing lookup, so if it fails its his fault
+            }
+
+           
+            for (int h = 2; h < mapCount; h++)
+            {
+                body.Add(
+                    Expression.Call(
+                    arr, 
+                    typeof(List<RacketPair>).GetMethod("Add", new Type[] { typeof(RacketPair) }), 
+                    unboxValue(matchExpression(list.values[h], env), typeof(RacketPair)))); 
+            }
+
+            body.Add(Expression.Call(null,
+                typeof(FunctionLib).GetMethod("Map"), fun, arr));
+
+            return Expression.Block(new ParameterExpression[] { arr }, body);
+            
+        }
+
         private static Expression displayExpr(ListNode list, Expression env)
         {
             List<Expression> block = new List<Expression>();
@@ -830,9 +908,9 @@ namespace DLR_Compiler
 
             //Now we want to box this expression in a FunctionHolder
             Expression func = Expression.New(
-                typeof(FunctionHolder).GetConstructor(new Type[] { typeof(Delegate) }),
-                lambda);
-
+                typeof(FunctionHolder).GetConstructor(new Type[] { typeof(Delegate), typeof(int)}),
+                lambda, Expression.Constant(paramList.Count, typeof(int)));
+           
             //Now lets box this into a objBox
             return Expression.New(
                 typeof(ObjBox).GetConstructor(new Type[] {typeof(Object), typeof(Type)}),
@@ -887,7 +965,7 @@ namespace DLR_Compiler
             if (tree.values.Count != 3)
                 throw new ParsingException("failed to parse < for list " + tree.ToString());
 
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));    
             dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
 

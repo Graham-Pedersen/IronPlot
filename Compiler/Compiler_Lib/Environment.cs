@@ -88,9 +88,11 @@ namespace CompilerLib
     {
         //int count;
         public Delegate func;
-        public FunctionHolder(Delegate _func)
+        public int param_num;
+        public FunctionHolder(Delegate _func, int count)
         {
             func = _func;
+            param_num = count;
             //count = 0;
         }
 
@@ -99,7 +101,11 @@ namespace CompilerLib
             //count += 1;
             //Console.WriteLine("Got called");
             //Console.WriteLine("Count is: " + count.ToString());
-            Console.WriteLine(arguments);
+            //Console.WriteLine(arguments);
+            foreach (Object o in arguments)
+            {
+                Console.WriteLine(o.ToString());
+            }
             return func.DynamicInvoke(arguments.ToArray());
         }
     }
