@@ -2,28 +2,27 @@
 (define list "System.Collections.Generic.List")
 
 
-(define cons_qual (lambda (name method) 
-		(scall System.String.Concat name assembly_info method)))
+(define cons_qual (lambda (name) 
+		(scall System.String Concat name assembly_info)))
 
 (define do_setup (lambda ()
-	(define sname (cons_qual "System.Net.Sockets.Socket" ""))	
-	(define get_input (lambda () (call '() System.Console.ReadLine)))
+	(define sname (cons_qual "System.Net.Sockets.Socket"))
 	(define ipHostInfo
-			(scall (cons_qual "System.Net.Dns" ".GetHostEntry")
-				(scall (cons_qual "System.Net.Dns" ".GetHostName"))))
+			(scall (cons_qual "System.Net.Dns") GetHostEntry
+				(scall (cons_qual "System.Net.Dns") GetHostName)))
 	(define ip 
 		(call 
 			(new list 
-				(typelist (cons_qual "System.Net.IPAddress" ""))
+				(typelist (cons_qual "System.Net.IPAddress"))
 				(call ipHostInfo AddressList))
 			Item
 			0))
 	(define port 11000)
 	(displayln  (cons '(starting on) (cons ip (cons '(and port) (cons port '())))))
 	(define family (call ip AddressFamily))
-	(define stype (scall (cons_qual "System.Net.Sockets.SocketType" ".Stream")))
-	(define protocol (scall (cons_qual "System.Net.Sockets.ProtocolType" ".Tcp")))
-	(define endpoint (new (cons_qual "System.Net.IPEndPoint" "") ip port))
+	(define stype (scall (cons_qual "System.Net.Sockets.SocketType") Stream))
+	(define protocol (scall (cons_qual "System.Net.Sockets.ProtocolType") Tcp))
+	(define endpoint (new (cons_qual "System.Net.IPEndPoint") ip port))
 	(define server_sock (new sname family stype protocol))
 	(call server_sock Bind endpoint)
 	(call server_sock Blocking set #f)
@@ -36,7 +35,7 @@
 
 (define get_message 
 	(lambda (client) 
-		(if (call client Poll 0 (scall (cons_qual "System.Net.Sockets.SelectMode" ".SelectRead")))
+		(if (call client Poll 0 (scall (cons_qual "System.Net.Sockets.SelectMode") SelectRead))
 			(begin 
 				(define count (call client Available))
 				(define bytes 
@@ -51,7 +50,7 @@
 	
 (define accept_client 
 	(lambda (server) 
-		(if (call server Poll 0 (scall (cons_qual "System.Net.Sockets.SelectMode" ".SelectRead")))
+		(if (call server Poll 0 (scall (cons_qual "System.Net.Sockets.SelectMode") SelectRead))
 			(begin 
 				(define newbie (call server Accept))
 				(displayln "Client connected!")

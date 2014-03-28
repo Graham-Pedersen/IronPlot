@@ -124,7 +124,7 @@
     <value>Application Icon</value>
   </data>
   <data name="ApplicationIconDescription" xml:space="preserve">
-    <value>Sets the .ico file to use as your application icon.</value>
+    <value>Templates\Projects\IronRacketProject\IronRacketProject.ico</value>
   </data>
   <data name="AssemblyName" xml:space="preserve">
     <value>Assembly Name</value>

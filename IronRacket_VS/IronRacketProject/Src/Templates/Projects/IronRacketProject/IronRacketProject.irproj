@@ -17,20 +17,16 @@
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
-  <Target Name="GetPath">
-    <GetFrameworkPath>
-      <Output
-          TaskParameter="C:\"
-          PropertyName="C:\" />
-    </GetFrameworkPath>
-  </Target>
-  
+
   
   <Target Name="Hello">
     <Message Text="Hello MSBuild" Importance="high"/>
   </Target>
   <Target Name="Build" DependsOnTargets="Hello">
   </Target>
+
+  <UsingTask AssemblyFile="C:\Users\Scott\Documents\Compiler\IronPlot\IronRacket_VS\DS_DLR_Int\bin\Debug\ClassLibrary1.dll"
+             TaskName="CompileTarget"/>
   
   <Target Name="CompileTarget">
     <Message Text="Building Your IronRacket Project" Importance="high"/>
@@ -40,7 +36,7 @@
   </Target>
   
   
-  <Import Project="C:\Users\Scott\Desktop\test.targets"/>
+  <!--<Import Project="C:\Users\Scott\Desktop\test.targets"/>-->
  
   <!--<Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />-->
 </Project>

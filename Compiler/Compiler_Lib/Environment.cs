@@ -98,14 +98,6 @@ namespace CompilerLib
 
         public dynamic invoke(List<Object> arguments)
         {
-            //count += 1;
-            //Console.WriteLine("Got called");
-            //Console.WriteLine("Count is: " + count.ToString());
-            //Console.WriteLine(arguments);
-            foreach (Object o in arguments)
-            {
-                Console.WriteLine(o.ToString());
-            }
             return func.DynamicInvoke(arguments.ToArray());
         }
     }

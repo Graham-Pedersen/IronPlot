@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="CustomProject.82ebba9b-4bcd-4a6a-9220-826810552bdc" Version="1.0" Language="en-US" Publisher="Microsoft" />
-    <DisplayName>CustomProject</DisplayName>
+    <Identity Id="IronRacketProject.82ebba9b-4bcd-4a6a-9220-826810552bdc" Version="1.0" Language="en-US" Publisher="Microsoft" />
+    <DisplayName>IronRacketProject</DisplayName>
     <Description xml:space="preserve">Sample MPF-based project system.</Description>
+    <MoreInfo>http://none.com</MoreInfo>
+    <Icon>Templates\Projects\IronRacketProject\IronRacketProject.ico</Icon>
+    <PreviewImage>Templates\Projects\IronRacketProject\IronRacketProject.ico</PreviewImage>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="11.0" />

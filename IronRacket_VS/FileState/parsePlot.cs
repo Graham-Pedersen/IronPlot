@@ -45,9 +45,10 @@ namespace IRLanguage.FileState
             return Regex.Replace(text, @"\s*","");
         }
 
-        private static int getEndOfFunction(string text, int start_index)
+        private static int getEndOfFunction(string text)
         {
             int left = 0;
+            int start_index = 0;
             while (text[start_index] != '(' && start_index + 1 < text.Length && text[start_index + 1] != 'd')
             {
                 start_index++;
@@ -80,7 +81,8 @@ namespace IRLanguage.FileState
         //MUST be at a starting (
         private static string pull_top_level_function(string text, ref int start_index)
         {
-            string[] tokens = text.Substring(start_index).Split(')');
+            text = text.Substring(start_index);
+            string[] tokens = text.Split(')');
             string TL_Function="";
             bool found = false;
             int i = 0;
@@ -110,14 +112,14 @@ namespace IRLanguage.FileState
             {
                 if (text.IndexOf(tokens[i]) != -1)
                 {
-                    start_index = getEndOfFunction(text, text.IndexOf(tokens[i]));
+                    start_index += getEndOfFunction(text);
                     return TL_Function.Trim();
                 }
-                start_index = getEndOfFunction(text, start_index);
+                start_index += getEndOfFunction(text);
                 return TL_Function.Trim();
 
             }
-            start_index = getEndOfFunction(text, start_index);
+            start_index += getEndOfFunction(text);
             return null;
 
         }
