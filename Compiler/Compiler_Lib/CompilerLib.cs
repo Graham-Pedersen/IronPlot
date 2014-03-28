@@ -205,16 +205,12 @@ namespace CompilerLib
         {
             Object instance = null;
             Type t;
-            String qualifiedName;
-            String typeName;
+
+            //if we have a static call the objBox will have a string that is the fully qualified type
             if (wrapper.getType() == (typeof(voidObj)))
             {
-                
-                int index = s.LastIndexOf('.');
-                qualifiedName = s.Substring(index + 1);
-                typeName = s.Substring(0, index);
-                t = Type.GetType(typeName);
-                s = qualifiedName;
+                String typename = (String)wrapper.getObj();
+                t = Type.GetType(typename);
             }
             else
             {
