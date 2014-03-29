@@ -1,8 +1,8 @@
+#lang racket
 ;This is a very simple desugarer for a simple scheme like language based on the article at http://matt.might.net/articles/desugaring-scheme/ over time we will grow this into a consideral subset of the racket language which we will grow out of this file by adding and changing functionality
 
 ; TODO remove language dependances from racket
 
-#lang racket
 
  
 ; Entry Point
@@ -16,7 +16,9 @@
                      (set! out (open-output-file output #:exists 'replace))
                    filename)) #:mode 'text)))
   (set! program (desugar-tops program)) ;; desugar-tops
+  (displayln program)
   (set! program (map desugar-define program)) ;; desugar the defines now
+  (displayln program)
   (set! program (partition-k 
                  atomic-define?
                  program
@@ -33,7 +35,9 @@
                          [`(define ,v ,complex)
                           `(set! ,v ,complex)]
                          [else (displayln "cannot desguar begin")])))
-                   (append atomic (list (desugar-exp `(let ,bindings ,@sets)))))))
+                   (begin
+                   (displayln `(let ,bindings ,@sets))
+                   (append atomic (list (desugar-exp `(let ,bindings ,@sets))))))))
   (write-output program out))
 ;; (displayln (pretty-format program 40)))
 
@@ -63,22 +67,30 @@
        ; Desugaring Functions
 
 (define (desugar-tops tops)
-    (define (top-to-def top)
-        (match top
-            [`(define (,name ,params ...) . ,body)
-             (function-def->var-def top)]
-            [`(define ,var ,exp)
-             `(define ,var ,exp)]
-            [`(begin . ,forms)
-             `(begin-top ,@forms)]
-            [exp `(define ,(gensym '_) ,exp)]))
-    (map top-to-def tops)) ;; map is putting in list...... problem with program wrapped in parens
+  (define (top-to-def top)
+    (match top
+      [`(define (,name ,params ...) . ,body)
+       (function-def->var-def top)]
+      [`(define ,var ,exp)
+       `(define ,var ,exp)]
+      [`(begin . ,forms)
+       `(begin-top ,@forms)]
+      [`(define-values ,ids ,exp)
+       (desugar-define-value def)]
+      [exp `(define ,(gensym '_) ,exp)]))
+  (map top-to-def tops)) ;; map is putting in list...... problem with program wrapped in parens
 
+(define (desugar-define-value def)
+  (match def
+    [`(define-value ,ids ,exp)
+     ]
+    [else
+     (displayln `(cannot desugar define-value ,def))]))
 
 ; desugar define statements of the form (define ,v ,exp)
 (define (desugar-define def)
     (match def
-      [`(define ,v ,exp) `(define ,v ,(desugar-exp exp))]
+      [`(define ,v ,exp) (begin (displayln exp)(displayln (desugar-exp exp))`(define ,v ,(desugar-exp exp)))]
       [`(begin-top . ,forms) `(begin-top ,@(map desugar-exp forms))]
       [else (displayln `(cannot desugar define ,def))]))
 
@@ -87,7 +99,9 @@
       [(? symbol?) exp]
       [`(quote ,s-exp) (desugar-quote s-exp)]
       [`(let ((,vs ,es) ...) . ,body)
-       `((lambda ,vs ,(desugar-body body)) ,@(map desugar-exp es))]
+       (begin
+       (displayln body)
+       `((lambda ,vs ,(desugar-body body)) ,@(map desugar-exp es)))]
       
       [`(letrec ((,vs ,es) ...) . ,body) 
        (desugar-exp `(let ,(for/list ([v vs])
@@ -124,7 +138,7 @@
        `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
       [`(if ,test ,exp1 ,exp2)
        `(if ,(desugar-exp test) ,(desugar-exp exp1) ,(desugar-exp exp2))]
-      [`(set! ,v ,exp) `(set! ,v ,(desugar-exp exp))]
+      [`(set! ,v ,exp) (begin (displayln exp) `(set! ,v ,(desugar-exp exp)))]
       [`(quasiquote ,qq-exp) (desugar-quasi-quote 1 qq-exp)]
       [`(begin . ,body) (desugar-body body)]
       [`(first ,exp) `(car ,exp)]
@@ -149,12 +163,15 @@
                                             `(- ,(desugar-exp farg)
                                                 ,(desugar-exp sarg))
                                             rest)]
-      [`(list . ,rest) (foldr (lambda (x a) `(cons ,(desugar-exp x) ,a)) '() rest)] ;; needs testing 
+      [`(list . ,rest) (foldr (lambda (x a) `(cons ,(desugar-exp x) ,a))
+			 `(quote()) rest)] ;; needs testing a is accumulator
                                    
       [(? atomic?) exp]
       [`(,function . ,args) 
-       `(,(desugar-exp function) ,@(map desugar-exp args))]
-      [else (displayln `(could not desugar expression ,@exp))]))
+       (begin
+       (displayln "here")
+       `(,(desugar-exp function) ,@(map desugar-exp args)))]
+      [else  (begin (displayln exp)(displayln `(could not desugar expression ,@exp)))]))
 
 ;; --------- desugar helpers -------------
 
@@ -164,16 +181,21 @@
 (define (desugar-body body)
   (match body
     [`(,exp)
-     (desugar-exp exp)]
+     (begin
+     (displayln "here") (displayln exp)
+     (desugar-exp exp))]
     
     [`(,(and (? not-define?) exps) ...)
-     `(begin ,@(map desugar-exp exps))]
+     (begin (displayln "here")(displayln exps)
+     `(begin ,@(map desugar-exp exps)))]
     
     [`(,tops ... ,exp)
+     (begin (displayln "here")
+            (displayln exp)
      (define defs (desugar-tops tops))
      (desugar-exp (match defs
                     [`((define ,vs ,es) ...)
-                     `(letrec ,(map list vs es) ,exp)]))]))
+                     `(letrec ,(map list vs es) ,exp)])))]))
 
 
 
@@ -299,6 +321,7 @@
     [(? boolean?)  #t]
     [`(quote . ,_) #t]
     ['(void)       #t]
+    [`() #t]
     [else          #f]))
 
 (define (partition-k pred list k)

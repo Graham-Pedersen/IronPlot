@@ -88,9 +88,11 @@ namespace CompilerLib
     {
         //int count;
         public Delegate func;
-        public FunctionHolder(Delegate _func)
+        public int param_num;
+        public FunctionHolder(Delegate _func, int count)
         {
             func = _func;
+            param_num = count;
             //count = 0;
         }
 
