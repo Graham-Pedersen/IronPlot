@@ -12,24 +12,29 @@ namespace CompilerLib
         {
             List<ObjBox> returnedValues = new List<ObjBox>();
             List<Object> args = new List<Object>();
-            while(! lists[0].isNull())
+            bool restNull = false;
+            int listLength = -1;
+            while(! restNull)
             {
                 args.Clear();
                 for(int i = 0; i < lists.Count; i++)
                 {
-                    
+                    if (listLength == -1)
+                        listLength = lists[i].length();
+                    if (lists[i].length() != listLength)
+                        throw new RuntimeException("Lists must be of same length");
+
                     args.Add(lists[i].car());
                     ObjBox rest = lists[i].cdr();
+
                     if (rest.getType() == typeof(voidObj))
                     {
-                        break;
+                        restNull = true;
                     }
-                    lists[i] = (RacketPair) rest.getObj();
-                    /*
                     else
                     {
-                        throw new RuntimeException("Inproper list passed to map!");
-                    } */
+                        lists[i] = (RacketPair)rest.getObj();
+                    }
                 }
                 returnedValues.Add(function.invoke(args));
             }
@@ -44,12 +49,17 @@ namespace CompilerLib
         private ObjBox value;
         private ObjBox rest;
         private Boolean Null;
+        private int Length;
 
         public RacketPair(ObjBox _value, ObjBox _rest)
         {
             value = _value;
             rest = _rest;
             Null = false;
+            if (_rest.getType() == typeof(voidObj))
+                Length = 1;
+            else
+                Length = 2;
         }
 
         public RacketPair()
@@ -57,11 +67,17 @@ namespace CompilerLib
             value = null;
             rest = null;
             Null = true;
+            Length = 0;
         }
 
         public Boolean isNull()
         {
             return Null || value.getType() == typeof(voidObj);
+        }
+
+        public int length()
+        {
+            return Length;
         }
 
         public RacketPair(List<ObjBox> list)
@@ -71,11 +87,13 @@ namespace CompilerLib
                 value = null;
                 rest = null;
                 Null = true;
+                Length = 0;
                 return;
             }
             value = list[0];
             Null = false;
             list.RemoveAt(0);
+            Length = list.Count;
             rest = new ObjBox(new RacketPair(list), typeof(RacketPair));
         }
 
@@ -128,14 +146,18 @@ namespace CompilerLib
         {
             String lhs;
             String rhs;
+            if (value == null)
+                return "";
 
-            if (value.getType() == typeof(RacketPair))
+            else if (value.getType() == typeof(RacketPair))
             {
                 lhs = ((RacketPair)value.getObj()).printList();
             }
             else { lhs = value.getObj().ToString(); }
+            if (rest == null)
+                rhs = "";
 
-            if (rest.getType() == typeof(RacketPair))
+            else if (rest.getType() == typeof(RacketPair))
             {
                 rhs = ((RacketPair)rest.getObj()).printList();
             }
