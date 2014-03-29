@@ -58,11 +58,22 @@ namespace DLR_Compiler
 
                 Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
 
-                //Add the environment to the start of the program
+
+                //Body of the program
                 List<Expression> program = new List<Expression>();
+
+                //TODO
+                //Add the link to Compiler_lib
+                //String dllLoc = Directory.GetCurrentDirectory() + "\\" + "Compiler_Lib.dll";
+                //Expression usingCompilerLib = Expression.Call(null, typeof(typeResolver).GetMethod("import"), Expression.Constant(dllLoc));
+                //program.Add(usingCompilerLib);
+
+                //Add the environment to the start of the program
                 program.Add(env);
                 program.Add(assign);
                 program.Add(assignVoid);
+
+
 
                 Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
 
@@ -182,6 +193,10 @@ namespace DLR_Compiler
 
                         case "":
                             return voidSingleton;
+
+                        //TODO REMOVE THIS AFTER DESUGARER FIX (add using as a top level form that escapes transformation)
+                        case "using":
+                            return netImportStmt(list, env);
 
                         case "call":
                             return callNetExpr(list, env);
@@ -320,7 +335,11 @@ namespace DLR_Compiler
             {
                 throw new ParsingException("Could not parse using expression");
             }
-            return Expression.Call(null, typeof(typeResolver).GetMethod("use"), Expression.Constant(list.values[1].getValue()));
+
+            Expression importStr = Expression.Constant(list.values[1].getValue());
+            return Expression.Block(
+            new ParameterExpression[] { }, 
+            new Expression[]  { Expression.Call(null, typeof(typeResolver).GetMethod("import", new Type[] { typeof(String) }), importStr) , voidSingleton });
         }
 
         private static Expression scallNetExpr(ListNode list, Expression env)
@@ -660,7 +679,6 @@ namespace DLR_Compiler
             }
             ListNode bodyLiterals = new ListNode(values, 0, false);
 
-            //TODO verify correctness of not making a new env
             return matchTopLevel(bodyLiterals, env);
         }
 
