@@ -73,6 +73,7 @@ namespace IRLanguage
             _IRTypes[IRTokenTypes.IRSetbang] = typeService.GetClassificationType("set!");
             _IRTypes[IRTokenTypes.IRDefinevar] = typeService.GetClassificationType("define_var");
             _IRTypes[IRTokenTypes.IRNew] = typeService.GetClassificationType("new");
+            _IRTypes[IRTokenTypes.IRKeyword] = typeService.GetClassificationType("keyword");
             
         }
 

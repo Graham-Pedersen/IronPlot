@@ -341,7 +341,25 @@ namespace IRLanguage
 
 
 
-
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "keyword")]
+    [Name("IRkeyword")]
+    //this should be visible to the end user
+    [UserVisible(false)]
+    //set the priority to be after the default classifiers
+    [Order(Before = Priority.Default)]
+    internal sealed class IRKeyword : ClassificationFormatDefinition
+    {
+        /// <summary>
+        /// Defines the visual format for the "ordinary" classification type
+        /// </summary>
+        public IRKeyword()
+        {
+            this.DisplayName = "keyword"; //human readable version of the name
+            this.ForegroundColor = Colors.Blue;
+            this.IsBold = false;
+        }
+    }
 
     #endregion //Format definition
 }

@@ -83,6 +83,11 @@
             return -1;
         }
 
+        private void findNewLine(string line, ref int location)
+        {
+            location = line.IndexOf('\n');
+        }
+
         private char findNextTrigger(string line, ref int location)
         {
             for (int i = 0; i < line.Length; i++)
@@ -105,8 +110,15 @@
         }
 
 
-        private bool isKeyWord(string incoming){
-            if(_IRTypes.ContainsKey(incoming.Trim()) || (Regex.IsMatch(incoming, @"define\s[a-z]+"))){
+        private bool isKeyWord(string incoming, ref string type){
+            if (_IRTypes.ContainsKey(incoming.Trim()))
+            {
+                type = incoming.Trim();
+                return true;
+            }
+
+            if(Regex.IsMatch(incoming, @"define\s[a-z]+")){
+                type = "define_var";
                 return true;
             }
 
@@ -114,10 +126,6 @@
         }
         
         private TagSpan<IRTokenTag> generateSpan(string input, SnapshotSpan tokenSpan){
-            if (Regex.IsMatch(input, @"define\s[a-z]+"))
-            {
-                return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes["define_var"]));
-            }
             return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes[input.Trim()]));
         }
 
@@ -126,6 +134,8 @@
             return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes["IRcomment"]));
         }
 
+
+        
 
 
         public IEnumerable<ITagSpan<IRTokenTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -155,14 +165,15 @@
                                 break;
                             }
                             char trig = findNextTrigger(line.Substring(location+1), ref location2);
+                            string type="";
                             string input = line.Substring(location+1, location2);
                             curLoc += location;
-                            if (isKeyWord(input))
+                            if (isKeyWord(input, ref type))
                             { //remove (
                                 var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, input.Length));
                                 if (tokenSpan.IntersectsWith(curSpan))
                                 {
-                                    yield return generateSpan(input, tokenSpan);
+                                    yield return generateSpan(type, tokenSpan);
                                 }
                             }
                             if (trig == '*')
@@ -176,6 +187,25 @@
                             line = line.Substring(location+location2+1);
                             break;
                         case ';':
+                            location2 = 0;
+                            if (location + 1 > line.Length)
+                            {
+                                curLoc += location;
+                                line = line.Substring(location);
+                                break;
+                            }
+                            //findNewLine(line.Substring(location), ref location2);
+                            location2 = line.Length;
+                            input = line;
+                            {
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, input.Length));
+                                if (tokenSpan.IntersectsWith(curSpan))
+                                {
+                                    yield return generateCommentStringSpan(tokenSpan);
+                                }
+                            }
+                            curLoc += location + location2; //account for the ;
+                            line = string.Empty;
                             break;
                         case '"':
                             curLoc++;
@@ -189,8 +219,14 @@
                             trig = findNextTrigger(line.Substring(location + 1), ref location2);
                             if (trig != '"')
                             {
-                                curLoc += line.Length;
-                                line = String.Empty;
+                                if (trig == '*')
+                                {
+                                    curLoc += line.Length;
+                                    line = String.Empty;
+                                    break;
+                                }
+                                curLoc += location + location2;
+                                line = line.Substring(location + location2 + 1);
                                 break;
                             }
                             input = line.Substring(location + 1, location2);

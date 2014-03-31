@@ -25,7 +25,11 @@ namespace DS_DLR_Int
                         Runcompiler(s + ".tmp", Filename + ".exe");
                     }
                 }
-                System.IO.File.Copy(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", name.Substring(0, name.Length - 11)+"Compiler_Lib.dll");
+                if (File.Exists(directory + @"\Compiler_lib.dll"))
+                {
+                    File.Delete(directory + @"\Compiler_Lib.dll");
+                }
+                System.IO.File.Copy(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", directory+ @"\Compiler_Lib.dll");
             }
          
 
