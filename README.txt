@@ -1,4 +1,5 @@
-This software is OPEN SOURCE under CRAPL: http://matt.might.net/articles/crapl/
+This software is OPEN SOURCE under CRAPL: http://matt.might.net/articles/crapl/CRAPL-LICENSE.txt
+Explanation of the CRAPL: http://matt.might.net/articles/crapl/
 
 This is the reopository for IronPlot a scheme-like language
 
@@ -44,7 +45,6 @@ input grammer:
 	   |  (cons <exp> <exp>)
 	   |  (car <list>)
 	   |  (cdr <list>)
-
 	   
 <math-exp> ::=  (+ <exp> <exp>)
 	   |  (- <exp> <exp>)
