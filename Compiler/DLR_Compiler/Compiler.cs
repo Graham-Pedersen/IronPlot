@@ -22,7 +22,6 @@ namespace DLR_Compiler
 
         public static void Main(string[] args)
         {
-
             if (args.Length != 3)
             {
                 throw new Exception("Compiler called with incorrect number of arguments!");
@@ -59,11 +58,22 @@ namespace DLR_Compiler
 
                 Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
 
-                //Add the environment to the start of the program
+
+                //Body of the program
                 List<Expression> program = new List<Expression>();
+
+                //TODO
+                //Add the link to Compiler_lib
+                //String dllLoc = Directory.GetCurrentDirectory() + "\\" + "Compiler_Lib.dll";
+                //Expression usingCompilerLib = Expression.Call(null, typeof(typeResolver).GetMethod("import"), Expression.Constant(dllLoc));
+                //program.Add(usingCompilerLib);
+
+                //Add the environment to the start of the program
                 program.Add(env);
                 program.Add(assign);
                 program.Add(assignVoid);
+
+
 
                 Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
 
@@ -144,7 +154,7 @@ namespace DLR_Compiler
                 {
                     return defineExpr(list, env);
                 }
-                else if (list.values[0].isLeaf() && list.values[0].getValue() == "netuse")
+                else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
                 {
                     return netImportStmt(list, env);
                 }
@@ -183,6 +193,10 @@ namespace DLR_Compiler
 
                         case "":
                             return voidSingleton;
+
+                        //TODO REMOVE THIS AFTER DESUGARER FIX (add using as a top level form that escapes transformation)
+                        case "using":
+                            return netImportStmt(list, env);
 
                         case "call":
                             return callNetExpr(list, env);
@@ -320,7 +334,15 @@ namespace DLR_Compiler
 
         private static Expression netImportStmt(ListNode list, Expression env)
         {
-            throw new NotImplementedException();
+            if(list.values.Count != 2)
+            {
+                throw new ParsingException("Could not parse using expression");
+            }
+
+            Expression importStr = Expression.Constant(list.values[1].getValue());
+            return Expression.Block(
+            new ParameterExpression[] { }, 
+            new Expression[]  { Expression.Call(null, typeof(typeResolver).GetMethod("import", new Type[] { typeof(String) }), importStr) , voidSingleton });
         }
 
         private static Expression scallNetExpr(ListNode list, Expression env)
@@ -660,7 +682,6 @@ namespace DLR_Compiler
             }
             ListNode bodyLiterals = new ListNode(values, 0, false);
 
-            //TODO verify correctness of not making a new env
             return matchTopLevel(bodyLiterals, env);
         }
 
@@ -670,6 +691,57 @@ namespace DLR_Compiler
                 throw new ParsingException("empty body in a begin0 exprssion");
 
             List<Node> values = new List<Node>();
+
+            return null;
+        }
+
+        private static Expression foldlExpr(ListNode list, Expression env)
+        {
+            int foldCount = list.values.Count;
+            if (foldCount < 4)
+                throw new ParsingException("foldl, not enough arguments provided");
+
+            // 1. function is user defined
+            // 2. function is built in
+            // 3. function is a lambda
+
+            Node function = list.values[1];
+            Expression fun;
+            List<Expression> body = new List<Expression>();
+
+            // init lists for map
+            ParameterExpression listArrs = Expression.Parameter(typeof(List<RacketPair>));
+            Expression argArray = Expression.New(typeof(List<RacketPair>).GetConstructor(new Type[] { }));
+            Expression assign = Expression.Assign(listArrs, argArray);
+
+            // must create parameter for init argument, don't know type
+            // TODO
+
+            body.Add(assign);
+            // must add parameter for init arg
+
+            if (function.isList()) // lambda case 
+            {
+                ListNode l = (ListNode)function;
+                if (!l.values[0].getValue().Equals("lambda")) // should be lambda, just check that it is
+                    throw new ParsingException("not a lambda, but should be");
+                if (l.values.Count != 3)
+                    throw new ParsingException("bad syntax, lambda");
+                ListNode parameters = (ListNode)l.values[1]; // parameters,
+                int count = parameters.values.Count;
+                if (count == 0)
+                    throw new ParsingException("number of parameters does not match number of lists given");
+                int listCount = foldCount - 2;
+                if (listCount != count)
+                    throw new ParsingException("number of lists does not match expected number of arguments");
+
+                fun = unboxValue(lambdaExpr(l, env), typeof(FunctionHolder));
+            }
+            else // built in or user defined case
+            {
+                fun = unboxValue(lookup(Expression.Constant(function.getValue()), env), typeof(FunctionHolder));
+                // graham will fix this by changing lookup, so if it fails its his fault
+            }
 
             return null;
         }
@@ -709,37 +781,23 @@ namespace DLR_Compiler
                 int listCount = mapCount - 2;
                 if (listCount != count)
                     throw new ParsingException("number of lists does not match expected number of arguments");
-                int paramLength = -1;
-                // check list lengths are the same
-                for (int i = 2; i < mapCount; i++)
-                {
-                    ListNode l2 = (ListNode)list.values[i];
-                    int l2Length = l2.values.Count;
-                    if (paramLength == -1)
-                    {
-                        paramLength = l2Length;
-                    }
-                    else if (paramLength != l2Length)
-                    {
-                        throw new ParsingException("All lists must have same size");
-                    }               
-                }
+
                 fun = unboxValue(lambdaExpr(l, env), typeof(FunctionHolder));
             }
-            else
+            else // built in or user defined case
             {
                 fun = unboxValue(lookup(Expression.Constant(function.getValue()), env), typeof(FunctionHolder));
                 // graham will fix this by changing lookup, so if it fails its his fault
             }
 
-           
             for (int h = 2; h < mapCount; h++)
             {
+                Expression l_ = unboxValue(matchExpression(list.values[h], env), typeof(RacketPair));
                 body.Add(
                     Expression.Call(
                     arr, 
                     typeof(List<RacketPair>).GetMethod("Add", new Type[] { typeof(RacketPair) }), 
-                    unboxValue(matchExpression(list.values[h], env), typeof(RacketPair)))); 
+                    l_)); 
             }
 
             body.Add(Expression.Call(null,

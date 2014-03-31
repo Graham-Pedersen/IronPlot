@@ -98,7 +98,14 @@ namespace CompilerLib
 
         public dynamic invoke(List<Object> arguments)
         {
-            return func.DynamicInvoke(arguments.ToArray());
+            try
+            {
+                return func.DynamicInvoke(arguments.ToArray());
+            }
+            catch (System.Reflection.TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
         }
     }
 
