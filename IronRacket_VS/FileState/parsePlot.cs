@@ -14,23 +14,30 @@ namespace IRLanguage.FileState
             string function;
             int index = 0;
             int debug_Length = text.Length;
+            bool already_found = false;
+
             while (index < text.Length)
             {
+                already_found = false;
                 if ((function = pull_top_level_function(text, ref index)) != null)
                 {
-                    /*           TODO              *
-                     *     FIND END OF FUNCTION    *
-                     *         DOESN'T HANDLE      *
-                     *  ITERATING THROUGH TOKENS   * 
-                     *  ARRAY PROPERLY, WITH       *
-                     *  RESPECT TO THE TRUE END OF *
-                     *  THE FUNCTION, HENCE WHY WE *
-                     *  GET DUPLICATES IN OUR      *
-                     *  INTELLISENSE WINDOW        */
-                      
-                    if (!completions.Contains(new Completion(function)))
+
+                    //change 3/28/ lol object comparason without a compartor WHOOPS
+                    foreach (Completion e in completions)
                     {
-                        completions.Add(new Completion(function));
+                        if (e.DisplayText == function)
+                        {
+                            already_found = true;
+                            break;
+                        }
+                    }
+                    if (!already_found)
+                    {
+                        Completion c = new Completion(function);
+                        c.Description = "User defined Function";
+                        //c.IconSource = Microsoft.VisualStudio.Language.Intellisense.IGlyphService.GetGlyph(StandardGlyphGroup.GlyphGroupMethod, StandardGlyphItem.GlyphItemPublic)
+                        completions.Add(c);
+                        already_found = false;
                     }
                 }
             }

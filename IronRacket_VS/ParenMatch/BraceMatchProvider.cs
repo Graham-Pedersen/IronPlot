@@ -19,12 +19,9 @@ namespace IRLanguage.ParenMatch
     internal sealed class BraceMatchingTagger : ITagger<TextMarkerTag>
     {
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
-      //  public static readonly TextMarkerTag BraceHighlightTag = new TextMarkerTag(PredefinedClassificationTypeNames.Operator);
-
 
         public static readonly TextMarkerTag BraceHighlightTag = new TextMarkerTag("bracematch");
-        
-      //  public static readonly IRTokenTag BraceHighlightTag = new IRTokenTag(IRTokenTypes.IRLambda);
+       
         public BraceMatchingTagger(ITextView textView, ITextBuffer sourceBuffer, IClassifier aggregator, IEnumerable<KeyValuePair<char, char>> matchingCharacters)
         {
             if (textView == null || sourceBuffer == null || aggregator == null || matchingCharacters == null)

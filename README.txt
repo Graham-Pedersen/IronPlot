@@ -1,3 +1,7 @@
+This software is OPEN SOURCE under CRAPL: http://matt.might.net/articles/crapl/
+
+
+
 This is the reopository for IronPlot a scheme-like language
 
 This language and compiler are still heavily under construction do not yet provide the ease of access we would like to building and running the project

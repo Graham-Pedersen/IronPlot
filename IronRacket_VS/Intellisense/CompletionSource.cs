@@ -40,8 +40,6 @@ namespace IRLanguage
             List<Completion> completions = new List<Completion>()
             {
                 new Completion("(define"),
-                new Completion("(car"),
-                new Completion("(cdr"),
                 new Completion("(lambda"),
             };
 

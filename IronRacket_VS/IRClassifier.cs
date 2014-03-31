@@ -73,6 +73,17 @@ namespace IRLanguage
             _IRTypes[IRTokenTypes.IRSetbang] = typeService.GetClassificationType("set!");
             _IRTypes[IRTokenTypes.IRDefinevar] = typeService.GetClassificationType("define_var");
             _IRTypes[IRTokenTypes.IRNew] = typeService.GetClassificationType("new");
+            _IRTypes[IRTokenTypes.IRWhile] = typeService.GetClassificationType("while");
+            _IRTypes[IRTokenTypes.IRBegin] = typeService.GetClassificationType("begin");
+            _IRTypes[IRTokenTypes.IRNullhuh] = typeService.GetClassificationType("null?");
+            _IRTypes[IRTokenTypes.IRMap] = typeService.GetClassificationType("map");
+            _IRTypes[IRTokenTypes.IREqualhuh] = typeService.GetClassificationType("equal?");
+            _IRTypes[IRTokenTypes.IRNot] = typeService.GetClassificationType("not");
+            _IRTypes[IRTokenTypes.IRCall] = typeService.GetClassificationType("call");
+            _IRTypes[IRTokenTypes.IRScall] = typeService.GetClassificationType("scall");
+            _IRTypes[IRTokenTypes.IRDisplayln] = typeService.GetClassificationType("displayln");
+            _IRTypes[IRTokenTypes.IRBool] = typeService.GetClassificationType("bool");
+
             
         }
 

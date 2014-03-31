@@ -14,7 +14,7 @@ namespace DS_DLR_Int
         private string SourceFile;
         public override bool Execute()
        {
-            CallCompiler cc = new CallCompiler(SourceFile); 
+            CallCompiler c = new CallCompiler(SourceFile); 
             return true;
         }
         public string SourceFiles

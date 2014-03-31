@@ -59,6 +59,17 @@
             _IRTypes["letrec"] = IRTokenTypes.IRLetrec;
             _IRTypes["define_var"] = IRTokenTypes.IRDefinevar;
             _IRTypes["new"] = IRTokenTypes.IRNew;
+            _IRTypes["while"] = IRTokenTypes.IRWhile;
+            _IRTypes["begin"] = IRTokenTypes.IRBegin;
+            _IRTypes["null?"] = IRTokenTypes.IRNullhuh;
+            _IRTypes["map"] = IRTokenTypes.IRMap;
+            _IRTypes["equal?"] = IRTokenTypes.IREqualhuh;
+            _IRTypes["not"] = IRTokenTypes.IRNot;
+            _IRTypes["call"] = IRTokenTypes.IRCall;
+            _IRTypes["scall"] = IRTokenTypes.IRScall;
+            _IRTypes["displayln"] = IRTokenTypes.IRDisplayln;
+            _IRTypes["bool"] = IRTokenTypes.IRBool;
+
             //_IRTypes["comment"] = IRTokenTypes.IRString;
 
 
@@ -83,6 +94,11 @@
             return -1;
         }
 
+        private void findNewLine(string line, ref int location)
+        {
+            location = line.IndexOf('\n');
+        }
+
         private char findNextTrigger(string line, ref int location)
         {
             for (int i = 0; i < line.Length; i++)
@@ -98,6 +114,9 @@
                     case '"':
                         location = i;
                         return '"';
+                    case '#':
+                        location = i;
+                        return '#';
                 }
             }
             location = line.Length;
@@ -105,19 +124,62 @@
         }
 
 
-        private bool isKeyWord(string incoming){
-            if(_IRTypes.ContainsKey(incoming.Trim()) || (Regex.IsMatch(incoming, @"define\s[a-z]+"))){
+        /* this function is a help function for keyword such as define var*/
+        private int  findSecondWhitespace(string incoming)
+        {
+            int count = 0;
+            for (int i = 0; i < incoming.Length; i++)
+            {
+                if (incoming[i] == ' ')
+                {
+                    count++;
+                }
+                if (count == 2)
+                {
+                    return i;
+                }
+            }
+            return incoming.Length;
+        }
+
+        private bool isKeyWord(string incoming, ref string type, ref int length)
+        {
+            string[] pkeys;
+            int temp_len=0;
+            if (_IRTypes.ContainsKey(incoming.Trim()))
+            {
+                type = incoming.Trim();
+                length = incoming.Length;
                 return true;
             }
+
+            if(Regex.IsMatch(incoming, @"define\s[a-z]+")){
+                type = "define_var";
+                length = findSecondWhitespace(incoming);
+                return true;
+            }
+            
+            pkeys = incoming.Split(' ');
+            for (int i =0; i< pkeys.Length; i++)
+            {
+                //if(isKeyWord(pkeys[i], ref temp_type, ref temp_len)){
+                if(_IRTypes.ContainsKey(pkeys[i].Trim())){
+                    type = pkeys[i].Trim();
+                    temp_len+=i;
+                    temp_len += pkeys[i].Length;
+                    for(int j = 0; j<i; i++){
+                        temp_len+=pkeys[j].Length;
+                    }
+                    length = temp_len;
+                    return true;
+                }
+            }// hold on this comment I may or may not be retarded //Recursive solution won't work as the len we get passed back will be all fucked up due to splitting --
+            //the logic to try and figure out where it is in the real string seems kinda shitty.
 
             return false;
         }
         
         private TagSpan<IRTokenTag> generateSpan(string input, SnapshotSpan tokenSpan){
-            if (Regex.IsMatch(input, @"define\s[a-z]+"))
-            {
-                return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes["define_var"]));
-            }
             return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes[input.Trim()]));
         }
 
@@ -126,6 +188,8 @@
             return new TagSpan<IRTokenTag>(tokenSpan, new IRTokenTag(_IRTypes["IRcomment"]));
         }
 
+
+        
 
 
         public IEnumerable<ITagSpan<IRTokenTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -143,6 +207,7 @@
                 {
                     int location = 0;
                     char c = findNextTrigger(line, ref location);
+                    int span_len = 0;
                     switch (c)
                     {
                         case '(':
@@ -155,14 +220,15 @@
                                 break;
                             }
                             char trig = findNextTrigger(line.Substring(location+1), ref location2);
+                            string type="";
                             string input = line.Substring(location+1, location2);
                             curLoc += location;
-                            if (isKeyWord(input))
+                            if (isKeyWord(input, ref type, ref span_len))
                             { //remove (
-                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, input.Length));
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, span_len));
                                 if (tokenSpan.IntersectsWith(curSpan))
                                 {
-                                    yield return generateSpan(input, tokenSpan);
+                                    yield return generateSpan(type, tokenSpan);
                                 }
                             }
                             if (trig == '*')
@@ -176,6 +242,25 @@
                             line = line.Substring(location+location2+1);
                             break;
                         case ';':
+                            location2 = 0;
+                            if (location + 1 > line.Length)
+                            {
+                                curLoc += location;
+                                line = line.Substring(location);
+                                break;
+                            }
+                            //findNewLine(line.Substring(location), ref location2);
+                            location2 = line.Length;
+                            input = line;
+                            {
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, input.Length));
+                                if (tokenSpan.IntersectsWith(curSpan))
+                                {
+                                    yield return generateCommentStringSpan(tokenSpan);
+                                }
+                            }
+                            curLoc += location + location2; //account for the ;
+                            line = string.Empty;
                             break;
                         case '"':
                             curLoc++;
@@ -189,8 +274,14 @@
                             trig = findNextTrigger(line.Substring(location + 1), ref location2);
                             if (trig != '"')
                             {
-                                curLoc += line.Length;
-                                line = String.Empty;
+                                if (trig == '*')
+                                {
+                                    curLoc += line.Length;
+                                    line = String.Empty;
+                                    break;
+                                }
+                                curLoc += location + location2;
+                                line = line.Substring(location + location2 + 1);
                                 break;
                             }
                             input = line.Substring(location + 1, location2);
@@ -203,6 +294,24 @@
                             }
                             curLoc += location + location2;
                             line = line.Substring(location+location2+1);
+                            break;
+                        case '#':
+                            location2 = 0;
+                            if (location + 1 > line.Length)
+                            {
+                                curLoc += location;
+                                line = line.Substring(location);
+                                break;
+                            }
+                            {
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, 2));
+                                if (tokenSpan.IntersectsWith(curSpan))
+                                {
+                                    yield return generateSpan("bool", tokenSpan);
+                                }
+                            }
+                            line = line.Substring(2);
+                            curLoc += 2;
                             break;
                         case '*':
                             curLoc += line.Length;

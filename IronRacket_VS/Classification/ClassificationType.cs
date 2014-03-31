@@ -80,6 +80,48 @@ namespace IRLanguage
         [Name("new")]
         internal static ClassificationTypeDefinition IRNew = null;
 
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("while")]
+        internal static ClassificationTypeDefinition IRWhile = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("begin")]
+        internal static ClassificationTypeDefinition IRBegin = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("null?")]
+        internal static ClassificationTypeDefinition IRNullhuh = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("map")]
+        internal static ClassificationTypeDefinition IRMap = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("equal?")]
+        internal static ClassificationTypeDefinition IREqualhuh = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("not")]
+        internal static ClassificationTypeDefinition IRNot = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("call")]
+        internal static ClassificationTypeDefinition IRCall = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("scall")]
+        internal static ClassificationTypeDefinition IRScall = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("displayln")]
+        internal static ClassificationTypeDefinition IRDisplayln = null;
+
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("bool")]
+        internal static ClassificationTypeDefinition IRBool = null;
+
+
+
 
         #endregion
     }
