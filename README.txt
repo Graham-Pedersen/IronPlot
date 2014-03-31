@@ -1,7 +1,5 @@
 This software is OPEN SOURCE under CRAPL: http://matt.might.net/articles/crapl/
 
-
-
 This is the reopository for IronPlot a scheme-like language
 
 This language and compiler are still heavily under construction do not yet provide the ease of access we would like to building and running the project
@@ -10,9 +8,65 @@ How it works
 
 .plot file -> (parser) -> parse tree -> (desugaring) -> core scheme parse tree -> (Dynamic Language Runtime conversion) -> .NET intermediate language .exe file
 
-input grammer:
+input grammer: 
+<prog> ::= <top>*
 
-core scheme grammer:
+<top> ::= <def> 
+	   |  <exp>
+       |  <use>
+
+<def> ::= (define (<var> <var>*) <body>)
+       |  (define <var> <exp>)
+	   
+<use> ::= (using <net_name_space | net_dll_path>)
+
+<exp> ::= <var>
+       |  <literal>
+       |  <prim>
+	   |  <netcall>
+	   |  (map <exp> <list>*)
+       |  (lambda (<var>*) <body>)
+       |  (let ((<var> <exp>)*) <body>)
+       |  (letrec ((<var> <exp>)*) <body>) 
+	   |  (while <exp> <exp>)
+	   |  (displayln <exp>)
+       |  (cond (<exp> <exp>)* [(else <exp>)])
+       |  (if <exp> <exp> [ <exp> ])
+       |  (set! <var> <exp>)
+       |  (begin <body>)
+       |  (quote <s-exp>)
+       |  (quasiquote <qq-exp 1>)
+	   |  <list-exp>
+	   |  <math-exp>
+	   |  <comp-exp>
+	   
+<list-exp> ::= (list <exp>*)
+	   |  (cons <exp> <exp>)
+	   |  (car <list>)
+	   |  (cdr <list>)
+
+	   
+<math-exp> ::=  (+ <exp> <exp>)
+	   |  (- <exp> <exp>)
+	   |  (* <exp> <exp>)
+	   |  (/ <exp> <exp>)
+	   |  (% <exp> <exp>)
+	   
+<comp-exp>   ::= (equals <exp> <exp>)
+	   |  (< <exp> <exp>)
+	   |  (<= <exp> <exp>)
+	   |  (> <exp> <exp>)
+	   |  (>= <exp> <exp>)
+	   |  (and <exp>*)
+       |  (or <exp>*)
+	   
+	   
+	   
+<netcall> ::=  (new <nettype> [<typelist>] exp*) ;; this represent a constructor to a .net OBJCET if a typelist is included it calls a generic constructor
+		  ::=  (call <obj> <method_name> exp*) ;; represents a call to a .net object with exp* arguments
+          ::=  (scall <nettype> <method_name> exp*) ;; represents a static .net call with exp* arguments
+		
+<typelist> ::= (typelist <nettype>*
 
 
 
