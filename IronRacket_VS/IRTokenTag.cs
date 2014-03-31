@@ -59,6 +59,17 @@
             _IRTypes["letrec"] = IRTokenTypes.IRLetrec;
             _IRTypes["define_var"] = IRTokenTypes.IRDefinevar;
             _IRTypes["new"] = IRTokenTypes.IRNew;
+            _IRTypes["while"] = IRTokenTypes.IRWhile;
+            _IRTypes["begin"] = IRTokenTypes.IRBegin;
+            _IRTypes["null?"] = IRTokenTypes.IRNullhuh;
+            _IRTypes["map"] = IRTokenTypes.IRMap;
+            _IRTypes["equal?"] = IRTokenTypes.IREqualhuh;
+            _IRTypes["not"] = IRTokenTypes.IRNot;
+            _IRTypes["call"] = IRTokenTypes.IRCall;
+            _IRTypes["scall"] = IRTokenTypes.IRScall;
+            _IRTypes["displayln"] = IRTokenTypes.IRDisplayln;
+            _IRTypes["bool"] = IRTokenTypes.IRBool;
+
             //_IRTypes["comment"] = IRTokenTypes.IRString;
 
 
@@ -103,6 +114,9 @@
                     case '"':
                         location = i;
                         return '"';
+                    case '#':
+                        location = i;
+                        return '#';
                 }
             }
             location = line.Length;
@@ -110,17 +124,57 @@
         }
 
 
-        private bool isKeyWord(string incoming, ref string type){
+        /* this function is a help function for keyword such as define var*/
+        private int  findSecondWhitespace(string incoming)
+        {
+            int count = 0;
+            for (int i = 0; i < incoming.Length; i++)
+            {
+                if (incoming[i] == ' ')
+                {
+                    count++;
+                }
+                if (count == 2)
+                {
+                    return i;
+                }
+            }
+            return incoming.Length;
+        }
+
+        private bool isKeyWord(string incoming, ref string type, ref int length)
+        {
+            string[] pkeys;
+            int temp_len=0;
             if (_IRTypes.ContainsKey(incoming.Trim()))
             {
                 type = incoming.Trim();
+                length = incoming.Length;
                 return true;
             }
 
             if(Regex.IsMatch(incoming, @"define\s[a-z]+")){
                 type = "define_var";
+                length = findSecondWhitespace(incoming);
                 return true;
             }
+            
+            pkeys = incoming.Split(' ');
+            for (int i =0; i< pkeys.Length; i++)
+            {
+                //if(isKeyWord(pkeys[i], ref temp_type, ref temp_len)){
+                if(_IRTypes.ContainsKey(pkeys[i].Trim())){
+                    type = pkeys[i].Trim();
+                    temp_len+=i;
+                    temp_len += pkeys[i].Length;
+                    for(int j = 0; j<i; i++){
+                        temp_len+=pkeys[j].Length;
+                    }
+                    length = temp_len;
+                    return true;
+                }
+            }// hold on this comment I may or may not be retarded //Recursive solution won't work as the len we get passed back will be all fucked up due to splitting --
+            //the logic to try and figure out where it is in the real string seems kinda shitty.
 
             return false;
         }
@@ -153,6 +207,7 @@
                 {
                     int location = 0;
                     char c = findNextTrigger(line, ref location);
+                    int span_len = 0;
                     switch (c)
                     {
                         case '(':
@@ -168,9 +223,9 @@
                             string type="";
                             string input = line.Substring(location+1, location2);
                             curLoc += location;
-                            if (isKeyWord(input, ref type))
+                            if (isKeyWord(input, ref type, ref span_len))
                             { //remove (
-                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, input.Length));
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, span_len));
                                 if (tokenSpan.IntersectsWith(curSpan))
                                 {
                                     yield return generateSpan(type, tokenSpan);
@@ -239,6 +294,24 @@
                             }
                             curLoc += location + location2;
                             line = line.Substring(location+location2+1);
+                            break;
+                        case '#':
+                            location2 = 0;
+                            if (location + 1 > line.Length)
+                            {
+                                curLoc += location;
+                                line = line.Substring(location);
+                                break;
+                            }
+                            {
+                                var tokenSpan = new SnapshotSpan(curSpan.Snapshot, new Span(curLoc, 2));
+                                if (tokenSpan.IntersectsWith(curSpan))
+                                {
+                                    yield return generateSpan("bool", tokenSpan);
+                                }
+                            }
+                            line = line.Substring(2);
+                            curLoc += 2;
                             break;
                         case '*':
                             curLoc += line.Length;
