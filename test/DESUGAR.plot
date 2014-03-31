@@ -1,9 +1,11 @@
-(define x (new CompilerLib.primeGener 101))
+(using CompilerLib)
 
-(define getPrimes (lambda (primeList)
+(define x (new primeGener 1001))
+
+(define (getPrimesprimeList)
 	(define prime (call primeList getNext))
 	(if (not (equal? -1 prime))
 		(begin (displayln prime) (getPrimes primeList))
-		'())))
+		'()))
 		
 (displayln (getPrimes x))
