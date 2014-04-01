@@ -120,6 +120,9 @@ namespace IRLanguage
         [Name("bool")]
         internal static ClassificationTypeDefinition IRBool = null;
 
+        [Export(typeof(ClassificationTypeDefinition))]
+        [Name("using")]
+        internal static ClassificationTypeDefinition IRUsing = null;
 
 
 
