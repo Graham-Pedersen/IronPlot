@@ -18,20 +18,20 @@ namespace Evaluator
 
         public dynamic eval()
         {
-            return null;
+            return primitive;
         }
 
-        public string getPrimitive()
+        public string ToString()
         {
-            return primitive;
+            return "#<procedure>";
         }
     }
 
-    public class numExpr : Expr
+    public class NumExpr : Expr
     {
         dynamic value;
 
-        public numExpr(dynamic val)
+        public NumExpr(dynamic val)
         {
             this.value = val;
         }
@@ -39,6 +39,74 @@ namespace Evaluator
         public dynamic eval()
         {
             return value;
+        }
+
+        public string ToString()
+        {
+            // value should be int or something;
+            return value.ToString();
+        }
+    }
+
+    public class VarExpr : Expr
+    {
+        string name;
+        string value;
+
+        public VarExpr(string sym)
+        {
+            this.name = sym;
+        }
+
+        public dynamic eval()
+        {
+            // look up in environment?
+            return null;
+        }
+
+        public string ToString()
+        {
+            return "";
+        }
+    }
+
+    public class ClosExpr : Expr
+    {
+        Expr env;
+        Expr func;
+
+        public ClosExpr(Expr function, Expr env)
+        {
+            this.env = env;
+            this.func = function;
+        }
+
+        public dynamic eval()
+        {
+            return null;
+        }
+
+        public string ToString()
+        {
+            return "#<procedure>";
+        }
+    }
+
+    public class LamExpr : Expr
+    {
+        public LamExpr()
+        {
+
+        }
+
+        public dynamic eval()
+        {
+            return null;
+        }
+
+        public string ToString()
+        {
+            return "#<procedure>";
         }
     }
 
@@ -55,10 +123,26 @@ namespace Evaluator
 
         public dynamic eval()
         {
-            if (isPrimitiveFunc())
+            dynamic app_res = app.eval();
+            if (app.GetType() == typeof(PrimFuncExpr))
             {
-                PrimFuncExpr app_ = (PrimFuncExpr)app;
-                string prim = app_.getPrimitive();
+                switch ((string)app_res)
+                {
+                    case "+":
+                        return null;
+                    case "-": 
+                        return null;
+                    case "*": 
+                        return null;
+                    case "<": 
+                        return null;
+                    case ">": 
+                        return null;
+                    case "<=": 
+                        return null;
+                    case ">=": 
+                        return null;
+                }
             }
             return null;
         }
@@ -74,7 +158,6 @@ namespace Evaluator
         dynamic eval();
 
         string ToString();
-
 
     }
 
