@@ -22,57 +22,6 @@ namespace Evaluator
         { }
     }
 
-     public class appExpr : Expr
-    {
-        private string type;
-        private Expr left;
-        private Expr right;
-        private dynamic value;
-
-        public appExpr()
-        {
-
-        }
-
-        // math constructor
-        public appExpr(string type, Expr left, Expr right)
-        {
-            this.type = type;
-            this.left = left;
-            this.right = right;
-            this.value = null;
-        }
-
-        // number or symbol constructor etc
-        public Expr(string type, dynamic value)
-        {
-            this.type = type;
-            this.value = value;
-            this.left = null;
-            this.right = null;
-        }
-
-        public string getType()
-        {
-            return type;
-        }
-
-        public Expr getLeft()
-        {
-            return left;
-        }
-
-        public Expr getRight()
-        {
-            return right;
-        }
-
-        public dynamic getValue()
-        {
-            return value;
-        }
-    }
-
     public class Evaluator
     {
         // grammar
@@ -130,22 +79,5 @@ namespace Evaluator
         {
             return "";
         }
-
-        private dynamic eval(Expr expr)
-        {
-            switch (expr.getType())
-            {
-                case "number": return expr.getValue();   
-                case "+":   return eval(expr.getLeft()) + eval(expr.getRight());
-                case "-":   return eval(expr.getLeft()) - eval(expr.getRight());  
-                case "*":   return eval(expr.getLeft()) * eval(expr.getRight());
-                case "<":   return eval(expr.getLeft()) < eval(expr.getRight());
-                case ">":   return eval(expr.getLeft()) > eval(expr.getRight());
-                case ">=":  return eval(expr.getLeft()) >= eval(expr.getRight());
-                case "<=":  return eval(expr.getLeft()) <= eval(expr.getRight());
-                default: throw new EvaluatorException("unknown/unimplemented type");
-            }
-        }
-
     }
 }
