@@ -10,6 +10,7 @@ namespace IRLanguage.FileState
     public static class parsePlot
     {
         public static void GetMethods(string text, ref List<Completion> completions){
+            text = remove_comments(text);
             text = remove_linebreaks(text);
             string function;
             int index = 0;
@@ -41,6 +42,21 @@ namespace IRLanguage.FileState
                     }
                 }
             }
+        }
+
+        private static string remove_comments(string text)
+        {
+            string[] tokens = text.Split('\n');
+            string return_string="";
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                if (tokens[i].IndexOf(";") != -1)
+                {
+                    tokens[i] = tokens[i].Substring(0, tokens[i].IndexOf(";"));
+                }
+                return_string += tokens[i];
+            }
+            return return_string;
         }
 
         private static string remove_linebreaks(string text)
