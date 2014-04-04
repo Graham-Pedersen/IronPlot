@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 
 namespace CompilerLib
 {
@@ -43,6 +44,383 @@ namespace CompilerLib
         }
     }
 
+    public interface RacketNum
+    {
+        RacketNum Plus(RacketNum other);
+        RacketNum Sub(RacketNum other);
+        RacketNum Mult(RacketNum other);
+        RacketNum Div(RacketNum other);
+        RacketNum Mod(RacketNum other);
+
+        Boolean RealQ(RacketNum other);
+        Boolean ComplexQ(RacketNum other);
+        Boolean FloatQ(RacketNum other);
+        Boolean IntegerQ(RacketNum other);
+    }
+
+    public class RacketInt : RacketNum
+    {
+        public int value { private set;  get; }
+
+        public RacketInt(int _value)
+        {
+            value = _value;
+        }
+
+        public static implicit operator int(RacketInt m)
+        {
+            return m.value;
+        }
+
+        public override string ToString()
+        {
+            return value.ToString();
+        }
+
+        public RacketNum Plus(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketInt(value + ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value + ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value + ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Sub(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketInt(value - ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value - ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value - ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Mult(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketInt(value * ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value * ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value * ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Div(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketFloat(((Double) value) / ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value / ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value / ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Mod(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketInt(value % ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value % ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                throw new InvalidOperationException("Cannot use mod operation with a complex number");
+            }
+            throw new NotImplementedException();
+        }
+
+        bool RacketNum.RealQ(RacketNum other)
+        {
+            return true;
+        }
+
+        bool RacketNum.ComplexQ(RacketNum other)
+        {
+            return false;
+        }
+
+        bool RacketNum.FloatQ(RacketNum other)
+        {
+            return false;
+        }
+
+        bool RacketNum.IntegerQ(RacketNum other)
+        {
+            return true;
+        }
+    }
+
+    public class RacketFloat : RacketNum
+    {
+        public Double value { private set; get; }
+        
+        public RacketFloat(Double _value)
+        {
+            value = _value;
+        }
+
+        public static implicit operator Double(RacketFloat m)
+        {
+            return m.value;
+        }
+
+        public override string ToString()
+        {
+            return value.ToString();
+        }
+
+        public RacketNum Plus(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value + ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketFloat(value + ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value + ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Sub(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value - ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketFloat(value - ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value - ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Mult(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value * ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketFloat(value * ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value * ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Div(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value / ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketFloat(value / ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value / ((RacketComplex)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Mod(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketFloat(value % ((RacketFloat)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketFloat(value % ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                throw new InvalidOperationException("Cannot use mod operation with a complex number");
+            }
+            throw new NotImplementedException();
+        }
+
+        public bool RealQ(RacketNum other)
+        {
+            return true;
+        }
+
+        public bool ComplexQ(RacketNum other)
+        {
+            return false;
+        }
+
+        public bool FloatQ(RacketNum other)
+        {
+            return true;
+        }
+
+        public bool IntegerQ(RacketNum other)
+        {
+            return false;
+        }
+    }
+
+    public class RacketComplex : RacketNum
+    {
+        public Complex value { private set; get; }
+
+        public RacketComplex(Complex _value)
+        {
+            value = _value;
+        }
+
+
+        public static implicit operator Complex(RacketComplex m)
+        {
+            return m.value;
+        }
+
+        public override string ToString()
+        {
+            return value.ToString();
+        }
+
+        public RacketNum Plus(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value + ((RacketComplex)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketComplex(value + ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketComplex(value + ((RacketFloat)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Sub(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value - ((RacketComplex)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketComplex(value - ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketComplex(value - ((RacketFloat)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Mult(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value * ((RacketComplex)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketComplex(value * ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketComplex(value * ((RacketFloat)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Div(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketComplex))
+            {
+                return new RacketComplex(value / ((RacketComplex)other).value);
+            }
+            if (other.GetType() == typeof(RacketInt))
+            {
+                return new RacketComplex(value / ((RacketInt)other).value);
+            }
+            if (other.GetType() == typeof(RacketFloat))
+            {
+                return new RacketComplex(value / ((RacketFloat)other).value);
+            }
+            throw new NotImplementedException();
+        }
+
+        public RacketNum Mod(RacketNum other)
+        {
+            throw new InvalidOperationException("Cannot use mod operation with a complex number");
+        }
+
+        public bool RealQ(RacketNum other)
+        {
+            return false;
+        }
+
+        public bool ComplexQ(RacketNum other)
+        {
+            return true;
+        }
+
+        public bool FloatQ(RacketNum other)
+        {
+            return false;
+        }
+
+        public bool IntegerQ(RacketNum other)
+        {
+            return false;
+        }
+    }
 
     public class RacketPair
     {

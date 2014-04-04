@@ -12,7 +12,9 @@ using Microsoft.CSharp.RuntimeBinder;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Resources;
+using System.Numerics;
 using CompilerLib;
+
 
 namespace DLR_Compiler
 {
@@ -991,11 +993,11 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-            Expression result = Expression.Divide(lhs, rhs);
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
 
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Div"), new Expression[] { rhs });
             return wrapInObjBox(result, type);
         }
 
@@ -1005,11 +1007,11 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-            Expression result = Expression.Modulo(lhs, rhs);
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
 
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Mod"), new Expression[] { rhs });
             return wrapInObjBox(result, type);
         }
 
@@ -1019,11 +1021,39 @@ namespace DLR_Compiler
                 throw new ParsingException("failed to parse plus for list " + tree.ToString());
 
             //unboxing from type object
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-            Expression result = Expression.Multiply(lhs, rhs);
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
 
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Mult"), new Expression[] { rhs });
+            return wrapInObjBox(result, type);
+        }
+
+        private static Expression addExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse plus for list " + tree.ToString());
+
+            //unboxing from type object
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
+            
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Plus"), new Expression[] { rhs });
+            return wrapInObjBox(result, type);
+        }
+
+        private static Expression subExpr(ListNode tree, Expression env)
+        {
+            if (tree.values.Count != 3)
+                throw new ParsingException("failed to parse plus for list " + tree.ToString());
+
+            //unboxing from type object
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
+
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Sub"), new Expression[] { rhs });
             return wrapInObjBox(result, type);
         }
 
@@ -1032,14 +1062,14 @@ namespace DLR_Compiler
             if (tree.values.Count != 3)
                 throw new ParsingException("failed to parse < for list " + tree.ToString());
 
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));    
+            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
             dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
 
             Expression result = Expression.LessThan(lhs, rhs);
 
             return wrapInObjBox(result, type);
-            
+
         }
 
         private static Expression lessThanEqualExpr(ListNode tree, Expression env)
@@ -1082,35 +1112,6 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
 
             Expression result = Expression.GreaterThanOrEqual(lhs, rhs);
-
-            return wrapInObjBox(result, type);
-        }
-
-        private static Expression addExpr(ListNode tree, Expression env)
-        {
-            if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse plus for list " + tree.ToString());
-
-            //unboxing from type object
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-
-            Expression result = Expression.Add(lhs, rhs);
-            return wrapInObjBox(result, type);
-        }
-
-        private static Expression subExpr(ListNode tree, Expression env)
-        {
-            if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse plus for list " + tree.ToString());
-
-            //unboxing from type object
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-
-            Expression result = Expression.Subtract(lhs, rhs);
 
             return wrapInObjBox(result, type);
         }
@@ -1291,10 +1292,11 @@ namespace DLR_Compiler
         // matches an atom returning a constant expression
         static Expression matchAtom(String value, out bool isAtom)
         {
-            
+            int num;
+            Double flo;
+
             Expression matchedExpr = null;
             isAtom = false;
-            int number;
             if (value == "#t")
             {
                 
@@ -1309,10 +1311,25 @@ namespace DLR_Compiler
                 matchedExpr = wrapInObjBox(Expression.Constant(false), type);
                 isAtom = true;
             }
-            else if (Int32.TryParse(value, out number))
+            else if (Int32.TryParse(value, out num))
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-                matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value)), type);
+                Expression numCons = Expression.New(
+                    typeof(RacketInt).GetConstructor(new Type[] { typeof(int) }),
+                    Expression.Constant(num));
+
+                matchedExpr = wrapInObjBox(numCons, type);
+                isAtom = true;
+            }
+            else if (Double.TryParse(value, out flo))
+            {
+                Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("floatType"));
+                Expression numCons = Expression.New(
+                  typeof(RacketFloat).GetConstructor(new Type[] { typeof(Double) }),
+                  Expression.Constant(flo));
+
+                matchedExpr = wrapInObjBox(numCons, type);
+
                 isAtom = true;
             }
             else if (value[0] == '\"')
@@ -1326,10 +1343,24 @@ namespace DLR_Compiler
             }
             else if (value[0] == '\'')
             {
-                if (Int32.TryParse(value.Substring(1), out number))
+                if (Int32.TryParse(value.Substring(1), out num))
                 {
                     Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-                    matchedExpr = wrapInObjBox(Expression.Constant(int.Parse(value.Substring(1))), type);
+                    Expression numCons = Expression.New(
+                        typeof(RacketInt).GetConstructor(new Type[] { typeof(int) }),
+                        Expression.Constant(num));
+
+                    matchedExpr = wrapInObjBox(numCons, type);
+                    isAtom = true;
+                }
+                else if (Double.TryParse(value.Substring(1), out flo))
+                {
+                    Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("floatType"));
+                    Expression numCons = Expression.New(
+                      typeof(RacketFloat).GetConstructor(new Type[] { typeof(Double) }),
+                      Expression.Constant(flo));
+
+                    matchedExpr = wrapInObjBox(numCons, type);
                     isAtom = true;
                 }
                 else // string case

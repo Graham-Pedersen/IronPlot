@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Numerics;
 using CompilerLib;
 
 namespace CompilerLib
@@ -14,11 +15,6 @@ namespace CompilerLib
         public static Type boolType()
         {
             return typeof(Boolean);
-        }
-
-        public static Type intType()
-        {
-            return typeof(int);
         }
 
         public static Type strType()
@@ -36,19 +32,24 @@ namespace CompilerLib
             return typeof(RacketPair);
         }
 
-        public static Type iNumType()
+        public static Type numType()
         {
-            throw new NotImplementedException();
+            return typeof(RacketNum);
+        }
+
+        public static Type intType()
+        {
+            return typeof(RacketInt);
+        }
+
+        public static Type complexType()
+        {
+            return typeof(RacketComplex);
         }
 
         public static Type floatType()
         {
-            throw new NotImplementedException();
-        }
-
-        public static Type litearlType()
-        {
-            throw new NotImplementedException();
+            return typeof(RacketFloat);
         }
 
         public static Type voidType()
@@ -94,11 +95,7 @@ namespace CompilerLib
         {
             List<Type> argTypes = new List<Type>();
             List<Object> objArray = new List<Object>();
-            foreach (ObjBox o in args)
-            {
-                argTypes.Add(o.getType());
-                objArray.Add(o.getObj());
-            }
+            unpackObjList(args, argTypes, objArray);
 
             if (argTypes.Count > 0 && argTypes[0].Equals(typeof(typeListWrapper)))
             {
@@ -188,6 +185,23 @@ namespace CompilerLib
             }
         }
 
+        private static void unpackObjList(ObjBox[] args, List<Type> outArgTypes, List<Object> outObjArray)
+        {
+            foreach (ObjBox o in args)
+            {
+                Console.WriteLine(o.getType().GetInterfaces().Contains(typeof(RacketNum)));
+                if (o.getType().GetInterfaces().Contains(typeof(RacketNum)))
+                {
+                    ConvertRacketNum(o, outArgTypes, outObjArray);
+                }
+                else
+                {
+                    outArgTypes.Add(o.getType());
+                    outObjArray.Add(o.getObj());
+                }
+            }
+        }
+
         public static ObjBox call(ObjBox wrapper, String s, ObjBox[] args)
         {
             Object instance = null;
@@ -213,11 +227,7 @@ namespace CompilerLib
             // lets get all our object boxes into nice arrays
             List<Type> argTypes = new List<Type>();
             List<Object> objArray = new List<Object>();
-            foreach (ObjBox o in args)
-            {
-                argTypes.Add(o.getType());
-                objArray.Add(o.getObj());
-            }
+            unpackObjList(args, argTypes, objArray);
 
             MethodInfo m = t.GetMethod(s, argTypes.ToArray());
             FieldInfo f = t.GetField(s);
@@ -240,7 +250,42 @@ namespace CompilerLib
             {
                 return callProperty(instance, p, argTypes, objArray);
             }
-            throw new RuntimeException("Could not resolve method or field: " + s);
+
+            String exceptionMessage; 
+            if (argTypes.Count == 0)
+            {
+                exceptionMessage = "Type:" + t.ToString() + "does not contain matching method or property: " + s;
+            }
+            else
+            {
+                exceptionMessage =  "Type:" + t.ToString() + "does not contain method matching signature: " + s + " with types: ";
+                foreach (Type sig in argTypes)
+                {
+                    exceptionMessage += " " + sig.ToString() + " ";
+                } 
+
+            }
+            throw new RuntimeException(exceptionMessage);
+        }
+
+        private static void ConvertRacketNum(ObjBox o, List<Type> argTypes, List<object> objArray)
+        {
+            Type t = o.getType();
+            if (t == typeof(RacketInt))
+            {
+                argTypes.Add(typeof(int));
+                objArray.Add(((RacketInt) o.getObj()).value);
+            }
+            else if (t == typeof(RacketFloat))
+            {
+                argTypes.Add(typeof(double));
+                objArray.Add(((RacketFloat)o.getObj()).value);
+            }
+            else if (t == typeof(RacketComplex))
+            {
+                argTypes.Add(typeof(Complex));
+                objArray.Add(((RacketComplex)o.getObj()).value);
+            }
         }
     }
 
