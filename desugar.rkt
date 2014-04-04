@@ -16,9 +16,7 @@
                      (set! out (open-output-file output #:exists 'replace))
                    filename)) #:mode 'text)))
   (set! program (desugar-tops program)) ;; desugar-tops
-  (displayln program)
   (set! program (map desugar-define program)) ;; desugar the defines now
-  (displayln program)
   (set! program (partition-k 
                  atomic-define?
                  program
@@ -35,11 +33,8 @@
                          [`(define ,v ,complex)
                           `(set! ,v ,complex)]
                          [else (displayln "cannot desguar begin")])))
-                   (begin
-                   (displayln `(let ,bindings ,@sets))
-                   (append atomic (list (desugar-exp `(let ,bindings ,@sets))))))))
+                   (append atomic (list (desugar-exp `(let ,bindings ,@sets)))))))
   (write-output program out))
-;; (displayln (pretty-format program 40)))
 
 (define (write-output program [file (current-output-port)])
   (cond
@@ -75,22 +70,14 @@
        `(define ,var ,exp)]
       [`(begin . ,forms)
        `(begin-top ,@forms)]
-      [`(define-values ,ids ,exp)
-       (desugar-define-value def)]
       [exp `(define ,(gensym '_) ,exp)]))
   (map top-to-def tops)) ;; map is putting in list...... problem with program wrapped in parens
 
-(define (desugar-define-value def)
-  (match def
-    [`(define-value ,ids ,exp)
-     ]
-    [else
-     (displayln `(cannot desugar define-value ,def))]))
 
 ; desugar define statements of the form (define ,v ,exp)
 (define (desugar-define def)
     (match def
-      [`(define ,v ,exp) (begin (displayln exp)(displayln (desugar-exp exp))`(define ,v ,(desugar-exp exp)))]
+      [`(define ,v ,exp) `(define ,v ,(desugar-exp exp))]
       [`(begin-top . ,forms) `(begin-top ,@(map desugar-exp forms))]
       [else (displayln `(cannot desugar define ,def))]))
 
@@ -99,9 +86,7 @@
       [(? symbol?) exp]
       [`(quote ,s-exp) (desugar-quote s-exp)]
       [`(let ((,vs ,es) ...) . ,body)
-       (begin
-       (displayln body)
-       `((lambda ,vs ,(desugar-body body)) ,@(map desugar-exp es)))]
+       `((lambda ,vs ,(desugar-body body)) ,@(map desugar-exp es))]
       
       [`(letrec ((,vs ,es) ...) . ,body) 
        (desugar-exp `(let ,(for/list ([v vs])
@@ -138,7 +123,7 @@
        `(if ,(desugar-exp test) ,(desugar-exp exp) (void))]
       [`(if ,test ,exp1 ,exp2)
        `(if ,(desugar-exp test) ,(desugar-exp exp1) ,(desugar-exp exp2))]
-      [`(set! ,v ,exp) (begin (displayln exp) `(set! ,v ,(desugar-exp exp)))]
+      [`(set! ,v ,exp) `(set! ,v ,(desugar-exp exp))]
       [`(quasiquote ,qq-exp) (desugar-quasi-quote 1 qq-exp)]
       [`(begin . ,body) (desugar-body body)]
       [`(first ,exp) `(car ,exp)]
@@ -165,13 +150,20 @@
                                             rest)]
       [`(list . ,rest) (foldr (lambda (x a) `(cons ,(desugar-exp x) ,a))
 			 `(quote()) rest)] ;; needs testing a is accumulator
-                                   
+      [`(map ,fun . ,lists) `(map ,(desugar-exp fun) ,@(map desugar-exp lists))]
+      [`(foldl ,fun ,init . ,lists) `(foldl ,(desugar-exp fun)
+                                            ,(desugar-exp init)
+                                            ,@(map desugar-exp lists))]
+      [`(foldr ,fun ,init . ,lists) `(foldl ,(desugar-exp fun)
+                                            ,(desugar-exp init)
+                                            ,(map (lambda (x) (desugar-exp (reverse x)))
+                                                  lists))]  ;; need to test
+      [`(apply ,fun ,opts ... ,list) `(apply ,(desugar-exp fun)
+                                             ,(desugar-exp (foldl cons list opts)))]
       [(? atomic?) exp]
       [`(,function . ,args) 
-       (begin
-       (displayln "here")
-       `(,(desugar-exp function) ,@(map desugar-exp args)))]
-      [else  (begin (displayln exp)(displayln `(could not desugar expression ,@exp)))]))
+       `(,(desugar-exp function) ,@(map desugar-exp args))]
+      [else  (displayln `(could not desugar expression ,@exp))]))
 
 ;; --------- desugar helpers -------------
 
@@ -181,21 +173,16 @@
 (define (desugar-body body)
   (match body
     [`(,exp)
-     (begin
-     (displayln "here") (displayln exp)
-     (desugar-exp exp))]
+     (desugar-exp exp)]
     
     [`(,(and (? not-define?) exps) ...)
-     (begin (displayln "here")(displayln exps)
-     `(begin ,@(map desugar-exp exps)))]
+     `(begin ,@(map desugar-exp exps))]
     
     [`(,tops ... ,exp)
-     (begin (displayln "here")
-            (displayln exp)
      (define defs (desugar-tops tops))
      (desugar-exp (match defs
                     [`((define ,vs ,es) ...)
-                     `(letrec ,(map list vs es) ,exp)])))]))
+                     `(letrec ,(map list vs es) ,exp)]))]))
 
 
 
@@ -277,14 +264,16 @@
 (define (desugar-lambda exp) ;; `(lambda ,params . ,body)
   (match exp
     [`(lambda ,params . ,body)
-     (displayln `(in lambda ,body))
      `(lambda ,params ,(desugar-body body))]))
 
      
 ; ----- helper functions -----
                             
 (define (function-def->var-def def)
-    `(define ,(caadr def) (lambda ,(cdadr def) ,(caddr def))))
+  (match def
+    [`(define (,name ,params ...) . ,body)
+     `(define ,name (lambda ,params ,@body))]
+    [else (error "shouldn't happen")]))
 
 
 (define (not-define? symbol)

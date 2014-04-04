@@ -83,6 +83,7 @@ namespace IRLanguage
             _IRTypes[IRTokenTypes.IRScall] = typeService.GetClassificationType("scall");
             _IRTypes[IRTokenTypes.IRDisplayln] = typeService.GetClassificationType("displayln");
             _IRTypes[IRTokenTypes.IRBool] = typeService.GetClassificationType("bool");
+            _IRTypes[IRTokenTypes.IRUsing] = typeService.GetClassificationType("using");
 
             
         }

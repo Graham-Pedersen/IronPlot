@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSchemeParser", "Simpl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler_Lib", "Compiler_Lib\Compiler_Lib.csproj", "{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evaluator", "Evaluator\Evaluator.csproj", "{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication2", "..\..\Visual Studio 2012\Projects\ConsoleApplication2\ConsoleApplication2\ConsoleApplication2.csproj", "{62308062-9A09-4802-9B26-94F95D03CB47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,14 @@ Global
 		{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62308062-9A09-4802-9B26-94F95D03CB47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62308062-9A09-4802-9B26-94F95D03CB47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62308062-9A09-4802-9B26-94F95D03CB47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62308062-9A09-4802-9B26-94F95D03CB47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

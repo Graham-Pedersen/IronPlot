@@ -69,6 +69,7 @@
             _IRTypes["scall"] = IRTokenTypes.IRScall;
             _IRTypes["displayln"] = IRTokenTypes.IRDisplayln;
             _IRTypes["bool"] = IRTokenTypes.IRBool;
+            _IRTypes["using"] = IRTokenTypes.IRUsing;
 
             //_IRTypes["comment"] = IRTokenTypes.IRString;
 
@@ -167,7 +168,7 @@
                     type = pkeys[i].Trim();
                     temp_len+=i;
                     temp_len += pkeys[i].Length;
-                    for(int j = 0; j<i; i++){
+                    for(int j = 0; j<i; j++){
                         temp_len+=pkeys[j].Length;
                     }
                     length = temp_len;
@@ -297,10 +298,11 @@
                             break;
                         case '#':
                             location2 = 0;
-                            if (location + 1 > line.Length)
+                            if (location + 2 > line.Length)
                             {
                                 curLoc += location;
-                                line = line.Substring(location);
+                                //line = line.Substring(location);
+                                line = string.Empty;
                                 break;
                             }
                             {

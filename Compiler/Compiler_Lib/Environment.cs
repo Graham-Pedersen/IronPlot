@@ -97,11 +97,11 @@ namespace CompilerLib
             //count = 0;
         }
 
-        public dynamic invoke(List<Object> arguments)
+        public ObjBox invoke(List<Object> arguments)
         {
             try
             {
-                return func.DynamicInvoke(arguments.ToArray());
+                return (ObjBox) func.DynamicInvoke(arguments.ToArray());
             }
             catch (System.Reflection.TargetInvocationException e)
             {
