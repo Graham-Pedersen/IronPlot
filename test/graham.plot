@@ -6,4 +6,4 @@
 		0
 		(+ (car list) (suml (cdr list))))))
 
-(suml l)
+(displayln (suml l))

@@ -1,3 +1,3 @@
-(letrec ([f (λ (x) (g x))]
-               [g (λ (y) y)])
-        (f 10))
+﻿(letrec ([f (lambda (x) (g x))]
+               [g (lambda (y) y)])
+        (displayln (f 10)))
