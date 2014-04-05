@@ -75,17 +75,9 @@
        `(define ,var ,exp)]
       [`(begin . ,forms)
        `(begin-top ,@forms)]
-      [`(define-values ,ids ,exp)
-       (desugar-define-value def)]
       [exp `(define ,(gensym '_) ,exp)]))
   (map top-to-def tops)) ;; map is putting in list...... problem with program wrapped in parens
 
-(define (desugar-define-value def)
-  (match def
-    [`(define-value ,ids ,exp)
-     ]
-    [else
-     (displayln `(cannot desugar define-value ,def))]))
 
 ; desugar define statements of the form (define ,v ,exp)
 (define (desugar-define def)
