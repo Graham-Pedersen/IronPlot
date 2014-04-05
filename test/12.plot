@@ -1,5 +1,5 @@
 (using System.Collections.Generic)
-(define list (new List (typelist System.Int32)))
+(define list (new System.Collections.Generic.List (typelist System.Int32)))
 (call list Add 1)
 (call list Add 5)
 (call list Add 7)

@@ -151,21 +151,22 @@ namespace DLR_Compiler
                     }
                     return Expression.Block(dlrTree);
                 }
-                //define expression
+
+                Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
+                Expression check = checkEnv(name, env);
+                Expression defaultExpression = null;
+                Expression envDefined = invokeLambda(list, env);
+
                 if (list.values[0].isLeaf() && list.values[0].getValue() == "define" )
                 {
-                    return defineExpr(list, env);
+                    defaultExpression = defineExpr(list, env);
+                    return envOverrideBranch(check, envDefined, defaultExpression);
                 }
                 else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
                 {
-                    return netImportStmt(list, env);
+                    defaultExpression = netImportStmt(list, env);
+                    return envOverrideBranch(check, envDefined, defaultExpression);
                 }
-                /*
-                 * bool parsed = false;
-                var ret = matchExpression(list, env, out parsed);
-                if (parsed)
-                    return ret;
-                 */
             }
             return matchExpression(tree, env);
         }
@@ -174,127 +175,175 @@ namespace DLR_Compiler
         // This matches a list and converts it into an expression
         static Expression matchExpression(Node tree, Expression env)
         {
-            if (tree.isList())
+            if (tree.isLeaf())
             {
-                ListNode list = (ListNode)tree;
+                //match on the leaf nodes
+                return matchLeaf((LeafNode) tree, env);
+            }
 
-                if (list.isLiteral)
-                {
-                    return matchLiteralList(list, env);
-                }
+            ListNode list = (ListNode)tree;
 
-                else if (list.values[0].isList())
-                {
-                    return autoInvokeLambda(list, env);
-                }
-                else
-                {
-                    //perform a function lookup first because in scheme you can overwrite language keywords
-                    switch (list.values[0].getValue())
-                    {
+            // match a list of literals
+            if (list.isLiteral)
+            {
+                return matchLiteralList(list, env);
+            }
 
-                        case "":
-                            return voidSingleton;
-
-                        //TODO REMOVE THIS AFTER DESUGARER FIX (add using as a top level form that escapes transformation)
-                        case "using":
-                            return netImportStmt(list, env);
-
-                        case "call":
-                            return callNetExpr(list, env);
-
-                        case "scall":
-                            return scallNetExpr(list, env);
-
-                        case "new":
-                            return newNetObj(list, env);
-
-                        case "typelist":
-                            return newTypeList(list, env);
-
-                        case "<":
-                            return lessThanExpr(list, env);
-
-                        case "<=":
-                            return lessThanEqualExpr(list, env);
-
-                        case ">":
-                            return gretThanExpr(list, env);
-
-                        case ">=":
-                            return gretThanEqualExpr(list, env);
-
-                        case "+":
-                            return addExpr(list, env);
-
-                        case "-":
-                            return subExpr(list, env);
-
-                        case "*":
-                            return multExpr(list, env);
-
-                        case "/":
-                            return divExpr(list, env);
-
-                        case "%":
-                            return modExpr(list, env);
-
-                        case "void":
-                            return voidSingleton;
-
-                        case "equal?":
-                            return equalExpr(list, env);
-
-                        case "not":
-                            return notExpr(list, env);
-
-                        case "lambda":
-                            return lambdaExpr(list, env);
-
-                        case "if":
-                            return ifExpr(list, env);
-
-                        case "while":
-                            return whileExpr(list, env);
-
-                        //TODO extend environment and fix this
-                        case "set!":
-                            return setBangExpr(list, env);
-
-                        case "cons":
-                            return consExpr(list, env);
-
-                        case "car":
-                            return carExpr(list, env);
-
-                        case "cdr":
-                            return cdrExpr(list, env);
-
-                        case "begin":
-                            return beginExpr(list, env);
-
-                        case "begin0":
-                            return begin0Expr(list, env);
-
-                        case "displayln":
-                            return displayExpr(list, env);
-
-                        case "null?":
-                            return nullCheckExpr(list, env);
-
-                        case "map":
-                            return mapExpr(list, env);
-
-                        //TODO add environment check and move above standard cases
-                        default:
-                            return invokeLambda(list, env);
-                    }
-                }
+            //we know if the first part is another list we are defining a lambda to be immediately 
+            else if (list.values[0].isList())
+            {
+                return invokeLambda(list, env);
             }
             else
             {
-                return matchLeaf(tree, env);
+                Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
+                Expression check = checkEnv(name, env);
+                Expression defaultExpression = null;
+                Expression envDefined = invokeLambda(list, env);
+
+
+                switch (list.values[0].getValue())
+                {
+                    //TODO REMOVE THIS AFTER DESUGARER FIX (add using as a top level form that escapes transformation)
+                    case "using":
+                        defaultExpression = netImportStmt(list, env);
+                        break;
+
+                    case "call":
+                        defaultExpression = callNetExpr(list, env);
+                        break;
+
+                    case "scall":
+                        defaultExpression = scallNetExpr(list, env);
+                        break;
+
+                    case "new":
+                        defaultExpression = newNetObj(list, env);
+                        break;
+
+                    case "typelist":
+                        defaultExpression = newTypeList(list, env);
+                        break;
+
+                    case "<":
+                        defaultExpression = lessThanExpr(list, env);
+                        break;
+
+                    case "<=":
+                        defaultExpression = lessThanEqualExpr(list, env);
+                        break;
+
+                    case ">":
+                        defaultExpression = gretThanExpr(list, env);
+                        break;
+
+                    case ">=":
+                        defaultExpression = gretThanEqualExpr(list, env);
+                        break;
+
+                    case "+":
+                        defaultExpression = addExpr(list, env);
+                        break;
+
+                    case "-":
+                        defaultExpression = subExpr(list, env);
+                        break;
+
+                    case "*":
+                        defaultExpression = multExpr(list, env);
+                        break;
+
+                    case "/":
+                        defaultExpression = divExpr(list, env);
+                        break;
+
+                    case "%":
+                        defaultExpression = modExpr(list, env);
+                        break;
+
+                    case "void":
+                        defaultExpression = voidSingleton;
+                        break;
+
+                    case "equal?":
+                        defaultExpression = equalExpr(list, env);
+                        break;
+
+                    case "not":
+                        defaultExpression = notExpr(list, env);
+                        break;
+
+                    case "lambda":
+                        defaultExpression = lambdaExpr(list, env);
+                        break;
+
+                    case "if":
+                        defaultExpression = ifExpr(list, env);
+                        break;
+
+                    case "while":
+                        defaultExpression = whileExpr(list, env);
+                        break;
+
+                    case "set!":
+                        defaultExpression = setBangExpr(list, env);
+                        break;
+
+                    case "cons":
+                        defaultExpression = consExpr(list, env);
+                        break;
+
+                    case "car":
+                        defaultExpression = carExpr(list, env);
+                        break;
+
+                    case "cdr":
+                        defaultExpression = cdrExpr(list, env);
+                        break;
+
+                    case "begin":
+                        defaultExpression = beginExpr(list, env);
+                        break;
+
+                    case "begin0":
+                        defaultExpression = begin0Expr(list, env);
+                        break;
+
+                    case "displayln":
+                        defaultExpression = displayExpr(list, env);
+                        break;
+
+                    case "null?":
+                        defaultExpression = nullCheckExpr(list, env);
+                        break;
+
+                    case "map":
+                        defaultExpression = mapExpr(list, env);
+                        break;
+
+                    //TODO add environment check and move above standard cases
+                    default:
+                        defaultExpression = createRuntimeException("Could not resolve procedure:" + list.values[0].getValue());
+                        break;
+                }
+
+                return envOverrideBranch(check, envDefined, defaultExpression);
             }
+            
+        }
+
+        private static Expression envOverrideBranch(Expression envCheck, Expression envDef, Expression builtInDef)
+        {
+            ParameterExpression result = Expression.Parameter(typeof(ObjBox));
+
+            Expression branch = Expression.IfThenElse(
+                envCheck,
+                Expression.Assign(result, envDef),
+                Expression.Assign(result, builtInDef));
+
+            return Expression.Block(
+                new ParameterExpression[] { result },
+                new Expression[] { branch, result });
         }
 
 
@@ -326,7 +375,9 @@ namespace DLR_Compiler
         private static Expression notExpr(ListNode list, Expression env)
         {
             if (list.values.Count != 2)
-                throw new ParsingException("wrong number of arguments supplied for not expression");
+            {
+                 return createRuntimeException("wrong number of arguments passed to not procedure");
+            }
 
             Expression not = Expression.Not(unboxValue(matchExpression(list.values[1], env), typeof(Boolean)));
             return wrapInObjBox(
@@ -338,7 +389,7 @@ namespace DLR_Compiler
         {
             if(list.values.Count != 2)
             {
-                throw new ParsingException("Could not parse using expression");
+                return createRuntimeException("wrong number of arguments passed to using procedure");
             }
 
             Expression importStr = Expression.Constant(list.values[1].getValue());
@@ -352,7 +403,7 @@ namespace DLR_Compiler
             List<Expression> block = new List<Expression>();
             if (list.values.Count < 3)
             {
-                throw new ParsingException("Failed to parse .net static call expression");
+                return createRuntimeException("wrong number of arguments passed to static-call procedure");
             }
 
             ParameterExpression arr = Expression.Parameter(typeof(List<ObjBox>));
@@ -408,7 +459,7 @@ namespace DLR_Compiler
             List<Expression> block = new List<Expression>();
             if (list.values.Count < 3)
             {
-                throw new ParsingException("Failed to parse .net call expression");
+                return createRuntimeException("wrong number of arguments passed to call procedure");
             }
 
             ParameterExpression arr = Expression.Parameter(typeof(List<ObjBox>));
@@ -444,8 +495,8 @@ namespace DLR_Compiler
                          arg));
             }
             Expression instance = matchExpression(list.values[1], env);
-            Expression obj = aliasOrLiteralName(list.values[2], env);
-            Expression callStr = unboxValue(obj, typeof(String));
+            Expression name = aliasOrLiteralName(list.values[2], env);
+            Expression callStr = unboxValue(name, typeof(String));
             block.Add(Expression.Call(null, typeof(NetIneractLib).GetMethod("call"), 
                 Expression.Convert(instance, typeof(ObjBox)), 
                 callStr,
@@ -505,7 +556,7 @@ namespace DLR_Compiler
             List<Expression> block = new List<Expression>();
             if (list.values.Count < 2)
             {
-                throw new ParsingException("Failed to parse .net new expression");
+                return createRuntimeException("wrong number of arguments passed to new procedure");
             }
 
             ParameterExpression arr = Expression.Parameter(typeof(List<ObjBox>));
@@ -533,7 +584,9 @@ namespace DLR_Compiler
         private static Expression nullCheckExpr(ListNode list, Expression env)
         {
             if (list.values.Count != 2)
-                throw new ParsingException("Wrong number of arguments supplied to null?");
+            {
+                return createRuntimeException("wrong number of arguments passed to null? procedure");
+            }
 
             ParameterExpression result = Expression.Parameter(typeof(ObjBox));
 
@@ -578,7 +631,7 @@ namespace DLR_Compiler
         {
             if(list.values.Count != 2)
             {
-                throw new ParsingException("failed to parse cdr");
+                return createRuntimeException("wrong number of arguments passed to cdr procedure");
             }
             Expression pair = unboxValue(matchExpression(list.values[1], env), typeof(RacketPair));
             return Expression.Call(pair, typeof(RacketPair).GetMethod("cdr"));
@@ -588,7 +641,7 @@ namespace DLR_Compiler
         {
             if (list.values.Count != 2)
             {
-                throw new ParsingException("failed to parse car");
+                return createRuntimeException("wrong number of arguments passed to car procedure");
             }
             Expression pair = unboxValue(matchExpression(list.values[1], env), typeof(RacketPair));
             return Expression.Call(pair, typeof(RacketPair).GetMethod("car"));
@@ -597,7 +650,9 @@ namespace DLR_Compiler
         private static Expression consExpr(ListNode list, Expression env)
         {
             if (list.values.Count != 3)
-                throw new ParsingException("Could not parse cons");
+            {
+                return createRuntimeException("wrong number of arguments passed to cons procedure");
+            }
 
             Expression first = matchExpression(list.values[1], env);
             Expression rest = matchExpression(list.values[2], env);
@@ -617,7 +672,9 @@ namespace DLR_Compiler
 
             //TODO check variable names are a legal scheme variable name
             if (list.values.Count != 3 || list.values[1].isList() || list.values[1].getValue().GetType() != typeof(String))
-                throw new ParsingException("failed to parse set!");
+            {
+                return createRuntimeException("wrong number of arguments passed to set! procedure");
+            }
 
             var name = Expression.Constant(list.values[1].getValue());
 
@@ -634,6 +691,7 @@ namespace DLR_Compiler
             return Expression.Block(block);
         }
 
+       //DEPRECIATED DO NOT CALL
         private static Expression autoInvokeLambda(ListNode list, Expression env)
         {
             //first expression must be a lambda
@@ -673,8 +731,10 @@ namespace DLR_Compiler
 
         private static Expression beginExpr(ListNode list, Expression env)
         {
-            if (list.values.Count < 2) // i think it is okay ot have empty begin like (begin) but won't worry about that right now
-                throw new ParsingException("empty body in a begin expression");
+            if (list.values.Count < 2)
+            {
+                return createRuntimeException("wrong number of arguments passed to begin procedure");
+            }
 
             List<Node> values = new List<Node>();
 
@@ -690,7 +750,9 @@ namespace DLR_Compiler
         private static Expression begin0Expr(ListNode list, Expression env)
         {
             if (list.values.Count < 2)
-                throw new ParsingException("empty body in a begin0 exprssion");
+            {
+                return createRuntimeException("wrong number of arguments passed to begin procedure");
+            }
 
             List<Node> values = new List<Node>();
 
@@ -701,7 +763,9 @@ namespace DLR_Compiler
         {
             int foldCount = list.values.Count;
             if (foldCount < 4)
-                throw new ParsingException("foldl, not enough arguments provided");
+            {
+                return createRuntimeException("wrong number of arguments passed to foldl procedure");
+            }
 
             // 1. function is user defined
             // 2. function is built in
@@ -752,7 +816,9 @@ namespace DLR_Compiler
         {
             int mapCount = list.values.Count;
             if (mapCount < 3)
-                throw new ParsingException("map, not enough arguments provided");
+            {
+                return createRuntimeException("wrong number of arguments passed to map procedure");
+            }
 
             // 1. function is user defined
             // 2. function is built in
@@ -814,7 +880,9 @@ namespace DLR_Compiler
             List<Expression> block = new List<Expression>();
 
             if (list.values.Count != 2)
-                throw new ParsingException("wrong number of arguments passed to displayln");
+            {
+                return createRuntimeException("wrong number of arguments passed to displayln procedure");
+            }
 
             Expression print = unboxValue(matchExpression(list.values[1], env), typeof(Object));
             Expression toStr = Expression.Call(print, typeof(Object).GetMethod("ToString"));
@@ -828,7 +896,10 @@ namespace DLR_Compiler
         private static Expression equalExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse equals for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to equal? procedure");
+            }
+        
 
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(Object));
             Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(Object));
@@ -849,7 +920,7 @@ namespace DLR_Compiler
         {
             if (list.values.Count != 3)
             {
-                throw new ParsingException("Incorrect number of arguments supplied to While");
+                return createRuntimeException("wrong number of arguments passed to while procedure");
             }
 
             LabelTarget done = Expression.Label(typeof(ObjBox));
@@ -863,7 +934,9 @@ namespace DLR_Compiler
         private static Expression ifExpr(ListNode list, Expression env)
         {
             if (list.values.Count != 4)
-                throw new ParsingException("wrong number of arguments for if expression");
+            {
+                return createRuntimeException("wrong number of arguments passed to if procedure");
+            }
 
             // this will get assigned the result of the if statement
             ParameterExpression objBox = Expression.Parameter(typeof(ObjBox));
@@ -909,7 +982,7 @@ namespace DLR_Compiler
                     Expression.Convert(matchExpression(tree.values[i], env), typeof(Object))));
             }
 
-            Expression getFunction = unboxValue(lookup(Expression.Constant(tree.values[0].getValue()), env), typeof(FunctionHolder));
+            Expression getFunction = unboxValue(matchExpression(tree.values[0], env), typeof(FunctionHolder));
   
             var invoke = Expression.Call(
                 getFunction,
@@ -924,7 +997,10 @@ namespace DLR_Compiler
         // create a new lambda expression and store it into the environment
         private static Expression lambdaExpr(ListNode tree, Expression env)
         {
-
+            if (tree.values.Count < 3 || !tree.values[1].isList())
+            {
+                return createRuntimeException("too few arguments passed to lambda procedure or first argument was not parameter list");
+            }
             //make new environment
             var makeEnv = Expression.New(
                 typeof(CompilerLib.Environment).GetConstructor(new Type[] { typeof(CompilerLib.Environment) }),
@@ -943,7 +1019,9 @@ namespace DLR_Compiler
             foreach (Node n in tree.values[1].getList())
             {
                 if (!n.isLeaf())
-                    throw new ParsingException("list embeded in parameter list");
+                {
+                    return createRuntimeException("list embeded in the parameter list of labmda expression");
+                }
 
                 ParameterExpression var = Expression.Variable(typeof(Object), n.getValue()); 
                 paramList.Add(var);
@@ -990,7 +1068,9 @@ namespace DLR_Compiler
         private static Expression divExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse plus for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to divide procedure");
+            }
 
             //unboxing from type object
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
@@ -1003,7 +1083,9 @@ namespace DLR_Compiler
         private static Expression modExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse plus for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to mod procedure");
+            }
 
             //unboxing from type object
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
@@ -1016,7 +1098,9 @@ namespace DLR_Compiler
         private static Expression multExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse plus for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to multiply procedure");
+            }
 
             //unboxing from type object
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
@@ -1029,7 +1113,9 @@ namespace DLR_Compiler
         private static Expression addExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse plus for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to add procedure");
+            }
 
             //unboxing from type object
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
@@ -1045,7 +1131,9 @@ namespace DLR_Compiler
         private static Expression subExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse plus for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to subtract procedure");
+            }
 
             //unboxing from type object
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
@@ -1059,7 +1147,9 @@ namespace DLR_Compiler
         private static Expression lessThanExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse < for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to less-than procedure");
+            }
 
             dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
             dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
@@ -1074,7 +1164,9 @@ namespace DLR_Compiler
         private static Expression lessThanEqualExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse < for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to less-than-equal procedure");
+            }
 
             dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
             dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
@@ -1090,7 +1182,9 @@ namespace DLR_Compiler
         private static Expression gretThanExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse > for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to greater-than procedure");
+            }
 
             dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
             dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
@@ -1104,7 +1198,9 @@ namespace DLR_Compiler
         private static Expression gretThanEqualExpr(ListNode tree, Expression env)
         {
             if (tree.values.Count != 3)
-                throw new ParsingException("failed to parse > for list " + tree.ToString());
+            {
+                return createRuntimeException("wrong number of arguments passed to greater-than-equal procedure");
+            }
 
             dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
             dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
@@ -1121,7 +1217,9 @@ namespace DLR_Compiler
             
             //TODO check variable names are a legal scheme variable name
             if (tree.values.Count != 3 || tree.values[1].isList() || tree.values[1].getValue().GetType() != typeof(String))
-                throw new ParsingException("failed to parse define");
+            {
+                return createRuntimeException("define procedure failed");
+            }
 
             var rhs = matchExpression(tree.values[2], env);
 
@@ -1139,7 +1237,7 @@ namespace DLR_Compiler
         }
 
 
-        //unboxes the object allowing us to safley cast it at runtime
+        //unboxes the object allowing us to safley  perfomar a cast at runtime
         static Expression unboxValue(Expression obj, Type type)
         {
             List<Expression> body = new List<Expression>();
@@ -1257,10 +1355,7 @@ namespace DLR_Compiler
             }
             else // is atom
             {
-                bool matchedAtom;
-                first = matchAtom('\'' + n.getValue(), out matchedAtom);
-                if(!matchedAtom)
-                    throw new RuntimeException("Could not parse literal list");
+                first = matchAtom('\'' + n.getValue());
             }
 
             Expression cons = Expression.New(
@@ -1272,43 +1367,36 @@ namespace DLR_Compiler
             return wrapInObjBox(cons, type);
         }
 
-        static Expression matchLeaf(Node leaf, Expression env)
+       //If the value of the leaf node is symbol held by the environment return that
+       //else try to treat the value as an atomic
+        static Expression matchLeaf(LeafNode leaf, Expression env)
         {
 
-            bool matchedAtom;
-            Expression e;
-            e = matchAtom(leaf.getValue(), out matchedAtom);
-            if (matchedAtom)
-            {
-                return e;
-            }
-            else
-            {
-                return lookup(Expression.Constant(leaf.getValue()), env);
-            }
+            Expression name = Expression.Constant(leaf.getValue());
+            Expression check = checkEnv(name, env);
+
+            Expression envlookup = lookup(name, env);
+            Expression atom = matchAtom(leaf.getValue());
+
+            return envOverrideBranch(check, envlookup, atom);
         }
 
         // matches an atom returning a constant expression
-        static Expression matchAtom(String value, out bool isAtom)
+        static Expression matchAtom(String value)
         {
             int num;
             Double flo;
 
-            Expression matchedExpr = null;
-            isAtom = false;
             if (value == "#t")
             {
-                
                 // this expression is the same as calling typeof(Boolean);
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
-                matchedExpr = wrapInObjBox(Expression.Constant(true), type);
-                isAtom = true;
+                return wrapInObjBox(Expression.Constant(true), type);
             }
             else if (value == "#f")
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
-                matchedExpr = wrapInObjBox(Expression.Constant(false), type);
-                isAtom = true;
+                return wrapInObjBox(Expression.Constant(false), type);
             }
             else if (Int32.TryParse(value, out num))
             {
@@ -1317,8 +1405,7 @@ namespace DLR_Compiler
                     typeof(RacketInt).GetConstructor(new Type[] { typeof(int) }),
                     Expression.Constant(num));
 
-                matchedExpr = wrapInObjBox(numCons, type);
-                isAtom = true;
+                return wrapInObjBox(numCons, type);
             }
             else if (Double.TryParse(value, out flo))
             {
@@ -1327,9 +1414,7 @@ namespace DLR_Compiler
                   typeof(RacketFloat).GetConstructor(new Type[] { typeof(Double) }),
                   Expression.Constant(flo));
 
-                matchedExpr = wrapInObjBox(numCons, type);
-
-                isAtom = true;
+                return wrapInObjBox(numCons, type);
             }
             else if (value[0] == '\"')
             {
@@ -1337,8 +1422,7 @@ namespace DLR_Compiler
                 value = value.Substring(0, value.Length);
 
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
-                matchedExpr = wrapInObjBox(Expression.Constant(value, typeof(String)), type);
-                isAtom = true;
+                return wrapInObjBox(Expression.Constant(value, typeof(String)), type);
             }
             else if (value[0] == '\'')
             {
@@ -1349,8 +1433,7 @@ namespace DLR_Compiler
                         typeof(RacketInt).GetConstructor(new Type[] { typeof(int) }),
                         Expression.Constant(num));
 
-                    matchedExpr = wrapInObjBox(numCons, type);
-                    isAtom = true;
+                    return wrapInObjBox(numCons, type);
                 }
                 else if (Double.TryParse(value.Substring(1), out flo))
                 {
@@ -1359,23 +1442,31 @@ namespace DLR_Compiler
                       typeof(RacketFloat).GetConstructor(new Type[] { typeof(Double) }),
                       Expression.Constant(flo));
 
-                    matchedExpr = wrapInObjBox(numCons, type);
-                    isAtom = true;
+                    return wrapInObjBox(numCons, type);
                 }
                 else // string case
                 {
                     Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
-                    matchedExpr = wrapInObjBox(Expression.Constant(value.Substring(1), typeof(String)), type);
-                    isAtom = true;
+                    return wrapInObjBox(Expression.Constant(value.Substring(1), typeof(String)), type);
                 }
             }
             else if (value == "void" || value == "(void)")
             {
-                isAtom = true;
-                matchedExpr = voidSingleton;
+                return voidSingleton;
             }
 
-            return matchedExpr;
+            return createRuntimeException("value was not defined and could not be parsed as an atomic value:" + value);
+        }
+
+        static Expression createRuntimeException(String message)
+        {
+           return Expression.Block(
+                    new ParameterExpression[] { },
+                    new Expression[] {
+                        Expression.Throw(
+                            Expression.New(typeof(RuntimeException).GetConstructor(new Type[] { typeof(String) }),
+                            Expression.Constant(message, typeof(String)))), 
+                        voidSingleton});
         }
 
         static void PrintHelp()
