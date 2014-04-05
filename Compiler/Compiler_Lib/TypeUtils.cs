@@ -189,13 +189,13 @@ namespace CompilerLib
         {
             foreach (ObjBox o in args)
             {
-                Console.WriteLine(o.getType().GetInterfaces().Contains(typeof(RacketNum)));
                 if (o.getType().GetInterfaces().Contains(typeof(RacketNum)))
                 {
                     ConvertRacketNum(o, outArgTypes, outObjArray);
                 }
                 else
                 {
+                    Console.WriteLine("Wrong branch taken? for type:" + o.getType());
                     outArgTypes.Add(o.getType());
                     outObjArray.Add(o.getObj());
                 }

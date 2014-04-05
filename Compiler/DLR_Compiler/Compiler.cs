@@ -996,9 +996,8 @@ namespace DLR_Compiler
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
             Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
 
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
             Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Div"), new Expression[] { rhs });
-            return wrapInObjBox(result, type);
+            return result;
         }
 
         private static Expression modExpr(ListNode tree, Expression env)
@@ -1010,9 +1009,8 @@ namespace DLR_Compiler
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
             Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
 
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
             Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Mod"), new Expression[] { rhs });
-            return wrapInObjBox(result, type);
+            return result;
         }
 
         private static Expression multExpr(ListNode tree, Expression env)
@@ -1024,9 +1022,8 @@ namespace DLR_Compiler
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
             Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
 
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
             Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Mult"), new Expression[] { rhs });
-            return wrapInObjBox(result, type);
+            return result;
         }
 
         private static Expression addExpr(ListNode tree, Expression env)
@@ -1038,9 +1035,11 @@ namespace DLR_Compiler
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
             Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
             
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
             Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Plus"), new Expression[] { rhs });
-            return wrapInObjBox(result, type);
+
+            // we do not need to wrap this in an obj box because this is done in logic already
+            //return wrapInObjBox(result, type);
+            return result;
         }
 
         private static Expression subExpr(ListNode tree, Expression env)
@@ -1052,9 +1051,9 @@ namespace DLR_Compiler
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
             Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
 
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("numType"));
+            
             Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Sub"), new Expression[] { rhs });
-            return wrapInObjBox(result, type);
+            return result;
         }
 
         private static Expression lessThanExpr(ListNode tree, Expression env)

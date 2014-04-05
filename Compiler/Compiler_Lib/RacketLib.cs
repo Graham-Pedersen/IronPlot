@@ -46,11 +46,11 @@ namespace CompilerLib
 
     public interface RacketNum
     {
-        RacketNum Plus(RacketNum other);
-        RacketNum Sub(RacketNum other);
-        RacketNum Mult(RacketNum other);
-        RacketNum Div(RacketNum other);
-        RacketNum Mod(RacketNum other);
+        ObjBox Plus(RacketNum other);
+        ObjBox Sub(RacketNum other);
+        ObjBox Mult(RacketNum other);
+        ObjBox Div(RacketNum other);
+        ObjBox Mod(RacketNum other);
 
         Boolean RealQ(RacketNum other);
         Boolean ComplexQ(RacketNum other);
@@ -67,6 +67,31 @@ namespace CompilerLib
             value = _value;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType().GetInterfaces().Contains(typeof(RacketNum)))
+            {
+                if(obj.GetType() == typeof(RacketInt))
+                {
+                    return this.value == ((RacketInt) obj).value;
+                }
+                if(obj.GetType() == typeof(RacketFloat))
+                {
+                    return this.value == ((RacketFloat) obj).value;
+                }
+                if(obj.GetType() == typeof(RacketComplex))
+                {
+                    return this.value == ((RacketComplex) obj).value;
+                }
+            }
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
+
         public static implicit operator int(RacketInt m)
         {
             return m.value;
@@ -77,83 +102,83 @@ namespace CompilerLib
             return value.ToString();
         }
 
-        public RacketNum Plus(RacketNum other)
+        public ObjBox Plus(RacketNum other)
         {
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketInt(value + ((RacketInt)other).value);
+                return new ObjBox(new RacketInt(value + ((RacketInt)other).value), typeof(RacketInt));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value + ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value + ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value + ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value + ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Sub(RacketNum other)
+        public ObjBox Sub(RacketNum other)
         {
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketInt(value - ((RacketInt)other).value);
+                return new ObjBox(new RacketInt(value - ((RacketInt)other).value), typeof(RacketInt));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value - ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value - ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value - ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value - ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Mult(RacketNum other)
+        public ObjBox Mult(RacketNum other)
         {
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketInt(value * ((RacketInt)other).value);
+                return new ObjBox(new RacketInt(value * ((RacketInt)other).value), typeof(RacketInt));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value * ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value * ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value * ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value * ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Div(RacketNum other)
+        public ObjBox Div(RacketNum other)
         {
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketFloat(((Double) value) / ((RacketInt)other).value);
+                return new ObjBox(new RacketFloat(((Double) value) / ((RacketInt)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value / ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value / ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value / ((RacketComplex)other).value);
+                return new ObjBox( new RacketComplex(value / ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Mod(RacketNum other)
+        public ObjBox Mod(RacketNum other)
         {
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketInt(value % ((RacketInt)other).value);
+                return new ObjBox(new RacketInt(value % ((RacketInt)other).value), typeof(RacketInt));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value % ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value % ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
@@ -197,88 +222,113 @@ namespace CompilerLib
             return m.value;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType().GetInterfaces().Contains(typeof(RacketNum)))
+            {
+                if (obj.GetType() == typeof(RacketInt))
+                {
+                    return this.value == ((RacketInt)obj).value;
+                }
+                if (obj.GetType() == typeof(RacketFloat))
+                {
+                    return this.value == ((RacketFloat)obj).value;
+                }
+                if (obj.GetType() == typeof(RacketComplex))
+                {
+                    return this.value == ((RacketComplex)obj).value;
+                }
+            }
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
+
         public override string ToString()
         {
             return value.ToString();
         }
 
-        public RacketNum Plus(RacketNum other)
+        public ObjBox Plus(RacketNum other)
         {
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value + ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value + ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketFloat(value + ((RacketInt)other).value);
+                return new ObjBox(new RacketFloat(value + ((RacketInt)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value + ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value + ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Sub(RacketNum other)
+        public ObjBox Sub(RacketNum other)
         {
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value - ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value - ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketFloat(value - ((RacketInt)other).value);
+                return new ObjBox(new RacketFloat(value - ((RacketInt)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value - ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value - ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Mult(RacketNum other)
+        public ObjBox Mult(RacketNum other)
         {
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value * ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value * ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketFloat(value * ((RacketInt)other).value);
+                return new ObjBox(new RacketFloat(value * ((RacketInt)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value * ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value * ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Div(RacketNum other)
+        public ObjBox Div(RacketNum other)
         {
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value / ((RacketFloat)other).value);
+                return new ObjBox(new RacketFloat(value / ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketFloat(value / ((RacketInt)other).value);
+                return new ObjBox(new RacketFloat(value / ((RacketInt)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value / ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value / ((RacketComplex)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Mod(RacketNum other)
+        public ObjBox Mod(RacketNum other)
         {
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketFloat(value % ((RacketFloat)other).value);
+                return new ObjBox( new RacketFloat(value % ((RacketFloat)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketFloat(value % ((RacketInt)other).value);
+                return new ObjBox(new RacketFloat(value % ((RacketInt)other).value), typeof(RacketFloat));
             }
             if (other.GetType() == typeof(RacketComplex))
             {
@@ -317,10 +367,34 @@ namespace CompilerLib
             value = _value;
         }
 
-
         public static implicit operator Complex(RacketComplex m)
         {
             return m.value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType().GetInterfaces().Contains(typeof(RacketNum)))
+            {
+                if (obj.GetType() == typeof(RacketInt))
+                {
+                    return this.value == ((RacketInt)obj).value;
+                }
+                if (obj.GetType() == typeof(RacketFloat))
+                {
+                    return this.value == ((RacketFloat)obj).value;
+                }
+                if (obj.GetType() == typeof(RacketComplex))
+                {
+                    return this.value == ((RacketComplex)obj).value;
+                }
+            }
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
         }
 
         public override string ToString()
@@ -328,75 +402,75 @@ namespace CompilerLib
             return value.ToString();
         }
 
-        public RacketNum Plus(RacketNum other)
+        public ObjBox Plus(RacketNum other)
         {
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value + ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value + ((RacketComplex)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketComplex(value + ((RacketInt)other).value);
+                return new ObjBox(new RacketComplex(value + ((RacketInt)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketComplex(value + ((RacketFloat)other).value);
+                return new ObjBox(new RacketComplex(value + ((RacketFloat)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Sub(RacketNum other)
+        public ObjBox Sub(RacketNum other)
         {
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value - ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value - ((RacketComplex)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketComplex(value - ((RacketInt)other).value);
+                return new ObjBox(new RacketComplex(value - ((RacketInt)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketComplex(value - ((RacketFloat)other).value);
+                return new ObjBox(new RacketComplex(value - ((RacketFloat)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Mult(RacketNum other)
+        public ObjBox Mult(RacketNum other)
         {
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value * ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value * ((RacketComplex)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketComplex(value * ((RacketInt)other).value);
+                return new ObjBox(new RacketComplex(value * ((RacketInt)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketComplex(value * ((RacketFloat)other).value);
+                return new ObjBox(new RacketComplex(value * ((RacketFloat)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Div(RacketNum other)
+        public ObjBox Div(RacketNum other)
         {
             if (other.GetType() == typeof(RacketComplex))
             {
-                return new RacketComplex(value / ((RacketComplex)other).value);
+                return new ObjBox(new RacketComplex(value / ((RacketComplex)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketInt))
             {
-                return new RacketComplex(value / ((RacketInt)other).value);
+                return new ObjBox(new RacketComplex(value / ((RacketInt)other).value), typeof(RacketComplex));
             }
             if (other.GetType() == typeof(RacketFloat))
             {
-                return new RacketComplex(value / ((RacketFloat)other).value);
+                return new ObjBox(new RacketComplex(value / ((RacketFloat)other).value), typeof(RacketComplex));
             }
             throw new NotImplementedException();
         }
 
-        public RacketNum Mod(RacketNum other)
+        public ObjBox Mod(RacketNum other)
         {
             throw new InvalidOperationException("Cannot use mod operation with a complex number");
         }
