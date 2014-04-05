@@ -73,7 +73,7 @@ namespace IRLanguage.FileState
             int left = 0;
             int start_index = 0;
             while (text[start_index] != '(' && start_index + 1 < text.Length && text[start_index + 1] != 'd')
-            {
+            { 
                 start_index++;
             }
             if (start_index == text.Length) return start_index;
