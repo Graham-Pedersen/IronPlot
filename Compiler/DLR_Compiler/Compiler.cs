@@ -116,7 +116,7 @@ namespace DLR_Compiler
                 else if (mode == "run")
                 {
                     Expression.Lambda<Action>(code).Compile()();
-                    Console.ReadKey();
+                    
                 }
             }
         }
