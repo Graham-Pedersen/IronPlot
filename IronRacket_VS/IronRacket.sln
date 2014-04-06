@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSchemeParser", "..\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler_Lib", "..\Compiler\Compiler_Lib\Compiler_Lib.csproj", "{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desugar-Compiler_TestHarness", "..\Desugar-Compiler_TestHarness\Desugar-Compiler_TestHarness.csproj", "{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96A288D5-B535-4B8E-ADD0-EEF086E30E4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

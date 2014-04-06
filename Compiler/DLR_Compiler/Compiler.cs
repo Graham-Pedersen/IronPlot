@@ -144,28 +144,32 @@ namespace DLR_Compiler
                 ListNode list = (ListNode)tree;
                 if (list.getNestingLevel() == 0)
                 {
-                    List<Expression> dlrTree = new List<Expression>();
-                    foreach (Node n in ((ListNode)tree).getList())
+                    List<Expression> body = new List<Expression>();
+                    foreach(Node n in list.values)
                     {
-                        dlrTree.Add(matchTopLevel(n, env));
+                        body.Add(matchTopLevel(n, env));
                     }
-                    return Expression.Block(dlrTree);
+                    return Expression.Block(
+                            new ParameterExpression[] { },
+                            body);
                 }
-
-                Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
-                Expression check = checkEnv(name, env);
-                Expression defaultExpression = null;
-                Expression envDefined = invokeLambda(list, env);
-
-                if (list.values[0].isLeaf() && list.values[0].getValue() == "define" )
+                if (list.values[0].isLeaf())
                 {
-                    defaultExpression = defineExpr(list, env);
-                    return envOverrideBranch(check, envDefined, defaultExpression);
-                }
-                else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
-                {
-                    defaultExpression = netImportStmt(list, env);
-                    return envOverrideBranch(check, envDefined, defaultExpression);
+                    Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
+                    Expression check = checkEnv(name, env);
+                    Expression defaultExpression = null;
+                    Expression envDefined = invokeLambda(list, env);
+
+                    if (list.values[0].isLeaf() && list.values[0].getValue() == "define")
+                    {
+                        defaultExpression = defineExpr(list, env);
+                        return envOverrideBranch(check, envDefined, defaultExpression);
+                    }
+                    else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
+                    {
+                        defaultExpression = netImportStmt(list, env);
+                        return envOverrideBranch(check, envDefined, defaultExpression);
+                    }
                 }
             }
             return matchExpression(tree, env);
@@ -183,14 +187,13 @@ namespace DLR_Compiler
 
             ListNode list = (ListNode)tree;
 
-            // match a list of literals
-            if (list.isLiteral)
+            if (list.values.Count == 0)
             {
-                return matchLiteralList(list, env);
+                return voidSingleton;
             }
 
             //we know if the first part is another list we are defining a lambda to be immediately 
-            else if (list.values[0].isList())
+            if (list.values[0].isList())
             {
                 return invokeLambda(list, env);
             }
@@ -319,6 +322,17 @@ namespace DLR_Compiler
 
                     case "map":
                         defaultExpression = mapExpr(list, env);
+                        break;
+
+                    case "quote":
+                        if (list.values.Count != 2)
+                        {
+                            defaultExpression = createRuntimeException("wrong number of arguments passed to quote procedure");
+                        }
+                        else
+                        {
+                            defaultExpression = matchLiteral(list.values[1], env);
+                        }
                         break;
 
                     //TODO add environment check and move above standard cases
@@ -691,7 +705,7 @@ namespace DLR_Compiler
             return Expression.Block(block);
         }
 
-       //DEPRECIATED DO NOT CALL
+
         private static Expression autoInvokeLambda(ListNode list, Expression env)
         {
             //first expression must be a lambda
@@ -976,7 +990,7 @@ namespace DLR_Compiler
             // add each matched argument into our list of arguments
             for (int i = 1; i < tree.values.Count; i++)
             {
-                invokeLamb.Add(Expression.Call(
+                 invokeLamb.Add(Expression.Call(
                     objList,
                     typeof(List<Object>).GetMethod("Add", new Type[] { typeof(Object) }),
                     Expression.Convert(matchExpression(tree.values[i], env), typeof(Object))));
@@ -1334,38 +1348,7 @@ namespace DLR_Compiler
             return check;
         }
 
-        static Expression matchLiteralList(ListNode tree, Expression env)
-        {
-
-            if (tree.values.Count == 0)
-            {
-                return voidSingleton;
-            }
-
-            Expression first;
-            Expression rest;
-
-            Node n = tree.values[0];
-            tree.values.RemoveAt(0);
-            rest = matchLiteralList(tree, env);
-            
-            if (n.isList()) // check if literal list
-            {
-                first = matchLiteralList((ListNode) n, env);
-            }
-            else // is atom
-            {
-                first = matchAtom('\'' + n.getValue());
-            }
-
-            Expression cons = Expression.New(
-                typeof(RacketPair).GetConstructor(
-                    new Type[] { typeof(ObjBox), typeof(ObjBox) }),
-                first,
-                rest);
-            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
-            return wrapInObjBox(cons, type);
-        }
+        
 
        //If the value of the leaf node is symbol held by the environment return that
        //else try to treat the value as an atomic
@@ -1379,26 +1362,118 @@ namespace DLR_Compiler
             Expression atom = matchAtom(leaf.getValue());
 
             return envOverrideBranch(check, envlookup, atom);
+        } 
+
+
+        static Expression matchLiteral(Node lit, Expression env)
+        {
+            if (lit.isList())
+            {
+                return matchLiteralList((ListNode) lit, env);
+            }
+
+            String value = ((LeafNode) lit).getValue();
+
+            if (isBoolean(value))
+                return parseBoolean(value);
+            if (isNumber(value))
+                return parseNumber(value);
+
+            Expression type = Expression.Call(typeof(TypeUtils).GetMethod("strType"));
+            return wrapInObjBox(Expression.Constant(value, typeof(String)), type);
+
+
         }
 
-        // matches an atom returning a constant expression
-        static Expression matchAtom(String value)
+        static Expression matchLiteralList(ListNode tree, Expression env)
         {
-            int num;
-            Double flo;
 
-            if (value == "#t")
+            if (tree.values.Count == 0)
+            {
+                return voidSingleton;
+            }
+
+            Expression first;
+            Expression rest;
+
+            Node n = tree.values[0];
+            first = matchLiteral(n, env);
+
+            tree.values.RemoveAt(0);
+            rest = matchLiteral(tree, env);
+           
+            Expression cons = Expression.New(
+                typeof(RacketPair).GetConstructor(
+                    new Type[] { typeof(ObjBox), typeof(ObjBox) }),
+                first,
+                rest);
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
+            return wrapInObjBox(cons, type);
+        }
+
+
+        // matches an atom returning a constant expression
+        // Atoms can be a number type or a boolean type
+        static Expression matchAtom(String atom)
+        {
+
+            if (isBoolean(atom))
+            {
+                return parseBoolean(atom);
+            }
+
+            if (isNumber(atom))
+            {
+                return parseNumber(atom);
+            }
+
+            return createRuntimeException("value was not defined and could not be parsed as an atomic value:" + atom);
+        }
+
+        static Boolean isBoolean(String atom)
+        {
+            Expression result = parseBoolean(atom);
+            if (result != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        static Expression parseBoolean(String atom)
+        {
+            if (atom == "#t")
             {
                 // this expression is the same as calling typeof(Boolean);
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
                 return wrapInObjBox(Expression.Constant(true), type);
             }
-            else if (value == "#f")
+
+            if (atom == "#f")
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
                 return wrapInObjBox(Expression.Constant(false), type);
             }
-            else if (Int32.TryParse(value, out num))
+            return null;
+        }
+
+        static Boolean isNumber(String atom)
+        {
+            Expression result = parseNumber(atom);
+            if (result != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        static Expression parseNumber(String atom)
+        {
+            int num;
+            Double flo;
+            //TODO add complex numbers
+
+            if (Int32.TryParse(atom, out num))
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
                 Expression numCons = Expression.New(
@@ -1407,7 +1482,8 @@ namespace DLR_Compiler
 
                 return wrapInObjBox(numCons, type);
             }
-            else if (Double.TryParse(value, out flo))
+            
+            if (Double.TryParse(atom, out flo))
             {
                 Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("floatType"));
                 Expression numCons = Expression.New(
@@ -1416,46 +1492,8 @@ namespace DLR_Compiler
 
                 return wrapInObjBox(numCons, type);
             }
-            else if (value[0] == '\"')
-            {
-                value = value.Substring(1);
-                value = value.Substring(0, value.Length);
 
-                Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
-                return wrapInObjBox(Expression.Constant(value, typeof(String)), type);
-            }
-            else if (value[0] == '\'')
-            {
-                if (Int32.TryParse(value.Substring(1), out num))
-                {
-                    Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("intType"));
-                    Expression numCons = Expression.New(
-                        typeof(RacketInt).GetConstructor(new Type[] { typeof(int) }),
-                        Expression.Constant(num));
-
-                    return wrapInObjBox(numCons, type);
-                }
-                else if (Double.TryParse(value.Substring(1), out flo))
-                {
-                    Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("floatType"));
-                    Expression numCons = Expression.New(
-                      typeof(RacketFloat).GetConstructor(new Type[] { typeof(Double) }),
-                      Expression.Constant(flo));
-
-                    return wrapInObjBox(numCons, type);
-                }
-                else // string case
-                {
-                    Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
-                    return wrapInObjBox(Expression.Constant(value.Substring(1), typeof(String)), type);
-                }
-            }
-            else if (value == "void" || value == "(void)")
-            {
-                return voidSingleton;
-            }
-
-            return createRuntimeException("value was not defined and could not be parsed as an atomic value:" + value);
+            return null;
         }
 
         static Expression createRuntimeException(String message)

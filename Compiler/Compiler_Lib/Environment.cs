@@ -99,6 +99,8 @@ namespace CompilerLib
 
         public ObjBox invoke(List<Object> arguments)
         {
+            //count += 1;
+            //Console.WriteLine("Called function for the {0}th time", count);
             try
             {
                 return (ObjBox) func.DynamicInvoke(arguments.ToArray());

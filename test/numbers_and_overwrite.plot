@@ -56,5 +56,6 @@
 		(displayln '(end of list)))))
 (displayln (cons '(count is ) (cons count '())))
 (printList list 0 count)
+(scall System.Console ReadKey )
 				
 
