@@ -15,10 +15,9 @@ using System.Resources;
 using System.Numerics;
 using CompilerLib;
 
-
 namespace DLR_Compiler
 {
-   public class DLR_Compiler
+   public partial class DLR_Compiler
     {
         static ParameterExpression voidSingleton;
 
@@ -75,7 +74,7 @@ namespace DLR_Compiler
                 program.Add(assign);
                 program.Add(assignVoid);
 
-
+                program.Add(setUpTopLevelEnviornemnt(env));
 
                 Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
 
@@ -119,6 +118,33 @@ namespace DLR_Compiler
                     
                 }
             }
+        }
+
+        private static Expression setUpTopLevelEnviornemnt(ParameterExpression env)
+        {
+            List<Expression> body = new List<Expression>();
+
+            //insert all default functions into the environment
+            addBuiltIn(env, body, addExpr(), "+");
+            addBuiltIn(env, body, subExpr(), "-");
+            addBuiltIn(env, body, multExpr(), "*");
+            addBuiltIn(env, body, divExpr(), "/");
+            addBuiltIn(env, body, modExpr(), "%");
+            addBuiltIn(env, body, usingExpr(), "using");
+            addBuiltIn(env, body, callExpr(), "call");
+            addBuiltIn(env, body, scallExpr(), "scall");
+
+
+            return Expression.Block(new ParameterExpression[] { }, body);
+        }
+
+        private static void addBuiltIn(Expression env, List<Expression> body, Expression func, string name)
+        {
+            body.Add(Expression.Call(
+                env,
+                typeof(CompilerLib.Environment).GetMethod("add"),
+                    Expression.Constant(name, typeof(String)),
+                    func));
         }
 
         static void repl()
@@ -167,7 +193,7 @@ namespace DLR_Compiler
                     }
                     else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
                     {
-                        defaultExpression = netImportStmt(list, env);
+                        defaultExpression = usingExpr(list, env);
                         return envOverrideBranch(check, envDefined, defaultExpression);
                     }
                 }
@@ -209,15 +235,15 @@ namespace DLR_Compiler
                 {
                     //TODO REMOVE THIS AFTER DESUGARER FIX (add using as a top level form that escapes transformation)
                     case "using":
-                        defaultExpression = netImportStmt(list, env);
+                        defaultExpression = usingExpr(list, env);
                         break;
 
                     case "call":
-                        defaultExpression = callNetExpr(list, env);
+                        defaultExpression = callExpr(list, env);
                         break;
 
                     case "scall":
-                        defaultExpression = scallNetExpr(list, env);
+                        defaultExpression = scallExpr(list, env);
                         break;
 
                     case "new":
@@ -242,26 +268,6 @@ namespace DLR_Compiler
 
                     case ">=":
                         defaultExpression = gretThanEqualExpr(list, env);
-                        break;
-
-                    case "+":
-                        defaultExpression = addExpr(list, env);
-                        break;
-
-                    case "-":
-                        defaultExpression = subExpr(list, env);
-                        break;
-
-                    case "*":
-                        defaultExpression = multExpr(list, env);
-                        break;
-
-                    case "/":
-                        defaultExpression = divExpr(list, env);
-                        break;
-
-                    case "%":
-                        defaultExpression = modExpr(list, env);
                         break;
 
                     case "void":
@@ -399,7 +405,7 @@ namespace DLR_Compiler
                 Expression.Call(null, typeof(TypeUtils).GetMethod("boolType")));
         }
 
-        private static Expression netImportStmt(ListNode list, Expression env)
+        private static Expression usingExpr(ListNode list, Expression env)
         {
             if(list.values.Count != 2)
             {
@@ -412,7 +418,7 @@ namespace DLR_Compiler
             new Expression[]  { Expression.Call(null, typeof(typeResolver).GetMethod("import", new Type[] { typeof(String) }), importStr) , voidSingleton });
         }
 
-        private static Expression scallNetExpr(ListNode list, Expression env)
+        private static Expression scallExpr(ListNode list, Expression env)
         {
             List<Expression> block = new List<Expression>();
             if (list.values.Count < 3)
@@ -468,7 +474,7 @@ namespace DLR_Compiler
             return Expression.Block(new ParameterExpression[] { arr }, block);
         }
 
-        private static Expression callNetExpr(ListNode list, Expression env)
+        private static Expression callExpr(ListNode list, Expression env)
         {
             List<Expression> block = new List<Expression>();
             if (list.values.Count < 3)
@@ -1008,6 +1014,7 @@ namespace DLR_Compiler
             return Expression.Block(new ParameterExpression[] {objList}, invokeLamb);
         }
 
+
         // create a new lambda expression and store it into the environment
         private static Expression lambdaExpr(ListNode tree, Expression env)
         {
@@ -1016,11 +1023,11 @@ namespace DLR_Compiler
                 return createRuntimeException("too few arguments passed to lambda procedure or first argument was not parameter list");
             }
             //make new environment
-            var makeEnv = Expression.New(
+            Expression makeEnv = Expression.New(
                 typeof(CompilerLib.Environment).GetConstructor(new Type[] { typeof(CompilerLib.Environment) }),
                 env);
-            var new_env = Expression.Variable(typeof(CompilerLib.Environment));
-            var assign = Expression.Assign(new_env, makeEnv);
+            ParameterExpression new_env = Expression.Variable(typeof(CompilerLib.Environment));
+            Expression assign = Expression.Assign(new_env, makeEnv);
 
             //Add the environment to the start of the body of the lambda
             List<Expression> body = new List<Expression>();
@@ -1050,7 +1057,6 @@ namespace DLR_Compiler
                     Expression.Convert(var, typeof(ObjBox)));
 
                 body.Add(addToEnv);
-
             }
 
             List<Node> values = new List<Node>();
@@ -1065,7 +1071,7 @@ namespace DLR_Compiler
             body.Add(matchTopLevel(bodyLiterals, new_env));
 
 
-            var lambda = Expression.Lambda(Expression.Block(new ParameterExpression[] { new_env }, body), paramList);
+            Expression lambda = Expression.Lambda(Expression.Block(new ParameterExpression[] { new_env }, body), paramList);
 
             //Now we want to box this expression in a FunctionHolder
             Expression func = Expression.New(
@@ -1077,85 +1083,6 @@ namespace DLR_Compiler
                 typeof(ObjBox).GetConstructor(new Type[] {typeof(Object), typeof(Type)}),
                 Expression.Convert(func, typeof(Object)),
                 Expression.Call(null, typeof(TypeUtils).GetMethod("funcType")));
-        }
-
-        private static Expression divExpr(ListNode tree, Expression env)
-        {
-            if (tree.values.Count != 3)
-            {
-                return createRuntimeException("wrong number of arguments passed to divide procedure");
-            }
-
-            //unboxing from type object
-            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
-            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
-
-            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Div"), new Expression[] { rhs });
-            return result;
-        }
-
-        private static Expression modExpr(ListNode tree, Expression env)
-        {
-            if (tree.values.Count != 3)
-            {
-                return createRuntimeException("wrong number of arguments passed to mod procedure");
-            }
-
-            //unboxing from type object
-            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
-            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
-
-            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Mod"), new Expression[] { rhs });
-            return result;
-        }
-
-        private static Expression multExpr(ListNode tree, Expression env)
-        {
-            if (tree.values.Count != 3)
-            {
-                return createRuntimeException("wrong number of arguments passed to multiply procedure");
-            }
-
-            //unboxing from type object
-            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
-            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
-
-            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Mult"), new Expression[] { rhs });
-            return result;
-        }
-
-        private static Expression addExpr(ListNode tree, Expression env)
-        {
-            if (tree.values.Count != 3)
-            {
-                return createRuntimeException("wrong number of arguments passed to add procedure");
-            }
-
-            //unboxing from type object
-            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
-            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
-            
-            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Plus"), new Expression[] { rhs });
-
-            // we do not need to wrap this in an obj box because this is done in logic already
-            //return wrapInObjBox(result, type);
-            return result;
-        }
-
-        private static Expression subExpr(ListNode tree, Expression env)
-        {
-            if (tree.values.Count != 3)
-            {
-                return createRuntimeException("wrong number of arguments passed to subtract procedure");
-            }
-
-            //unboxing from type object
-            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
-            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
-
-            
-            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Sub"), new Expression[] { rhs });
-            return result;
         }
 
         private static Expression lessThanExpr(ListNode tree, Expression env)
@@ -1250,7 +1177,6 @@ namespace DLR_Compiler
             return Expression.Block(block);
         }
 
-
         //unboxes the object allowing us to safley  perfomar a cast at runtime
         static Expression unboxValue(Expression obj, Type type)
         {
@@ -1267,11 +1193,11 @@ namespace DLR_Compiler
                 typeof(Object),
                 Expression.Call(temp, typeof(ObjBox).GetMethod("getObj")));
 
-           Expression invoke = Expression.Call(
-                castMethod, 
-                typeof(System.Reflection.MethodInfo).GetMethod("Invoke", new Type[] { typeof(Object), typeof(Object[]) }),
-                temp,
-                objArray);
+            Expression invoke = Expression.Call(
+                 castMethod,
+                 typeof(System.Reflection.MethodInfo).GetMethod("Invoke", new Type[] { typeof(Object), typeof(Object[]) }),
+                 temp,
+                 objArray);
 
             Expression cast = Expression.Convert(invoke, type);
             body.Add(cast);
@@ -1284,6 +1210,7 @@ namespace DLR_Compiler
                     typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
                     new Expression[] { Expression.Convert(obj, typeof(Object)), type });
         }
+    
 
         //DEPRECIATED DO NOT USE
         //Using reflection we dynamically generate a templated call to a method that lets us recover the type of any object at runtime
@@ -1381,7 +1308,6 @@ namespace DLR_Compiler
 
             Expression type = Expression.Call(typeof(TypeUtils).GetMethod("strType"));
             return wrapInObjBox(Expression.Constant(value, typeof(String)), type);
-
 
         }
 
