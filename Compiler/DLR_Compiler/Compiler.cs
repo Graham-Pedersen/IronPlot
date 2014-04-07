@@ -39,86 +39,81 @@ namespace DLR_Compiler
             voidSingleton = Expression.Variable(typeof(ObjBox), "void");
             Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
 
-            if (mode == "repl")
+
+            // make a new simple scheme parser
+            SchemeParser ssp = new SchemeParser(filename);
+            ListNode topLevelForms = ssp.parseFile();
+
+            // these expressions will initalize the top level environment
+            var makeEnv = Expression.New(typeof(CompilerLib.Environment));
+            var env = Expression.Variable(typeof(CompilerLib.Environment), "env");
+            var assign = Expression.Assign(env, makeEnv);
+
+            Expression initVoidObjBox = Expression.New(
+                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
+                new Expression[] { Expression.Convert(Expression.New(typeof(voidObj).GetConstructor(new Type[] { })), typeof(Object)), voidType });
+
+            Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
+
+
+            //Body of the program
+            List<Expression> program = new List<Expression>();
+
+            //TODO
+            //Add the link to Compiler_lib
+            //String dllLoc = Directory.GetCurrentDirectory() + "\\" + "Compiler_Lib.dll";
+            //Expression usingCompilerLib = Expression.Call(null, typeof(typeResolver).GetMethod("import"), Expression.Constant(dllLoc));
+            //program.Add(usingCompilerLib);
+
+            //Add the environment to the start of the program
+            program.Add(env);
+            program.Add(assign);
+            program.Add(assignVoid);
+
+
+
+            Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
+
+
+
+            //Match and add the rest of the program
+            program.Add(
+                Expression.Call(
+                null,
+                typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }),
+                    Expression.Call(ret, typeof(Object).GetMethod("ToString"))));
+
+            //if the program is being compiled put a readkey in
+            if (mode == "compile")
             {
-                repl();
+                program.Add(Expression.Call(typeof(Console).GetMethod("ReadKey", new Type[] { })));
             }
-            else
+
+            //Wrap the program into a block expression
+            Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
+
+            if (mode == "compile")
             {
-                // make a new simple scheme parser
-                SchemeParser ssp = new SchemeParser(filename);
-                ListNode topLevelForms = ssp.parseFile();
+                var asmName = new AssemblyName(outputName.Remove(outputName.IndexOf(".exe")));
+                var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
+                    (asmName, AssemblyBuilderAccess.RunAndSave);
+                var moduleBuilder = asmBuilder.DefineDynamicModule(outputName.Remove(outputName.IndexOf(".exe")), outputName);
+                var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
+                var methodBuilder = typeBuilder.DefineMethod("Main",
+                    MethodAttributes.Static, typeof(void), new[] { typeof(string) });
 
-                // these expressions will initalize the top level environment
-                var makeEnv = Expression.New(typeof(CompilerLib.Environment));
-                var env = Expression.Variable(typeof(CompilerLib.Environment), "env");
-                var assign = Expression.Assign(env, makeEnv);
+                Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
 
-                Expression initVoidObjBox = Expression.New(
-                    typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
-                    new Expression[] { Expression.Convert(Expression.New(typeof(voidObj).GetConstructor(new Type[] { })), typeof(Object)), voidType });
-
-                Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
-
-
-                //Body of the program
-                List<Expression> program = new List<Expression>();
-
-                //TODO
-                //Add the link to Compiler_lib
-                //String dllLoc = Directory.GetCurrentDirectory() + "\\" + "Compiler_Lib.dll";
-                //Expression usingCompilerLib = Expression.Call(null, typeof(typeResolver).GetMethod("import"), Expression.Constant(dllLoc));
-                //program.Add(usingCompilerLib);
-
-                //Add the environment to the start of the program
-                program.Add(env);
-                program.Add(assign);
-                program.Add(assignVoid);
-
-
-
-                Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
-
-
-
-                //Match and add the rest of the program
-                program.Add(
-                    Expression.Call(
-                    null,
-                    typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }),
-                        Expression.Call(ret, typeof(Object).GetMethod("ToString"))));
-
-                //if the program is being compiled put a readkey in
-                if (mode == "compile")
-                {
-                    program.Add(Expression.Call(typeof(Console).GetMethod("ReadKey", new Type[] { })));
-                }
-
-                //Wrap the program into a block expression
-                Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
-
-                if (mode == "compile")
-                {
-                    var asmName = new AssemblyName(outputName.Remove(outputName.IndexOf(".exe")));
-                    var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
-                        (asmName, AssemblyBuilderAccess.RunAndSave);
-                    var moduleBuilder = asmBuilder.DefineDynamicModule(outputName.Remove(outputName.IndexOf(".exe")), outputName);
-                    var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
-                    var methodBuilder = typeBuilder.DefineMethod("Main",
-                        MethodAttributes.Static, typeof(void), new[] { typeof(string) });
-
-                    Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
-
-                    typeBuilder.CreateType();
-                    asmBuilder.SetEntryPoint(methodBuilder);
-                    asmBuilder.Save(outputName);
-                }
-                else if (mode == "run")
-                {
-                    Expression.Lambda<Action>(code).Compile()();
+                typeBuilder.CreateType();
+                asmBuilder.SetEntryPoint(methodBuilder);
+                asmBuilder.Save(outputName);
+            }
+            if (mode == "run")
+            {
+                Expression.Lambda<Action>(code).Compile()();
                     
-                }
             }
+            
         }
 
         static void repl()
@@ -202,7 +197,7 @@ namespace DLR_Compiler
                 Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
                 Expression check = checkEnv(name, env);
                 Expression defaultExpression = null;
-                Expression envDefined = invokeLambda(list, env);
+                //Expression envDefined = invokeLambda(list, env);
 
 
                 switch (list.values[0].getValue())
@@ -341,9 +336,9 @@ namespace DLR_Compiler
                         break;
                 }
 
-                return envOverrideBranch(check, envDefined, defaultExpression);
+                return defaultExpression;
+                //return envOverrideBranch(check, envDefined, defaultExpression);
             }
-            
         }
 
         private static Expression envOverrideBranch(Expression envCheck, Expression envDef, Expression builtInDef)
