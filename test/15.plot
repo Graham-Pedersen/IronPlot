@@ -3,4 +3,7 @@
 	      [rest (cdr pair)])
 		first))
 
-(displayln (get-first (cons 1 2)))
+(if 
+	(equal? (get-first (cons 1 2) 1))
+	(displayln 'Passed)
+	(displayln "Failed"))

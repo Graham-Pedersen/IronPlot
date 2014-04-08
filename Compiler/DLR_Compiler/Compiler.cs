@@ -35,19 +35,42 @@ namespace DLR_Compiler
             string mode = args[1];
             string outputName = args[2];
 
-            //set up a single instance of type void
-            voidSingleton = Expression.Variable(typeof(ObjBox), "void");
-            Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
-
-
             // make a new simple scheme parser
             SchemeParser ssp = new SchemeParser(filename);
             ListNode topLevelForms = ssp.parseFile();
+
+            //TODO
+            //Add the link to Compiler_lib
+
+            //This is pedantic but it makes the cases quite clear
+            if (mode == "dll")
+            {
+                createDll(topLevelForms, outputName);
+                return;
+            }
+            if (mode == "compile")
+            {
+                createExe(topLevelForms, true, outputName);
+            }
+            else
+            {
+                createExe(topLevelForms, false, null);
+            }
+        }
+
+        static void createExe(ListNode parseTree, Boolean compile, String outputName)
+        {
+            //Body of the program
+            List<Expression> program = new List<Expression>();
 
             // these expressions will initalize the top level environment
             var makeEnv = Expression.New(typeof(CompilerLib.Environment));
             var env = Expression.Variable(typeof(CompilerLib.Environment), "env");
             var assign = Expression.Assign(env, makeEnv);
+
+            //set up a single instance of type void
+            voidSingleton = Expression.Variable(typeof(ObjBox), "void");
+            Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
 
             Expression initVoidObjBox = Expression.New(
                 typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
@@ -55,49 +78,40 @@ namespace DLR_Compiler
 
             Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
 
-
-            //Body of the program
-            List<Expression> program = new List<Expression>();
-
-            //TODO
-            //Add the link to Compiler_lib
-            //String dllLoc = Directory.GetCurrentDirectory() + "\\" + "Compiler_Lib.dll";
-            //Expression usingCompilerLib = Expression.Call(null, typeof(typeResolver).GetMethod("import"), Expression.Constant(dllLoc));
-            //program.Add(usingCompilerLib);
-
-            //Add the environment to the start of the program
+            //Add the environment set up to the very start of the program
             program.Add(env);
             program.Add(assign);
             program.Add(assignVoid);
+            
+            // add all the top level forms into the program
+            foreach(Node n in parseTree.values)
+            {
+                program.Add(matchTopLevel(n, env));
+            }
+          
 
-
-
-            Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
-
-
-
-            //Match and add the rest of the program
-            program.Add(
+            //Print whatever the program returns
+            /*
+                program.Add(
                 Expression.Call(
                 null,
                 typeof(Console).GetMethod("WriteLine", new Type[] { typeof(String) }),
-                    Expression.Call(ret, typeof(Object).GetMethod("ToString"))));
+                    Expression.Call(result, typeof(Object).GetMethod("ToString"))));
+             * */
+            
 
-            //if the program is being compiled put a readkey in
-            if (mode == "compile")
+            //program.Add(Expression.Empty());
+
+            //turn our program body into a expression block
+            Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton}, program);
+           
+            if (compile)
             {
-                program.Add(Expression.Call(typeof(Console).GetMethod("ReadKey", new Type[] { })));
-            }
-
-            //Wrap the program into a block expression
-            Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton }, program);
-
-            if (mode == "compile")
-            {
-                var asmName = new AssemblyName(outputName.Remove(outputName.IndexOf(".exe")));
+                //create and output an assembly
+                var asmName = new AssemblyName();
                 var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
                     (asmName, AssemblyBuilderAccess.RunAndSave);
-                var moduleBuilder = asmBuilder.DefineDynamicModule(outputName.Remove(outputName.IndexOf(".exe")), outputName);
+                var moduleBuilder = asmBuilder.DefineDynamicModule(outputName, outputName + ".exe");
                 var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
                 var methodBuilder = typeBuilder.DefineMethod("Main",
                     MethodAttributes.Static, typeof(void), new[] { typeof(string) });
@@ -108,27 +122,128 @@ namespace DLR_Compiler
                 asmBuilder.SetEntryPoint(methodBuilder);
                 asmBuilder.Save(outputName);
             }
-            if (mode == "run")
+            else
             {
+                //Compile and invoke the program in this context
                 Expression.Lambda<Action>(code).Compile()();
-                    
             }
-            
         }
 
-        static void repl()
+        static void createDll(ListNode parseTree, String outputName)
         {
-            string input = "";
-            while (true)
+
+            // these expressions will initalize the top level environment
+            var makeEnv = Expression.New(typeof(CompilerLib.Environment));
+            var env = Expression.Variable(typeof(CompilerLib.Environment), "env");
+            var assign = Expression.Assign(env, makeEnv);
+
+            //set up a single instance of type void
+            voidSingleton = Expression.Variable(typeof(ObjBox), "void");
+            Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
+
+            Expression initVoidObjBox = Expression.New(
+                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
+                new Expression[] { Expression.Convert(Expression.New(typeof(voidObj).GetConstructor(new Type[] { })), typeof(Object)), voidType });
+
+            Expression assignVoid = Expression.Assign(voidSingleton, initVoidObjBox);
+
+            // create the code for each top level form independantly
+            Tuple<List<Expression>, List<ExposedFunction>> dllTopLevels = matchTopLevelDll(parseTree, env);
+
+            List<Expression> buildFunctions = new List<Expression>();
+
+            //Add the environment set up to the very start of the program
+            buildFunctions.Add(env);
+            buildFunctions.Add(assign);
+            buildFunctions.Add(assignVoid);
+
+            //Add all the using statments
+            buildFunctions.AddRange(dllTopLevels.Item1);
+
+            //Add the list of program definitions
+            foreach (ExposedFunction ef in dllTopLevels.Item2)
             {
-                input += Console.ReadLine();
-                Console.WriteLine(input);
+                buildFunctions.Add(ef.expTree);
             }
+
+            //turn our program body into a expression block
+            Expression init = Expression.Block(new ParameterExpression[] { env, voidSingleton }, buildFunctions);
+
+            //make an method to invoke each function
+
+            var asm = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(outputName), System.Reflection.Emit.AssemblyBuilderAccess.Save);
+            var module = asm.DefineDynamicModule(outputName, outputName + ".dll");
+            var type = module.DefineType(outputName, TypeAttributes.Public);
+
+            createDllMethods(type, dllTopLevels.Item2);
+
+            type.CreateType();
+            asm.Save(outputName + ".dll");
+
+
         }
+
+        private static void createDllMethods(TypeBuilder type, List<ExposedFunction> list)
+        {
+            foreach (ExposedFunction ef in list)
+            {
+                var method = type.DefineMethod(ef.name, MethodAttributes.Public | MethodAttributes.Static);
+                Expression methodBody = 
+                //CompileToMethod
+                
+            }
+
+            Expression<Func<int, int, int>> add = (x, y) => (x + y);
+            add.CompileToMethod(method);
+        }
+
+        /** match all top level forms in the form of:
+         * 
+         *  topLevelForms ::= (<def> | <using>)*
+         *
+         *  each define will become a method that a c# code can call 
+         *  returns a list of using statments and a list of defines
+         **/ 
+        static Tuple<List<Expression>, List<ExposedFunction>> matchTopLevelDll(Node tree, Expression env)
+        {
+            List<Expression> usingList = new List<Expression>();
+            List<ExposedFunction> defineList = new List<ExposedFunction>();
+
+            if (tree.isList())
+            {
+                ListNode list = (ListNode)tree;
+                if (list.values[0].isLeaf())
+                {
+                    Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
+
+                    if (list.values[0].isLeaf() && list.values[0].getValue() == "define")
+                    {
+                        defineList.Add(dllDefineExpr(list, env));
+                    }
+                    else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
+                    {
+                        usingList.Add(netImportStmt(list, env));
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception("Illegal expression encountered at the top level of a DLL. Expression: " + tree.getValue());
+            }
+
+            if (defineList.Count == 0)
+            {
+                throw new Exception("Dll being compiled with no top level defines?");
+            }
+
+            return new Tuple<List<Expression>, List<ExposedFunction>>(usingList, defineList);
+        }
+
+
        
         /** match all top level forms in the form of:
          * 
-         *  topLevelForms ::= (<def> | <exp>)
+         *  topLevelForms ::= (<def> | <using> | <exp>)*
          *
          **/
         static Expression matchTopLevel(Node tree, Expression env)
@@ -137,33 +252,17 @@ namespace DLR_Compiler
             if (tree.isList())
             {
                 ListNode list = (ListNode)tree;
-                if (list.getNestingLevel() == 0)
-                {
-                    List<Expression> body = new List<Expression>();
-                    foreach(Node n in list.values)
-                    {
-                        body.Add(matchTopLevel(n, env));
-                    }
-                    return Expression.Block(
-                            new ParameterExpression[] { },
-                            body);
-                }
                 if (list.values[0].isLeaf())
                 {
                     Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
-                    Expression check = checkEnv(name, env);
-                    Expression defaultExpression = null;
-                    Expression envDefined = invokeLambda(list, env);
 
                     if (list.values[0].isLeaf() && list.values[0].getValue() == "define")
                     {
-                        defaultExpression = defineExpr(list, env);
-                        return envOverrideBranch(check, envDefined, defaultExpression);
+                        return defineExpr(list, env);
                     }
                     else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
                     {
-                        defaultExpression = netImportStmt(list, env);
-                        return envOverrideBranch(check, envDefined, defaultExpression);
+                        return netImportStmt(list, env);
                     }
                 }
             }
@@ -267,6 +366,10 @@ namespace DLR_Compiler
                         defaultExpression = equalExpr(list, env);
                         break;
 
+                    case "=":
+                        defaultExpression = equalExpr(list, env);
+                        break;
+
                     case "not":
                         defaultExpression = notExpr(list, env);
                         break;
@@ -303,8 +406,8 @@ namespace DLR_Compiler
                         defaultExpression = beginExpr(list, env);
                         break;
 
-                    case "begin0":
-                        defaultExpression = begin0Expr(list, env);
+                    case "begin-top":
+                        defaultExpression = beginExpr(list, env);
                         break;
 
                     case "displayln":
@@ -332,8 +435,9 @@ namespace DLR_Compiler
 
                     //TODO add environment check and move above standard cases
                     default:
-                        defaultExpression = createRuntimeException("Could not resolve procedure:" + list.values[0].getValue());
-                        break;
+                        return invokeLambda(list, env);
+                        //defaultExpression = createRuntimeException("Could not resolve procedure:" + list.values[0].getValue());
+                        //break;
                 }
 
                 return defaultExpression;
@@ -913,9 +1017,6 @@ namespace DLR_Compiler
             Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(Object));
             Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(Object));
 
-            //Expression lhs = matchExpression(tree.values[1], env);
-            //Expression rhs = matchExpression(tree.values[2], env);
-
             Expression equal = Expression.Call(lhs, typeof(Object).GetMethod("Equals", new Type[] { typeof(Object) }), rhs);
 
             return Expression.New(
@@ -1001,6 +1102,11 @@ namespace DLR_Compiler
             invokeLamb.Add(invoke);
 
             return Expression.Block(new ParameterExpression[] {objList}, invokeLamb);
+        }
+
+        //create a lambda that looks up and applys an argument list to a function in the environment
+        private static Expression externalLambda(String name, Expression env, int argCount)
+        {
         }
 
         // create a new lambda expression and store it into the environment
@@ -1160,11 +1266,11 @@ namespace DLR_Compiler
                 return createRuntimeException("wrong number of arguments passed to less-than procedure");
             }
 
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
 
-            Expression result = Expression.LessThan(lhs, rhs);
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("lessThan"), rhs);
 
             return wrapInObjBox(result, type);
 
@@ -1177,11 +1283,11 @@ namespace DLR_Compiler
                 return createRuntimeException("wrong number of arguments passed to less-than-equal procedure");
             }
 
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
 
-            Expression result = Expression.LessThanOrEqual(lhs, rhs);
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("lessThanEqual"), rhs);
 
             return wrapInObjBox(result, type);
 
@@ -1195,11 +1301,11 @@ namespace DLR_Compiler
                 return createRuntimeException("wrong number of arguments passed to greater-than procedure");
             }
 
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
 
-            Expression result = Expression.GreaterThan(lhs, rhs);
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("greaterThan"), rhs);
 
             return wrapInObjBox(result, type);
         }
@@ -1211,11 +1317,11 @@ namespace DLR_Compiler
                 return createRuntimeException("wrong number of arguments passed to greater-than-equal procedure");
             }
 
-            dynamic lhs = unboxValue(matchExpression(tree.values[1], env), typeof(int));
-            dynamic rhs = unboxValue(matchExpression(tree.values[2], env), typeof(int));
+            Expression lhs = unboxValue(matchExpression(tree.values[1], env), typeof(RacketNum));
+            Expression rhs = unboxValue(matchExpression(tree.values[2], env), typeof(RacketNum));
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
 
-            Expression result = Expression.GreaterThanOrEqual(lhs, rhs);
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("greaterThanEqual"), rhs);
 
             return wrapInObjBox(result, type);
         }
@@ -1243,6 +1349,44 @@ namespace DLR_Compiler
             block.Add(add);
             block.Add(voidSingleton);
             return Expression.Block(block);
+        }
+
+        private static ExposedFunction dllDefineExpr(ListNode tree, Expression env)
+        {
+            List<Expression> block = new List<Expression>();
+            
+            //TODO check variable names are a legal scheme variable name
+            if (tree.values.Count != 3  || 
+                tree.values[1].isList() || 
+                tree.values[1].getValue().GetType() != typeof(String) ||
+                tree.values[2].isLeaf())
+            {
+                throw new Exception("define procedure failed");
+            }
+
+            ListNode lam = (ListNode) tree.values[2];
+
+            if (lam.values[0].getValue() != "lambda" || lam.values[1].isLeaf())
+            {
+                throw new Exception("define procedure of dll failed: third argument was not a lambda");
+            }
+            int paramCount = ((ListNode)lam.values[1]).values.Count;
+
+            var func = matchExpression(tree.values[2], env);
+
+
+            String funcName = tree.values[1].getValue();
+            var name = Expression.Constant(funcName);
+
+            Expression add = Expression.Call(
+                env,
+                typeof(CompilerLib.Environment).GetMethod("add"),
+                name,
+                Expression.Convert(func, typeof(ObjBox)));
+
+            block.Add(add);
+            block.Add(voidSingleton);
+            return new ExposedFunction(Expression.Block(new ParameterExpression[] { }, block), funcName, paramCount);
         }
 
 
@@ -1507,4 +1651,19 @@ namespace DLR_Compiler
             Console.WriteLine("if this were a real project then we would print a help document here");
         }
     }
+
+   public class ExposedFunction
+   {
+
+       public Expression expTree;
+       public String name;
+       public int argCount;
+
+       public ExposedFunction(Expression _expTree, String _name, int _argCount )
+       {
+           expTree = _expTree;
+           name = _name;
+           argCount = _argCount;
+       }
+   }
 }

@@ -6,7 +6,6 @@
 
 
 
-; fact implimented with scoping using lambda
 (define (fact x)
     (define f (lambda (x) (if (<= x 1) 1 (* x (fact (- x 1))))))
 
@@ -19,8 +18,10 @@
     (* neg (f x)))
 
 (define x 5)
-(displayln (fact x))
 (set! x 8)
-(displayln (fact x))
-(displayln (boring_fact 5))
+(if 
+	(and (= (boring_fact 8) (fact x))  (= 40320 (fact x)))
+	(displayln 'Passed)
+	(displayln 'Failed))
+	
 

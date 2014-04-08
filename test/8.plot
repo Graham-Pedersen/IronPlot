@@ -7,9 +7,8 @@
 
 
 (define add_three (make_adder 3))
-;should print 8
-(displayln (add_three 5))
 
-
-;should print 20
-(displayln (plus_fun 4 5))
+(if 
+	(and (= 8 (add_three 5))  (= 20 (plus_fun 4 5)))
+	(displayln 'Passed)
+	(displayln 'Failed))
