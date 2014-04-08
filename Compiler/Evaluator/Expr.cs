@@ -7,6 +7,86 @@ using System.Threading.Tasks;
 
 namespace Evaluator
 {
+    public class BoolExpr : Expr
+    {
+        bool val;
+        public BoolExpr(bool val)
+        {
+            this.val = val;
+        }
+
+        public dynamic eval(Dictionary<string, Expr> env)
+        {
+            return this;
+        }
+
+        public string ToString()
+        {
+            if (val)
+                return "#t";
+            else
+                return "#f";
+        }
+
+        public bool getValue()
+        {
+            return val;
+        }
+    }
+    public class ConsExpr : Expr
+    {
+        Expr first;
+        Expr rest;
+
+        public ConsExpr(Expr first, Expr rest)
+        {
+            this.first = first;
+            this.rest = rest;
+        }
+
+        public dynamic eval(Dictionary<string, Expr> env)
+        {
+            return this;
+        }
+
+        public Expr getRest()
+        {
+            return rest;
+        }
+        public Expr getFirst()
+        {
+            return first;
+        }
+
+        public string ToString()
+        {
+            if (rest.GetType() == typeof(ConsExpr))
+                return String.Format("({0} {1})", first.ToString(), rest.ToString());
+            else if (rest.GetType() == typeof(EmptyExpr))
+                return string.Format("({0})", first.ToString());
+            else
+                return string.Format("({0} . {1})", first.ToString(), rest.ToString());
+        }
+    }
+
+    public class EmptyExpr : Expr // represents empty list
+    {
+        public EmptyExpr()
+        {
+
+        }
+
+        public dynamic eval(Dictionary<string, Expr> env)
+        {
+            return this;
+        }
+
+        public string ToString()
+        {
+            return "()";
+        }
+    }
+
     public class EnvExpr : Expr
     {
         private Dictionary<string, Expr> env;

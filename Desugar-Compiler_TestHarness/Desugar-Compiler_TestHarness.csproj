@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{036D8225-6C3E-447A-AD73-D0DC69F70069}</ProjectGuid>
+    <ProjectGuid>{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DLR_Compiler</RootNamespace>
-    <AssemblyName>DLR_Compiler</AssemblyName>
+    <RootNamespace>Desugar_Compiler_TestHarness</RootNamespace>
+    <AssemblyName>Desugar-Compiler_TestHarness</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,13 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>Desugar_Compiler_TestHarness.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,21 +44,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compiler.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Compiler_Lib\Compiler_Lib.csproj">
-      <Project>{96a288d5-b535-4b8e-add0-eef086e30e4c}</Project>
-      <Name>Compiler_Lib</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleSchemeParser\SimpleSchemeParser.csproj">
-      <Project>{5cc07aec-a3cb-44b4-9c37-e82f27a894a5}</Project>
-      <Name>SimpleSchemeParser</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

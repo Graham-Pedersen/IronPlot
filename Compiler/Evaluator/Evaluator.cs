@@ -100,6 +100,8 @@ namespace Evaluator
                 {
                     return new NumExpr(num);
                 }
+                else if (input == "empty")
+                    return new EmptyExpr();
                 else
                     return new VarExpr(input); 
             }

@@ -17,7 +17,7 @@ namespace SimpleSchemeParser
         //static String patternMatchAtom = "[ \t\r\n]*[^ ()\t\r\n]+[ \t\r\n]*";
         static String patternMatchAtom = "[ \t\r\n]*[^ ()\t\r\n]+[ \t\r\n]*";
         static String patternMatchAtomNoWhiteSpace = "[^ \t()\r\n]*";
-        static String patternMatchWhitespace = "[\\s]";
+        //static String patternMatchWhitespace = "[\\s]";
         static String patternMatchString = "[$\"]";
 
         String filename;
@@ -120,54 +120,6 @@ namespace SimpleSchemeParser
                         values.Add(ret.Item1);
                         continue;
                     }
-                }
-                if ((index + 6 < s.Length) && s[index] == '(' && s[index + 1] == 'q'
-                        && s[index + 2] == 'u' && s[index + 3] == 'o' && s[index + 4] == 't'
-                        && s[index + 5] == 'e' && Regex.IsMatch(s[index + 6].ToString(), patternMatchWhitespace)) // need to match all whitespace
-                {
-                    // must have special check for another opening paren, signaling a literal list
-                    index += 7;
-                    if ((index + 1 < s.Length) && s[index] == '(')
-                    {
-                        index += 1;
-                        Tuple<ListNode, int> ret = captureLiteralList(s, index, nesting + 1);
-                        index = ret.Item2;
-                        ret.Item1.isLiteral = true;
-                        values.Add(ret.Item1);
-                    }
-                    else
-                    {
-                        Tuple<LeafNode, int> ret = captureLiteral(s, index, nesting);
-                        index = ret.Item2;
-                        ret.Item1.isLiteral = true;
-                        values.Add(ret.Item1);
-                    }
-                    // need to match whitespace at end, and closing paren of quote
-                    while (index < s.Length && s[index] != ')')
-                    {
-                        if (Regex.IsMatch(s[index].ToString(), patternMatchWhitespace))
-                        {
-                            // check for things that are not whitespace, because if anything but whitespace this is syntax error
-                            index += 1;
-                        }
-                        else
-                            throw new Exception("Error parsing literal list in quote form \n");
-
-                    }
-                    index += 1;
-                    continue;
-                }
-                if (s[index] == '\"')
-                {   
-                    int start = index;
-                    index += 1;
-                    while (s[index] != '\"')
-                    {
-                        index += 1;
-                    }
-                    values.Add(new LeafNode(s.Substring(start, (index - start)), nesting));
-                    index += 1;
-                    continue;
                 }
                 if (s[index] == ')')
                 {

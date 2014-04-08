@@ -52,7 +52,9 @@ input grammer:
 	   |  (/ <exp> <exp>)
 	   |  (% <exp> <exp>)
 	   
-<comp-exp>   ::= (equals <exp> <exp>)
+<comp-exp>   ::= (equals? <exp> <exp>)
+	   |  (null? <exp>)
+	   |  (not <exp>)
 	   |  (< <exp> <exp>)
 	   |  (<= <exp> <exp>)
 	   |  (> <exp> <exp>)
@@ -68,6 +70,16 @@ input grammer:
 		
 <typelist> ::= (typelist <nettype>*
 
+<qq-exp 0> ::= <exp>
+
+<qq-exp n> ::= <symbol>
+            |  <literal>
+            |  <qq-exp n>*
+            |  (quasiquote <qq-exp n+1>)
+            |  (unquote <qq-exp n-1>)
+            |  (unquote-splicing <qq-exp n-1>)
+ 
+<body> ::= <top>* <exp>
 
 
 To compile you need a copy of racket to compile the desugarer located in the root directory

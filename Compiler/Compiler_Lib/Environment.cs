@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
 using System.Dynamic;
+using System.Numerics;
 
 namespace CompilerLib
 {
@@ -98,6 +99,8 @@ namespace CompilerLib
 
         public ObjBox invoke(List<Object> arguments)
         {
+            //count += 1;
+            //Console.WriteLine("Called function for the {0}th time", count);
             try
             {
                 return (ObjBox) func.DynamicInvoke(arguments.ToArray());
@@ -117,9 +120,39 @@ namespace CompilerLib
 
         public ObjBox(Object _obj, Type _type)
         {
-            this.obj = _obj;
-            this.type = _type;
-            converter = typeof(TypeUtils).GetMethod("cast").MakeGenericMethod(_type);
+            if (!hasExternalType(_type, _obj))
+            {
+                this.obj = _obj;
+                this.type = _type;
+            }
+
+
+            converter = typeof(TypeUtils).GetMethod("cast").MakeGenericMethod(type);
+        }
+
+        //test if the _type is a .net type we do not use internally. If it is we will convert it to what it should be
+        private Boolean hasExternalType(Type _type, object _obj)
+        {
+            if (_type == typeof(Int32))
+            {
+                this.type = typeof(RacketInt);
+                this.obj = new RacketInt((Int32) _obj);
+                return true;
+            }
+            if (_type == typeof(double))
+            {
+                this.type = typeof(RacketFloat);
+                this.obj = new RacketFloat((double)obj);
+                return true;
+            }
+            if (_type == typeof(Complex))
+            {
+                this.type = typeof(RacketComplex);
+                this.obj = new RacketComplex((Complex)obj);
+                return true;
+            }
+
+            return false;
         }
 
         public Object getObj()

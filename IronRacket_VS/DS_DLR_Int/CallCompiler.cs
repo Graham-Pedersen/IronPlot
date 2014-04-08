@@ -30,7 +30,7 @@ namespace DS_DLR_Int
                 {
                     File.Delete(directory + @"\Compiler_Lib.dll");
                 }
-                System.IO.File.Copy(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", directory+ @"\Compiler_Lib.dll");
+                System.IO.File.Copy(@"C:\Users\graha_000\Programing\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", directory + @"\Compiler_Lib.dll");
 
 
             }
