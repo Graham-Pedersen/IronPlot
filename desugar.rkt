@@ -154,12 +154,15 @@
       [`(foldl ,fun ,init . ,lists) `(foldl ,(desugar-exp fun)
                                             ,(desugar-exp init)
                                             ,@(map desugar-exp lists))]
-      [`(foldr ,fun ,init . ,lists) `(foldl ,(desugar-exp fun)
+      [`(foldr ,fun ,init ,list ...) (if (null? lists)
+                                        (error `(number of arguments not expected number of argumetns))
+                                          (displayln new_lists)
+                                           `(foldl ,(desugar-exp fun)
                                             ,(desugar-exp init)
-                                            ,(map (lambda (x) (desugar-exp (reverse x)))
-                                                  lists))]  ;; need to test
+                                            ,@(map (lambda (l) `(list ,(reverse (cdr))]  ;; need to test
       [`(apply ,fun ,opts ... ,list) `(apply ,(desugar-exp fun)
                                              ,(desugar-exp (foldl cons list opts)))]
+      [`(filter ,fun ,list) `(filter ,(desugar-exp fun) ,(desugar-exp list))]
       [(? atomic?) exp]
       [`(,function . ,args) 
        `(,(desugar-exp function) ,@(map desugar-exp args))]
@@ -167,7 +170,12 @@
 
 ;; --------- desugar helpers -------------
 
-
+(define (convert-nested-cons->list conses)
+  (match conses
+    [`(cons ,v . ,rest) `(,v ,convert-nested-cons->list rest)]
+    [`(quote ,e) '()]
+    [else (error "error")]))
+  
 
 ;; desugar body of a lambda or begin
 (define (desugar-body body)

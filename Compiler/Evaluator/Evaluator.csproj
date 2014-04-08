@@ -39,7 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Evaluator.cs" />
+    <Compile Include="BuiltIn.cs" />
     <Compile Include="Expr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
