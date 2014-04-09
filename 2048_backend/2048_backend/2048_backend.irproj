@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="CompileTarget" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Build</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>6CAFC0C6-A428-4d30-A9F9-700E829FEA51</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>IronRacketApplication</RootNamespace>
+    <AssemblyName>IronRacketApplication</AssemblyName>
+    <Name>2048_backend</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Build' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\Build\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="2048.plot">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <Target Name="Hello">
+    <Message Text="Hello MSBuild" Importance="high" />
+  </Target>
+  <Target Name="Build" DependsOnTargets="Hello">
+  </Target>
+  <UsingTask AssemblyFile="C:\Users\Scott\Documents\Compiler\IronPlot\IronRacket_VS\DS_DLR_Int\bin\Debug\ClassLibrary1.dll" TaskName="CompileTarget" />
+  <Target Name="CompileTarget">
+    <Message Text="Building Your IronRacket Project" Importance="high" />
+    <CompileTarget SourceFiles="$(MSBuildProjectDirectory)\@(Compile)" />
+  </Target>
+  <!--<Import Project="C:\Users\Scott\Desktop\test.targets"/>-->
+  <!--<Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />-->
+</Project>
