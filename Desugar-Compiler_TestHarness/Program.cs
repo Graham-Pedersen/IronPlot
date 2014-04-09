@@ -77,7 +77,7 @@ namespace Desugar_Compiler_TestHarness
             IO.Add("quote", "sarah\r\n(1 2 3 4 5)\r\n(1 2 3)\r\ns\r\n5\r\n6\r\n\r\n");
             IO.Add("string_whistespace", " sarah\r\n\r\n");
             IO.Add("when", "true\r\nand\r\nfalse\r\n\r\n");
-            IO.Add("if_tests", "hi there\r\nshould print2\r\n\r\n");
+            IO.Add("if_tests", "hi\r\n there\r\nshould print\r\n2\r\n\r\n");
             IO.Add("unless", "should print\r\n\r\n");
 
 
