@@ -7,6 +7,7 @@
  
 ; Entry Point
  ;; add begin to top level
+(define dll #f)
 (define (desugar-input)
 ;; (define program (read-input))
   (define out (void))
@@ -15,8 +16,16 @@
                    (begin
                      (set! out (open-output-file output #:exists 'replace))
                    filename)) #:mode 'text)))
-  (set! program (desugar-tops program)) ;; desugar-tops
+  ;; check for #lang dll
+  (set! program (splice-begin-forms program))
+  (if (is-dll? program)
+      (begin
+        (set! dll #t)
+        (set! program (remove-dll-keyword program))
+        (set! program (desugar-dll program)))
+      (set! program (desugar-tops program))) ;; desugar-tops
   (set! program (map desugar-define program)) ;; desugar the defines now
+  (displayln program)
   (set! program (partition-k 
                  atomic-define?
                  program
@@ -43,6 +52,18 @@
     [else
      (write (car program) file) (write-output (cdr program) file)]))
 
+(define (is-dll? program)
+  (match program 
+    [`(#:lang dll . ,body) #t]
+    [else #f]))
+  
+  (define (remove-dll-keyword program)
+    (match program
+      [`(#:lang dll . ,body) body]
+      [else (error "No dll keyword")]))
+  
+  
+  
 
 ; reads all input from std in into a list
 (define (read-input [file (current-input-port)])
@@ -54,13 +75,24 @@
 
 ; desugar top level begins, hope this is correct
 (define (splice-begin-forms tops)
-  (define (splice-begin top)
-    (match top
-      [`(begin . ,forms) `(begin-top . ,forms)]
-      [else (displayln `(cannot desugar begin))]))
-  (map splice-begin tops))
+  (match tops
+    [`(,stuff ... (begin ,forms ...) ,rest ...)
+     `(,@stuff ,@forms ,@rest)]
+    [else tops]))
        ; Desugaring Functions
 
+(define (desugar-dll tops)
+  (define (top-to-def-dll top)
+    (match top
+      [`(define (,name ,params ...) . ,body)
+       (function-def->var-def top)]
+      [`(define ,var ,exp)
+       `(define ,var ,exp)]
+      [`(using ,str)
+       `(using ,str)]
+      [else (error "only using and define forms allowed in dll")]))
+  (map top-to-def-dll tops))
+  
 (define (desugar-tops tops)
   (define (top-to-def top)
     (match top
@@ -68,17 +100,16 @@
        (function-def->var-def top)]
       [`(define ,var ,exp)
        `(define ,var ,exp)]
-      [`(begin . ,forms)
-       `(begin-top ,@forms)]
+  ;;    [`(begin ,forms ...) `(begin ,@forms)]
       [exp `(define ,(gensym '_) ,exp)]))
-  (map top-to-def tops)) ;; map is putting in list...... problem with program wrapped in parens
-
+  (map top-to-def tops))
 
 ; desugar define statements of the form (define ,v ,exp)
 (define (desugar-define def)
     (match def
       [`(define ,v ,exp) `(define ,v ,(desugar-exp exp))]
-      [`(begin-top . ,forms) `(begin-top ,@(map desugar-exp forms))]
+      [`(begin ,form) (desugar-exp form)]
+      [`(using ,str) `(using ,str)]
       [else (displayln `(cannot desugar define ,def))]))
 
 (define (desugar-exp exp)
@@ -154,12 +185,14 @@
       [`(foldl ,fun ,init . ,lists) `(foldl ,(desugar-exp fun)
                                             ,(desugar-exp init)
                                             ,@(map desugar-exp lists))]
+      #|
       [`(foldr ,fun ,init ,list ...) (if (null? lists)
                                         (error `(number of arguments not expected number of argumetns))
                                           (displayln new_lists)
                                            `(foldl ,(desugar-exp fun)
                                             ,(desugar-exp init)
-                                            ,@(map (lambda (l) `(list ,(reverse (cdr))]  ;; need to test
+                                            ,@(map (lambda (l) `(list ,(reverse (cdr))))]  ;; need to test 
+|#
       [`(apply ,fun ,opts ... ,list) `(apply ,(desugar-exp fun)
                                              ,(desugar-exp (foldl cons list opts)))]
       [`(filter ,fun ,list) `(filter ,(desugar-exp fun) ,(desugar-exp list))]
@@ -297,6 +330,7 @@
   (match def
     [`(define ,v ,exp) (atomic? exp)]
     [`(begin-top . ,forms) #t] ;; for now just do this
+    [`(using ,str) #t]
     [else #f]))
 
 

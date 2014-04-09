@@ -7,6 +7,88 @@ using System.Threading.Tasks;
 
 namespace Evaluator
 {
+    public class AndExpr : Expr
+    {
+        List<Expr> args;
+        public AndExpr(List<Expr> args)
+        {
+            this.args = args;
+        }
+
+        public dynamic eval(Dictionary<string, Expr> env)
+        {
+            Expr ret = new BoolExpr(true);
+            BoolExpr boolcast;
+            for (int i = 0; i < args.Count; i++)
+            {
+                ret = args[i].eval(env);
+                if (ret.GetType() == typeof(BoolExpr))
+                {
+                    boolcast = (BoolExpr)ret;
+                    if (!boolcast.getValue())
+                        return new BoolExpr(false);
+                }
+            }
+            return ret;
+        }
+    }
+
+    public class OrExpr : Expr
+    {
+        List<Expr> args;
+        public OrExpr(List<Expr> args)
+        {
+            this.args = args;
+        }
+
+        public dynamic eval(Dictionary<string, Expr> env)
+        {
+            Expr eval_res;
+            BoolExpr boolcast;
+            for (int i = 0; i < args.Count; i++)
+            {
+                eval_res = args[i].eval(env);
+                if (eval_res.GetType() == typeof(BoolExpr))
+                {
+                    boolcast = (BoolExpr)eval_res;
+                    if (!boolcast.getValue())
+                        continue;
+                }
+                else
+                    return eval_res;
+            }
+            return false;
+        }
+    }
+    public class IfExpr : Expr
+    {
+        Expr cond;
+        Expr then;
+        Expr else_;
+        public IfExpr(Expr cond, Expr then, Expr else_)
+        {
+            this.cond = cond;
+            this.then = then;
+            this.else_ = else_;
+        }
+
+        public dynamic eval(Dictionary<string,Expr> env)
+        {
+            Expr res = cond.eval(env);
+            if (res.GetType() == typeof(BoolExpr))
+            {
+                BoolExpr bool_res = (BoolExpr)res;
+                if (!bool_res.getValue()) // evaluate else_
+                    return else_.eval(env);
+            }
+            return then.eval(env);
+        }
+
+        public string ToString()
+        {
+            return base.ToString(); // dont know what to print
+        }
+    }
     public class BoolExpr : Expr
     {
         bool val;
@@ -37,6 +119,7 @@ namespace Evaluator
     {
         Expr first;
         Expr rest;
+        int length;
 
         public ConsExpr(Expr first, Expr rest)
         {

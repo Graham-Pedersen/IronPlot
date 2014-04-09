@@ -66,6 +66,12 @@ namespace Evaluator
                                     return parseLam(in_);
                             case "define":
                                     return parseDef(in_);
+                            case "if": // if appears to be special too
+                                    return parseIf(in_);
+                            case "or":
+                                    return parseOr(in_);
+                            case "and":
+                                    return parseAnd(in_);
                             default:
                                 {
                                     fun = new VarExpr(fun_string);
@@ -102,11 +108,95 @@ namespace Evaluator
                 }
                 else if (input == "empty")
                     return new EmptyExpr();
+                else if (input == "#t" || input == "true")
+                    return new BoolExpr(true);
+                else if (input == "#f" || input == "false")
+                    return new BoolExpr(false);
                 else
                     return new VarExpr(input); 
             }
         }
 
+        private AndExpr parseAnd(string input)
+        {
+            // first thing is and
+            string in_ = eatWhitespace(eatWord("and", input));
+            List<Expr> args = new List<Expr>();
+            string arg_s;
+            Expr arg;
+            while (peekChar(in_) != ')')
+            {
+                if (peekChar(in_) == '(')
+                    arg_s = peekList(in_);
+                else
+                    arg_s = peekWord(in_);
+
+                arg = parse(arg_s);
+                args.Add(arg);
+                in_ = eatWhitespace(eatWord(arg_s, in_));
+            }
+            return new AndExpr(args);
+        }
+
+        private OrExpr parseOr(string input)
+        {
+            // first thing is or
+            string in_ = eatWhitespace(eatWord("or", input));
+            List<Expr> args = new List<Expr>();
+            string arg_s;
+            Expr arg;
+            while (peekChar(in_) != ')')
+            {
+                if (peekChar(in_) == '(')
+                    arg_s = peekList(in_);
+                else
+                    arg_s = peekWord(in_);
+
+                arg = parse(arg_s);
+                in_ = eatWhitespace(eatWord(arg_s, in_));
+            }
+            return new OrExpr(args);
+        }
+
+        private IfExpr parseIf(string input)
+        {
+            // first thing is if
+            string in_ = input;
+            in_ = eatWhitespace(eatWord("if", in_));
+            Expr cond;
+            string cond_s;
+            if (peekChar(in_) == '(')
+                cond_s = peekList(in_);
+            else
+                cond_s = peekWord(in_);
+
+            cond = parse(cond_s);
+            in_ = eatWhitespace(eatWord(cond_s, in_));
+
+            Expr then;
+            string then_s;
+            if (peekChar(in_) == '(')
+                then_s = peekList(in_);
+            else
+                then_s = peekWord(in_);
+
+            then = parse(then_s);
+            in_ = eatWhitespace(eatWord(then_s, in_));
+
+            Expr else_;
+            string else_s;
+            if (peekChar(in_) == '(')
+                else_s = peekList(in_);
+            else
+                else_s = peekWord(in_);
+
+            else_ = parse(else_s);
+            in_ = eatWhitespace(eatWord(else_s, in_));
+
+            if (peekChar(in_) != ')')
+                throw new EvaluatorException("if bad syntax");
+            return new IfExpr(cond, then, else_);
+        }
         /*  parses a lambda
          */
         private LamExpr parseLam(string input)
