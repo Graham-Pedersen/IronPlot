@@ -42,6 +42,78 @@ namespace CompilerLib
             
             return new ObjBox(new RacketPair(returnedValues), typeof(RacketPair));
         }
+
+        public static ObjBox Foldl(FunctionHolder function, ObjBox init_param, List<RacketPair> lists)
+        {
+            ObjBox init = init_param;
+            List<Object> args = new List<Object>();
+            bool restNull = false;
+            int listLength;
+
+            if (function.param_num != lists.Count + 1)
+                throw new RuntimeException("Wrong number of arguments for given procedure");
+
+            while (!restNull)
+            {
+                args.Clear();
+            //    args.Add(init);
+                listLength = -1;
+                for (int i = 0; i < lists.Count; i++)
+                {
+                    if (listLength == -1)
+                        listLength = lists[i].length();
+                    if (lists[i].length() != listLength)
+                        throw new RuntimeException("Lists must be of same length");
+
+                    args.Add(lists[i].car());
+                    ObjBox rest = lists[i].cdr();
+
+                    if (rest.getType() == typeof(voidObj))
+                    {
+                        restNull = true;
+                    }
+                    else
+                    {
+                        lists[i] = (RacketPair)rest.getObj();
+                    }
+                }
+                args.Add(init);
+                init = function.invoke(args); // should be okay if making copies
+            //    returnedValues.Add(function.invoke(args));
+            }
+
+            return init;
+        }
+
+        public static ObjBox Apply(FunctionHolder function, RacketPair list)
+        {
+            int param_num = function.param_num;
+            List<Object> args = new List<Object>();
+            ObjBox fun_call;
+
+            if (list.length() != param_num)
+                throw new RuntimeException("The expected number of arguments does not match the given number");
+            int length = list.length();
+
+            for (int i = 0; i < length; i++)
+            {
+                args.Add(list.car());
+                ObjBox rest = list.cdr();
+
+                if (rest.getType() == typeof(voidObj))
+                {
+                    break;
+                }
+                else
+                {
+                    list = (RacketPair)rest.getObj();
+                }
+            }
+            fun_call = function.invoke(args);
+
+            return fun_call;
+        }
+
     }
 
     public interface RacketNum

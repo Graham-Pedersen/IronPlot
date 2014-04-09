@@ -8,4 +8,7 @@
            [is-odd? (lambda (n)
                       (and (not (zero? n))
                            (is-even? (- n 1))))])
-    (displayln (is-odd? 11)))
+		(if 
+			(is-odd? 11)
+			(displayln 'Passed)
+			(displayln "Failed")))

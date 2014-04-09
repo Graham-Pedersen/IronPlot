@@ -195,7 +195,6 @@ namespace CompilerLib
                 }
                 else
                 {
-                    Console.WriteLine("Wrong branch taken? for type:" + o.getType());
                     outArgTypes.Add(o.getType());
                     outObjArray.Add(o.getObj());
                 }

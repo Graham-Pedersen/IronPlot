@@ -14,7 +14,7 @@ namespace Desugar_Compiler_TestHarness
 
         private static string Runcompiler(string inputfile, string output_exe)
         {
-            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1} {2}", inputfile, "run", output_exe));
+            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\graha_000\Programing\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1} {2}", inputfile, "run", output_exe));
             comp.UseShellExecute = false;
             comp.CreateNoWindow = true;
             comp.RedirectStandardError = true;
@@ -90,7 +90,7 @@ namespace Desugar_Compiler_TestHarness
        static bool RunDesugar(string inputfile, string tempfile)
         {
             //Start the exe and forward standard output/error so we can parse etc.
-            ProcessStartInfo Desugar = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\desugar.exe", String.Format("\"{0}\" \"{1}\"", inputfile, tempfile));
+            ProcessStartInfo Desugar = new ProcessStartInfo(@"C:\Users\graha_000\Programing\IronPlot\desugar.exe", String.Format("\"{0}\" \"{1}\"", inputfile, tempfile));
             Desugar.UseShellExecute = false;
             Desugar.CreateNoWindow = false;
             Desugar.RedirectStandardError = true;
@@ -137,7 +137,7 @@ namespace Desugar_Compiler_TestHarness
         {
             String output = String.Empty;
             Dictionary<String, String> IO = createResults();
-            string[] files = Directory.GetFiles(@"C:\Users\Scott\Documents\Compiler\IronPlot\test");
+            string[] files = Directory.GetFiles(@"C:\Users\graha_000\Programing\IronPlot\test");
 
             foreach (string s in files)
             {
@@ -160,6 +160,7 @@ namespace Desugar_Compiler_TestHarness
                                 Console.WriteLine("Filename: " + Filename + ".plot Passed");
                             }
                         }
+                        Console.ReadKey();
                     }
                 }
             }
