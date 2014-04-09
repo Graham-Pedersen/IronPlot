@@ -7,6 +7,24 @@ using System.Threading.Tasks;
 
 namespace Evaluator
 {
+    public class StrExpr : Expr
+    {
+        string val;
+        public StrExpr(string str)
+        {
+            this.val = str;
+        }
+
+        public dynamic eval(Dictionary<string, Expr> env)
+        {
+            return this;
+        }
+
+        public string ToString()
+        {
+            return val;
+        }
+    }
     public class AndExpr : Expr
     {
         List<Expr> args;

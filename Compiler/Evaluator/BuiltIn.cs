@@ -72,8 +72,8 @@ namespace Evaluator
         {
             if (args.Count == 0)
                 return new EmptyExpr();
-
-            Expr first = args[0].eval(env);
+            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+            Expr first = args[0].eval(copy);
             args.RemoveAt(0);
             return new ConsExpr(first, List(args, env));
         }
@@ -85,7 +85,7 @@ namespace Evaluator
                 throw new EvaluatorException("the expected number of arguments does not match the given number");
 
             Expr proc = args[0];//.eval(env);
-            List<ConsExpr> evaled_lists = new List<ConsExpr>();
+            List<Expr> evaled_lists = new List<Expr>();
             List<Expr> proc_calls = new List<Expr>();
             Expr arg;
             for(int i = 1; i < args.Count; i ++)
@@ -95,15 +95,31 @@ namespace Evaluator
                     throw new EvaluatorException("map: contract violation\n expected: list?");
                 evaled_lists.Add((ConsExpr)arg);
             }
-            while(evaled_lists[0].getRest().GetType() != typeof(EmptyExpr))
+            while(evaled_lists[0].GetType() != typeof(EmptyExpr))
             {
+                List<Expr> proc_args = new List<Expr>();
                 for(int j = 0; j < evaled_lists.Count; j ++)
                 {
-                    //TODO
+                    if (evaled_lists[j].GetType() == typeof(EmptyExpr))
+                        throw new EvaluatorException("map: lists must be of same length");
+                    ConsExpr arg_ = (ConsExpr) evaled_lists[j];
+                    // check that all lists are proper lists
+                    if(arg_.getRest().GetType() != typeof(ConsExpr) &&
+                        arg_.getRest().GetType() != typeof(EmptyExpr))
+                        throw new EvaluatorException("map: contract violation\n expected: list?");
+                    proc_args.Add(arg_.getFirst());
+                    evaled_lists[j] = arg_.getRest();
                 }
+                proc_calls.Add(new AppExpr(proc, proc_args, env));
+            }
+            // check that all lists end
+            for(int j = 1; j < evaled_lists.Count; j ++)
+            {
+                if(evaled_lists[j].GetType() != typeof(EmptyExpr))
+                    throw new EvaluatorException("map: all lists must have same size");
             }
 
-            return 
+            return List(proc_calls, env);
         }
         private static Expr Cdr(List<Expr> arg, Dictionary<string, Expr> env)
         {
