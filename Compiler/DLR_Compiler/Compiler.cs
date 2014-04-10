@@ -1711,7 +1711,6 @@ namespace DLR_Compiler
        //else try to treat the value as an atomic
         static Expression matchLeaf(LeafNode leaf, Expression env)
         {
-
             Expression name = Expression.Constant(leaf.getValue());
             Expression check = checkEnv(name, env);
 
@@ -1775,14 +1774,11 @@ namespace DLR_Compiler
         {
 
             if (isBoolean(atom))
-            {
                 return parseBoolean(atom);
-            }
-
             if (isNumber(atom))
-            {
                 return parseNumber(atom);
-            }
+            if (isStr(atom))
+                return parseStr(atom);
 
             return createRuntimeException("value was not defined and could not be parsed as an atomic value:" + atom);
         }
@@ -1795,6 +1791,21 @@ namespace DLR_Compiler
                 return true;
             }
             return false;
+        }
+
+        static Boolean isStr(String atom)
+        {
+            if (atom[0].Equals('\"') && atom[atom.Length -1].Equals('\"'))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        static Expression parseStr(String atom)
+        {
+            Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("strType"));
+            return wrapInObjBox(Expression.Constant(atom.Substring(1, atom.Length - 2)), type);
         }
 
         static Expression parseBoolean(String atom)
