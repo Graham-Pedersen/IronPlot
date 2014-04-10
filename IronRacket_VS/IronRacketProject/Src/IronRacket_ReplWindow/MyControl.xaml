@@ -9,7 +9,8 @@
              d:DesignHeight="300" d:DesignWidth="700"
              Name="MyToolWindow">
     <Grid>
-        <TextBox Width="700" Height="300" HorizontalAlignment="Center" Text=">" Name="Repl_input_output" AcceptsReturn="True" AcceptsTab="True" Background="LightGray" TextChanged="TextBox_TextChanged" />
-        <!-- <Button Content="_Click Me!" Click="button1_Click" Width="120" Height="80" Name="button1"/> -->
+    <!--   <TextBox Width="700" Height="300" HorizontalAlignment="Center" Text=">" Name="Repl_input_output" AcceptsReturn="True" AcceptsTab="True" Background="LightGray" TextChanged="TextBox_TextChanged" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+     -->
+        <RichTextBox Width="700"  HorizontalAlignment="Center" Name="Repl" AcceptsReturn="True" AcceptsTab="True" Background="LightGray" TextChanged="Repl_TextChanged" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
     </Grid>
 </UserControl>

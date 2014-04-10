@@ -144,12 +144,10 @@ namespace Desugar_Compiler_TestHarness
                 if (s.Contains(".plot") && !s.Contains(".tmp"))
                 {
                     string Filename = Path.GetFileNameWithoutExtension(s);
-                    if (IO.ContainsKey(Filename))
-                    {
                         if (RunDesugar(s, s + ".tmp"))
                         {
                             output = Runcompiler(s + ".tmp", Filename + ".exe");
-                            if (output != IO[Filename])
+                            if (output != "Passed\r\n\r\n")
                             {
                                 Console.WriteLine("!!!!!!!! FAILED TEST !!!!!!!!!!!");
                                 Console.WriteLine("Filename: " + Filename + ".plot failed.");
@@ -163,7 +161,6 @@ namespace Desugar_Compiler_TestHarness
                         Console.ReadKey();
                     }
                 }
-            }
             cleanuptmp(@"C:\Users\Scott\Documents\Compiler\IronPlot\test");
         }
     }

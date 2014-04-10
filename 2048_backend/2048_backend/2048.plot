@@ -26,22 +26,27 @@
 
 
 
+
 (define (append-element lst elem)
-	(foldr cons (list elem) lst))
+	(displayln '(in append element))
+	(displayln elem)
+	(foldr (lambda (l i) 
+		(cons l i)) (list elem) lst)
 
+		(displayln '(test)))
 
-
-	
+(define (cons_wrap first rest)
+	(cons first rest))
 
 (define (shuffle_right row)
 	(reverse(shuffle_left  row)))
 
-
+	
 
 
 (define (shuffle_left row)
 	(cond
-		[(null? row) '()] 	
+		[(equal? row '()) '()] 	
 		[(equal? (car row) 0)   (append-element (shuffle_left (cdr row)) 0)]
 		[else (cons (car row) (shuffle_left (cdr row)))]))
 
@@ -87,6 +92,10 @@
 
 
 (define (move_board_right board)
+	(displayln 'hello)
+	(displayln (row_right (car board)))
+	(displayln 'hello)
+	(displayln (move_board_right (cdr board)))
 	(cond 
 		[(null? board) '()]
 		[else    (cons (row_right (car board)) (move_board_right (cdr board)))]))
@@ -168,7 +177,7 @@
   (displayln (car (cdr list)))
   (displayln (car (cdr (cdr list))))
   (displayln (car (cdr (cdr (cdr list)))))
-  (displayln ""))
+  (displayln '()))
 
 
 (define test_board (create_empty_board))

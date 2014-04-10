@@ -7,7 +7,6 @@
 
 
 (define add_three (make_adder 3))
-
 (if 
 	(and (= 8 (add_three 5))  (= 20 (plus_fun 4 5)))
 	(displayln 'Passed)
