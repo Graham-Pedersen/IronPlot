@@ -21,9 +21,10 @@ namespace DLR_Compiler
    public class DLR_Compiler
     {
         static ParameterExpression voidSingleton;
-
+        static Boolean isDll;
         public static void Main(string[] args)
         {
+            isDll = false;
             if (args.Length != 3)
             {
                 throw new Exception("Compiler called with incorrect number of arguments!");
@@ -45,6 +46,7 @@ namespace DLR_Compiler
             //This is pedantic but it makes the cases quite clear
             if (mode == "dll")
             {
+                isDll = true;
                 createDll(topLevelForms, outputName);
                 return;
             }
@@ -166,35 +168,37 @@ namespace DLR_Compiler
                 buildFunctions.Add(ef.expTree);
             }
 
+            buildFunctions.Add(env);
+
             //turn our program body into a expression block
             Expression init = Expression.Block(new ParameterExpression[] { env, voidSingleton }, buildFunctions);
 
-            //make an method to invoke each function
-
+            
             var asm = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(outputName), System.Reflection.Emit.AssemblyBuilderAccess.Save);
             var module = asm.DefineDynamicModule(outputName, outputName + ".dll");
             var type = module.DefineType(outputName, TypeAttributes.Public);
 
-            createDllMethods(type, dllTopLevels.Item2);
+            //make an init (ideally this would be in a static constructor for our type but currently I don't know how to do this)
+            //this must be called manually or any other calls will fail
+            var method = type.DefineMethod("init", MethodAttributes.Public | MethodAttributes.Static);
+            Expression methodBody = init;
+            Expression.Lambda<Func<CompilerLib.Environment>>(methodBody).CompileToMethod(method);
+
+            //make an method to invoke each function
+            createDllMethods(type, dllTopLevels.Item2, env);
 
             type.CreateType();
             asm.Save(outputName + ".dll");
-
-
         }
 
-        private static void createDllMethods(TypeBuilder type, List<ExposedFunction> list)
+        private static void createDllMethods(TypeBuilder type, List<ExposedFunction> list, Expression env)
         {
             foreach (ExposedFunction ef in list)
             {
                 var method = type.DefineMethod(ef.name, MethodAttributes.Public | MethodAttributes.Static);
-                Expression methodBody = 
-                //CompileToMethod
-                
+                LambdaExpression methodBody = externalLambda(ef.name);
+                methodBody.CompileToMethod(method);
             }
-
-            Expression<Func<int, int, int>> add = (x, y) => (x + y);
-            add.CompileToMethod(method);
         }
 
         /** match all top level forms in the form of:
@@ -204,31 +208,33 @@ namespace DLR_Compiler
          *  each define will become a method that a c# code can call 
          *  returns a list of using statments and a list of defines
          **/ 
-        static Tuple<List<Expression>, List<ExposedFunction>> matchTopLevelDll(Node tree, Expression env)
+        static Tuple<List<Expression>, List<ExposedFunction>> matchTopLevelDll(ListNode tree, Expression env)
         {
             List<Expression> usingList = new List<Expression>();
             List<ExposedFunction> defineList = new List<ExposedFunction>();
-
-            if (tree.isList())
+            foreach (Node n in tree.values)
             {
-                ListNode list = (ListNode)tree;
-                if (list.values[0].isLeaf())
+                if (n.isList())
                 {
-                    Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
+                    ListNode list = (ListNode)n;
+                    if (list.values[0].isLeaf())
+                    {
+                        Expression name = Expression.Constant(list.values[0].getValue(), typeof(String));
 
-                    if (list.values[0].isLeaf() && list.values[0].getValue() == "define")
-                    {
-                        defineList.Add(dllDefineExpr(list, env));
-                    }
-                    else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
-                    {
-                        usingList.Add(netImportStmt(list, env));
+                        if (list.values[0].isLeaf() && list.values[0].getValue() == "define")
+                        {
+                            defineList.Add(dllDefineExpr(list, env));
+                        }
+                        else if (list.values[0].isLeaf() && list.values[0].getValue() == "using")
+                        {
+                            usingList.Add(netImportStmt(list, env));
+                        }
                     }
                 }
-            }
-            else
-            {
-                throw new Exception("Illegal expression encountered at the top level of a DLL. Expression: " + tree.getValue());
+                else
+                {
+                    throw new Exception("Illegal expression encountered at the top level of a DLL. Expression: " + tree.getValue());
+                }
             }
 
             if (defineList.Count == 0)
@@ -289,6 +295,10 @@ namespace DLR_Compiler
             //we know if the first part is another list we are defining a lambda to be immediately 
             if (list.values[0].isList())
             {
+                if (isDll)
+                {
+                    return dllInvokeLambda(list, env);
+                }
                 return invokeLambda(list, env);
             }
             else
@@ -375,7 +385,14 @@ namespace DLR_Compiler
                         break;
 
                     case "lambda":
-                        defaultExpression = lambdaExpr(list, env);
+                        if(isDll)
+                        {
+                            defaultExpression = dllLambdaExpr(list);
+                        }
+                        else
+                        {
+                            defaultExpression = lambdaExpr(list, env);
+                        }
                         break;
 
                     case "if":
@@ -435,6 +452,10 @@ namespace DLR_Compiler
 
                     //TODO add environment check and move above standard cases
                     default:
+                        if(isDll)
+                        {
+                            return dllInvokeLambda(list, env);
+                        }
                         return invokeLambda(list, env);
                         //defaultExpression = createRuntimeException("Could not resolve procedure:" + list.values[0].getValue());
                         //break;
@@ -804,7 +825,7 @@ namespace DLR_Compiler
             return Expression.Block(block);
         }
 
-
+       //DEPRECIATED (I think)
         private static Expression autoInvokeLambda(ListNode list, Expression env)
         {
             //first expression must be a lambda
@@ -849,15 +870,14 @@ namespace DLR_Compiler
                 return createRuntimeException("wrong number of arguments passed to begin procedure");
             }
 
-            List<Node> values = new List<Node>();
+            List<Expression> body = new List<Expression>();
 
             for (int i = 1; i < list.values.Count; i++)
             {
-                values.Add(list.values[i]);
+                body.Add(matchExpression(list.values[i], env));
             }
-            ListNode bodyLiterals = new ListNode(values, 0, false);
 
-            return matchTopLevel(bodyLiterals, env);
+            return Expression.Block(new ParameterExpression[] { }, body);
         }
 
         private static Expression begin0Expr(ListNode list, Expression env)
@@ -1071,6 +1091,44 @@ namespace DLR_Compiler
             return Expression.Block( new ParameterExpression[] {objBox, }, new Expression[] { ifThenElse, objBox });
         }
 
+        private static Expression dllInvokeLambda(ListNode tree, Expression env)
+        {
+            List<Expression> invokeLamb = new List<Expression>();
+
+            //Statement to make a List
+            Expression newObjList = Expression.New(typeof(List<Object>).GetConstructor(new Type[] { }));
+            ParameterExpression objList = Expression.Variable(typeof(List<Object>), "argList");
+            Expression assignExpr = Expression.Assign(objList, newObjList);
+
+            invokeLamb.Add(objList);
+            invokeLamb.Add(assignExpr);
+
+            invokeLamb.Add(Expression.Call(
+                  objList,
+                  typeof(List<Object>).GetMethod("Add", new Type[] { typeof(Object) }),
+                  Expression.Convert(env, typeof(Object))));
+
+            // add each matched argument into our list of arguments
+            for (int i = 1; i < tree.values.Count; i++)
+            {
+                invokeLamb.Add(Expression.Call(
+                   objList,
+                   typeof(List<Object>).GetMethod("Add", new Type[] { typeof(Object) }),
+                   Expression.Convert(matchExpression(tree.values[i], env), typeof(Object))));
+            }
+
+            Expression getFunction = unboxValue(matchExpression(tree.values[0], env), typeof(FunctionHolder));
+
+            var invoke = Expression.Call(
+                getFunction,
+                typeof(FunctionHolder).GetMethod("invoke"),
+                objList);
+
+            invokeLamb.Add(invoke);
+
+            return Expression.Block(new ParameterExpression[] { objList }, invokeLamb);
+        }
+
         private static Expression invokeLambda(ListNode tree, Expression env)
         {
             List<Expression> invokeLamb = new List<Expression>();
@@ -1105,9 +1163,102 @@ namespace DLR_Compiler
         }
 
         //create a lambda that looks up and applys an argument list to a function in the environment
-        private static Expression externalLambda(String name, Expression env, int argCount)
+        private static LambdaExpression externalLambda(String name)
         {
+
+            List<Expression> body = new List<Expression>();
+
+            List<ParameterExpression> paramList = new List<ParameterExpression>();
+            paramList.Add(Expression.Parameter(typeof(CompilerLib.Environment)));
+            paramList.Add(Expression.Parameter(typeof(List<Object>)));
+
+            Expression addEnvToFront = Expression.Call(
+                paramList[1],
+                typeof(List<Object>).GetMethod("Insert"),
+                new Expression[] { Expression.Constant(0), paramList[0] });
+            body.Add(addEnvToFront);
+                
+            Expression function = unboxValue(lookup(Expression.Constant(name, typeof(String)), paramList[0]), typeof(FunctionHolder));
+
+            var invoke = Expression.Call(
+                function,
+                typeof(FunctionHolder).GetMethod("invoke"),
+                paramList[1]);
+
+            body.Add(invoke);
+
+            return Expression.Lambda<Func<CompilerLib.Environment, List<Object>, Object>>(Expression.Block(new ParameterExpression[] { }, body), paramList);
         }
+
+        // create a new lambda expression and store it into the environment
+        private static Expression dllLambdaExpr(ListNode tree)
+        {
+            if (tree.values.Count < 3 || !tree.values[1].isList())
+            {
+                return createRuntimeException("too few arguments passed to lambda procedure or first argument was not parameter list");
+            }
+
+            //make our parameter list
+            List<ParameterExpression> paramList = new List<ParameterExpression>();
+
+            paramList.Add(Expression.Variable(typeof(CompilerLib.Environment)));
+
+            //make new environment
+            var makeEnv = Expression.New(
+                typeof(CompilerLib.Environment).GetConstructor(new Type[] { typeof(CompilerLib.Environment) }),
+                paramList[0]);
+            var new_env = Expression.Variable(typeof(CompilerLib.Environment));
+            var assign = Expression.Assign(new_env, makeEnv);
+
+            //Add the environment to the start of the body of the lambda
+            List<Expression> body = new List<Expression>();
+            body.Add(new_env);
+            body.Add(assign);
+
+            foreach (Node n in tree.values[1].getList())
+            {
+                if (!n.isLeaf())
+                {
+                    return createRuntimeException("list embeded in the parameter list of labmda expression");
+                }
+
+                ParameterExpression var = Expression.Variable(typeof(Object), n.getValue());
+                paramList.Add(var);
+
+                // we also need to add a statement to put each of our parameters into our new environment (for scoping reasons)
+                var name = Expression.Constant(n.getValue());
+
+                Expression addToEnv = Expression.Call(
+                    new_env,
+                    typeof(CompilerLib.Environment).GetMethod("add"),
+                    name,
+                    Expression.Convert(var, typeof(ObjBox)));
+
+                body.Add(addToEnv);
+            }
+
+            List<Node> values = new List<Node>();
+
+            for (int i = 2; i < tree.values.Count; i++)
+            {
+                body.Add(matchExpression(tree.values[i], new_env));
+            }
+
+
+            var lambda = Expression.Lambda(Expression.Block(new ParameterExpression[] { new_env }, body), paramList);
+
+            //Now we want to box this expression in a FunctionHolder
+            Expression func = Expression.New(
+                typeof(FunctionHolder).GetConstructor(new Type[] { typeof(Delegate), typeof(int) }),
+                lambda, Expression.Constant(paramList.Count, typeof(int)));
+
+            //Now lets box this into a objBox
+            return Expression.New(
+                typeof(ObjBox).GetConstructor(new Type[] { typeof(Object), typeof(Type) }),
+                Expression.Convert(func, typeof(Object)),
+                Expression.Call(null, typeof(TypeUtils).GetMethod("funcType")));
+        }
+
 
         // create a new lambda expression and store it into the environment
         private static Expression lambdaExpr(ListNode tree, Expression env)
@@ -1158,13 +1309,8 @@ namespace DLR_Compiler
 
             for (int i = 2; i < tree.values.Count; i++)
             {
-                values.Add(tree.values[i]);
+                body.Add(matchTopLevel(tree.values[i], new_env));
             }
-            ListNode bodyLiterals = new ListNode(values, 0, false);
-
-            //Add the body of the lambda to the expression tree
-            body.Add(matchTopLevel(bodyLiterals, new_env));
-
 
             var lambda = Expression.Lambda(Expression.Block(new ParameterExpression[] { new_env }, body), paramList);
 
@@ -1372,7 +1518,7 @@ namespace DLR_Compiler
             }
             int paramCount = ((ListNode)lam.values[1]).values.Count;
 
-            var func = matchExpression(tree.values[2], env);
+            var func = matchExpression(lam, env);
 
 
             String funcName = tree.values[1].getValue();
