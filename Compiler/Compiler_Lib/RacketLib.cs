@@ -795,6 +795,8 @@ namespace CompilerLib
         {
             String lhs;
             String rhs;
+            if (isNull())
+                return "()";
 
             if (value.getType() == typeof(RacketPair))
             {
