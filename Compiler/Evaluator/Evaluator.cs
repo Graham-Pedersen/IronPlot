@@ -33,11 +33,39 @@ namespace Evaluator
         }
 
         // external facing function
-        public string evaluate(string input)
+        public List<string> evaluate(string input)
         {
-            Expr p = parse(input);
-            dynamic res = p.eval(env);
-            return res.ToString();
+            List<Expr> exprs = parseTopLevel(input);
+            List<string> ret = new List<string>();
+            for (int i = 0; i < exprs.Count; i++)
+            {
+                Expr expr = exprs[i].eval(env);
+                if (expr.GetType() == typeof(EnvExpr))
+                    env = expr.eval(env);
+                else
+                    ret.Add(expr.ToString());
+            }
+            return ret;
+        }
+        private List<Expr> parseTopLevel(string input)
+        {
+            // if no opening paren, then just one expression and can call parse
+            // if opening parent then there may be more than one expr
+            // can just call parse List to get each expr
+            List<Expr> exprs = new List<Expr>();
+            string in_ = input;
+            string fExpr;
+            while (in_ != "")
+            {
+                if (peekChar(in_) == '(') // may be more than one
+                    fExpr = peekList(in_);
+                else
+                    fExpr = peekWord(in_);
+
+                exprs.Add(parse(fExpr));
+                in_ = eatWhitespace(eatWord(fExpr, in_));
+            }
+            return exprs;
         }
 
         private Expr parse(string input)
@@ -101,6 +129,9 @@ namespace Evaluator
             }
             else
             {
+                if (peekChar(in_) == '"') // we have a string
+                    return new StrExpr(in_);
+
                 long num;
                 if (Int64.TryParse(input, out num))
                 {
