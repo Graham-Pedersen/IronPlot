@@ -738,28 +738,12 @@ namespace DLR_Compiler
 
             Expression rhs = matchExpression(list.values[1], env);
             Expression type = Expression.Call(rhs, typeof(ObjBox).GetMethod("getType"));
-            Expression listType = Expression.Call(null, typeof(TypeUtils).GetMethod("listType"));
+            Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
             
-            Expression test = Expression.Call(listType, typeof(Type).GetMethod("Equals", new Type[] { typeof(Type) }), type);
+            Expression test = Expression.Call(voidType, typeof(Type).GetMethod("Equals", new Type[] { typeof(Type) }), type);
 
-            Expression test2 = Expression.Call(unboxValue(rhs, typeof(RacketPair)), typeof(RacketPair).GetMethod("isNull"));
-
-            Expression ifTrue = wrapInObjBox(
-                Expression.Constant(true),
-                Expression.Call(null, typeof(TypeUtils).GetMethod("boolType")));
-
-
-            Expression ifFalse = wrapInObjBox(
-                Expression.Constant(false),
-                Expression.Call(null, typeof(TypeUtils).GetMethod("boolType")));
-
-            Expression assignTrue = Expression.Assign(result, ifTrue);
-            Expression assignFalse = Expression.Assign(result, ifFalse);
-
-            Expression checkIfNull = Expression.IfThenElse(test2, assignTrue, assignFalse);
-            Expression checkIfObjBox = Expression.IfThenElse(test, checkIfNull, assignFalse);
-
-            return Expression.Block(new ParameterExpression[] { result }, new Expression[] { checkIfObjBox, result });
+            Expression boolType = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
+            return wrapInObjBox(test, boolType);
         }
 
         private static Expression nullList(Expression env)
