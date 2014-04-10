@@ -12,6 +12,9 @@ namespace CompilerLib
         public static ObjBox Reverse(RacketPair list)
         {
             bool restNull = false;
+            if (list.isNull())
+                return new ObjBox(list, typeof(RacketPair));
+
             RacketPair accu = new RacketPair(list.car(), 
                 new ObjBox(new voidObj(), typeof(voidObj)));
             if (list.cdr().getType() == typeof(voidObj))
@@ -23,19 +26,12 @@ namespace CompilerLib
                 list = (RacketPair)list.cdr().getObj();
             }
             
-            while (!restNull)
+            while (!list.isNull())
             {
                 accu = new RacketPair(list.car(),
                     new ObjBox(accu, typeof(RacketPair)));
 
-                if (list.cdr().getType() == typeof(voidObj))
-                {
-                    restNull = true;
-                }
-                else
-                {
                     list = (RacketPair)list.cdr().getObj();
-                }
             }
             return new ObjBox(accu, typeof(RacketPair));
         }
@@ -83,7 +79,7 @@ namespace CompilerLib
             if (function.param_num != lists.Count + 1)
                 throw new RuntimeException("Wrong number of arguments for given procedure");
 
-            while (!restNull)
+            while (!lists[0].isNull())
             {
                 args.Clear();
             //    args.Add(init);
@@ -93,6 +89,8 @@ namespace CompilerLib
                     if (listLength == -1)
                         listLength = lists[i].length();
                     if (lists[i].length() != listLength)
+                        throw new RuntimeException("Lists must be of same length");
+                    if (lists[i].isNull())
                         throw new RuntimeException("Lists must be of same length");
 
                     args.Add(lists[i].car());
