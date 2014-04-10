@@ -116,6 +116,7 @@ namespace CompilerLib
 
     }
 
+
     public interface RacketNum
     {
         ObjBox Plus(RacketNum other);
@@ -128,6 +129,11 @@ namespace CompilerLib
         Boolean ComplexQ(RacketNum other);
         Boolean FloatQ(RacketNum other);
         Boolean IntegerQ(RacketNum other);
+
+        Boolean lessThan(RacketNum other);
+        Boolean lessThanEqual(RacketNum other);
+        Boolean greaterThan(RacketNum other);
+        Boolean greaterThanEqual(RacketNum other);
     }
 
     public class RacketInt : RacketNum
@@ -277,6 +283,47 @@ namespace CompilerLib
         bool RacketNum.IntegerQ(RacketNum other)
         {
             return true;
+        }
+
+
+        public bool lessThan(RacketNum other)
+        {
+            if(other.GetType() == typeof(RacketInt))
+                return this.value < ((RacketInt) other).value;
+            if(other.GetType() == typeof(RacketFloat))
+                return this.value < ((RacketFloat) other).value;
+
+            throw new NotImplementedException();
+        }
+
+        public bool lessThanEqual(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+                return this.value <= ((RacketInt)other).value;
+            if (other.GetType() == typeof(RacketFloat))
+                return this.value <= ((RacketFloat)other).value;
+
+            throw new NotImplementedException();
+        }
+
+        public bool greaterThan(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+                return this.value > ((RacketInt)other).value;
+            if (other.GetType() == typeof(RacketFloat))
+                return this.value > ((RacketFloat)other).value;
+
+            throw new NotImplementedException();
+        }
+
+        public bool greaterThanEqual(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+                return this.value >= ((RacketInt)other).value;
+            if (other.GetType() == typeof(RacketFloat))
+                return this.value >= ((RacketFloat)other).value;
+
+            throw new NotImplementedException();
         }
     }
 
@@ -428,6 +475,46 @@ namespace CompilerLib
         {
             return false;
         }
+
+        public bool lessThan(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+                return this.value < ((RacketInt)other).value;
+            if (other.GetType() == typeof(RacketFloat))
+                return this.value < ((RacketFloat)other).value;
+
+            throw new NotImplementedException();
+        }
+
+        public bool lessThanEqual(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+                return this.value <= ((RacketInt)other).value;
+            if (other.GetType() == typeof(RacketFloat))
+                return this.value <= ((RacketFloat)other).value;
+
+            throw new NotImplementedException();
+        }
+
+        public bool greaterThan(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+                return this.value > ((RacketInt)other).value;
+            if (other.GetType() == typeof(RacketFloat))
+                return this.value > ((RacketFloat)other).value;
+
+            throw new NotImplementedException();
+        }
+
+        public bool greaterThanEqual(RacketNum other)
+        {
+            if (other.GetType() == typeof(RacketInt))
+                return this.value >= ((RacketInt)other).value;
+            if (other.GetType() == typeof(RacketFloat))
+                return this.value >= ((RacketFloat)other).value;
+
+            throw new NotImplementedException();
+        }
     }
 
     public class RacketComplex : RacketNum
@@ -566,6 +653,27 @@ namespace CompilerLib
         {
             return false;
         }
+
+
+        public bool lessThan(RacketNum other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool lessThanEqual(RacketNum other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool greaterThan(RacketNum other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool greaterThanEqual(RacketNum other)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class RacketPair
@@ -584,6 +692,18 @@ namespace CompilerLib
                 Length = 1;
             else
                 Length = 2;
+        }
+
+        public override bool Equals(object obj)
+        {
+            
+            if (obj.GetType() == typeof(RacketPair))
+            {
+                RacketPair other = (RacketPair) obj;
+                return this.value.Equals(other.car()) && this.rest.Equals(other.cdr());
+            }
+            
+            return base.Equals(obj);
         }
 
         public RacketPair()

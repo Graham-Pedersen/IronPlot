@@ -130,6 +130,16 @@ namespace CompilerLib
             converter = typeof(TypeUtils).GetMethod("cast").MakeGenericMethod(type);
         }
 
+        public override bool Equals(object obj)
+        {
+            if(obj.GetType() == typeof(ObjBox))
+            {
+                ObjBox other = (ObjBox)obj;
+                return (this.type == other.type) && (this.getObj().Equals(other.getObj()));
+            }
+            return base.Equals(obj);
+        }
+
         //test if the _type is a .net type we do not use internally. If it is we will convert it to what it should be
         private Boolean hasExternalType(Type _type, object _obj)
         {

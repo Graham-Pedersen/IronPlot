@@ -5,11 +5,12 @@
 (call list Add 7)
 (define count (call list Count))
 
-(define (printList l index max)
+(define (sumList l index max)
 	(if (not (equal? index max))
-		(begin 
-			(displayln (call l Item index))
-			(printList l (+ index 1) max))
-		(displayln '(end of list))))
+		(+ (call l Item index) (sumList l (+ index 1) max))
+		0))
 
-(printList list 0 count)
+(if 
+	(equal? (sumList list 0 count) 13)
+	(displayln 'Passed)
+	(displayln 'Failed))
