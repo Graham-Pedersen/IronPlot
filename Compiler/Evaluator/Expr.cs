@@ -20,7 +20,7 @@ namespace Evaluator
             return this;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return val;
         }
@@ -102,7 +102,7 @@ namespace Evaluator
             return then.eval(env);
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return base.ToString(); // dont know what to print
         }
@@ -120,7 +120,7 @@ namespace Evaluator
             return this;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             if (val)
                 return "#t";
@@ -137,7 +137,6 @@ namespace Evaluator
     {
         Expr first;
         Expr rest;
-        int length;
 
         public ConsExpr(Expr first, Expr rest)
         {
@@ -159,7 +158,7 @@ namespace Evaluator
             return first;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             if (rest.GetType() == typeof(ConsExpr))
                 return String.Format("({0} {1})", first.ToString(), rest.ToString());
@@ -182,7 +181,7 @@ namespace Evaluator
             return this;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return "()";
         }

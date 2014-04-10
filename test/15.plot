@@ -4,6 +4,6 @@
 		first))
 
 (if 
-	(equal? (get-first (cons 1 2) 1))
+	(equal? (get-first (cons 1 2)) 1)
 	(displayln 'Passed)
 	(displayln "Failed"))

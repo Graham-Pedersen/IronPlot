@@ -110,10 +110,10 @@ namespace DLR_Compiler
             if (compile)
             {
                 //create and output an assembly
-                var asmName = new AssemblyName();
+                var asmName = new AssemblyName(outputName);
                 var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
                     (asmName, AssemblyBuilderAccess.RunAndSave);
-                var moduleBuilder = asmBuilder.DefineDynamicModule(outputName, outputName + ".exe");
+                var moduleBuilder = asmBuilder.DefineDynamicModule(outputName + "Module", outputName + ".exe");
                 var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
                 var methodBuilder = typeBuilder.DefineMethod("Main",
                     MethodAttributes.Static, typeof(void), new[] { typeof(string) });
@@ -122,7 +122,7 @@ namespace DLR_Compiler
 
                 typeBuilder.CreateType();
                 asmBuilder.SetEntryPoint(methodBuilder);
-                asmBuilder.Save(outputName);
+                asmBuilder.Save(outputName + ".exe");
             }
             else
             {

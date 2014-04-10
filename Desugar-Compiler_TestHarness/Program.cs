@@ -147,21 +147,23 @@ namespace Desugar_Compiler_TestHarness
                         if (RunDesugar(s, s + ".tmp"))
                         {
                             output = Runcompiler(s + ".tmp", Filename + ".exe");
-                            if (output != "Passed\r\n\r\n")
+                            if (output != "Passed\r\n")
                             {
                                 Console.WriteLine("!!!!!!!! FAILED TEST !!!!!!!!!!!");
                                 Console.WriteLine("Filename: " + Filename + ".plot failed.");
-                                Console.WriteLine("Expected: " + IO[Filename] + "Got: " + output);
+                                Console.WriteLine("Expected: " + "Passed\r\n" + "Got: " + output);
                             }
                             else
                             {
                                 Console.WriteLine("Filename: " + Filename + ".plot Passed");
                             }
                         }
-                        Console.ReadKey();
+                        //Console.ReadKey();
                     }
                 }
-            cleanuptmp(@"C:\Users\Scott\Documents\Compiler\IronPlot\test");
+            Console.WriteLine("Cleaning up");
+            cleanuptmp(@"C:\Users\graha_000\Programming\IronPlot\test");
+            Console.ReadKey();
         }
     }
 }
