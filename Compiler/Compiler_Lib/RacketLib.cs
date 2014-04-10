@@ -724,10 +724,14 @@ namespace CompilerLib
 
         public override bool Equals(object obj)
         {
-            
             if (obj.GetType() == typeof(RacketPair))
             {
                 RacketPair other = (RacketPair) obj;
+                if (this.isNull() && other.isNull())
+                    return true;
+                //one of us is null the other is not
+                if (this.isNull() || other.isNull())
+                    return false;
                 return this.value.Equals(other.car()) && this.rest.Equals(other.cdr());
             }
             
