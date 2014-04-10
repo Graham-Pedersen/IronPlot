@@ -1761,7 +1761,9 @@ namespace DLR_Compiler
 
             if (tree.values.Count == 0)
             {
-                return voidSingleton;
+                Expression cons_ = Expression.New(typeof(RacketPair).GetConstructor(new Type[] {}));
+                Expression type_ = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
+                return wrapInObjBox(cons_, type_);
             }
 
             Expression first;
