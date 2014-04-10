@@ -439,6 +439,18 @@ namespace DLR_Compiler
                         defaultExpression = mapExpr(list, env);
                         break;
 
+                    case "foldl":
+                        defaultExpression = foldlExpr(list, env);
+                        break;
+
+                    case "apply":
+                        defaultExpression = applyExpr(list, env);
+                        break;
+
+                    case "filter":
+                        defaultExpression = filterExpr(list, env);
+                        break;
+
                     case "quote":
                         if (list.values.Count != 2)
                         {
@@ -478,8 +490,8 @@ namespace DLR_Compiler
             return Expression.Block(
                 new ParameterExpression[] { result },
                 new Expression[] { branch, result });
+                
         }
-
 
 
         private static Expression newTypeList(ListNode list, Expression env)
@@ -892,6 +904,53 @@ namespace DLR_Compiler
             return null;
         }
 
+        private static Expression filterExpr(ListNode list, Expression env)
+        {
+            if (list.values.Count != 3)
+                throw new ParsingException("The expected number of arguments does not match the given number");
+
+            Node function = list.values[1];
+            Expression fun;
+            List<Expression> body = new List<Expression>();
+
+            if (function.isList())
+            {
+                ListNode l = (ListNode)function;
+                fun = unboxValue(matchExpression(l, env), typeof(FunctionHolder));
+            }
+
+            return null;
+        }
+
+        private static Expression applyExpr(ListNode list, Expression env)
+        {
+            int applyCount = list.values.Count;
+            if (applyCount != 3)
+                throw new ParsingException("apply takes a list, wich opts cons on front, possible error in desugarer");
+
+            Node function = list.values[1];
+            Expression fun;
+            List<Expression> body = new List<Expression>();
+
+            if (function.isList()) // lambda case or could be another function call that returns a function, fuckckckckckck
+            {
+                ListNode l = (ListNode)function;
+           //     fun = matchExpression(l, env);
+                fun= unboxValue(matchExpression(l, env), typeof(FunctionHolder));
+            }
+            else
+            {
+                fun = unboxValue(lookup(Expression.Constant(function.getValue()), env), typeof(FunctionHolder));
+            }
+
+                Expression l_ = unboxValue(matchExpression(list.values[2], env), typeof(RacketPair));
+
+            body.Add(Expression.Call(null,
+                typeof(FunctionLib).GetMethod("Apply"), fun, l_));
+
+            return Expression.Block(new ParameterExpression[] { }, body);
+        }
+
         private static Expression foldlExpr(ListNode list, Expression env)
         {
             int foldCount = list.values.Count;
@@ -913,36 +972,36 @@ namespace DLR_Compiler
             Expression argArray = Expression.New(typeof(List<RacketPair>).GetConstructor(new Type[] { }));
             Expression assign = Expression.Assign(listArrs, argArray);
 
-            // must create parameter for init argument, don't know type
-            // TODO
-
             body.Add(assign);
             // must add parameter for init arg
 
-            if (function.isList()) // lambda case 
+            if (function.isList()) // lambda case or could be another function call that returns a function, fuckckckckckck
             {
                 ListNode l = (ListNode)function;
-                if (!l.values[0].getValue().Equals("lambda")) // should be lambda, just check that it is
-                    throw new ParsingException("not a lambda, but should be");
-                if (l.values.Count != 3)
-                    throw new ParsingException("bad syntax, lambda");
-                ListNode parameters = (ListNode)l.values[1]; // parameters,
-                int count = parameters.values.Count;
-                if (count == 0)
-                    throw new ParsingException("number of parameters does not match number of lists given");
-                int listCount = foldCount - 2;
-                if (listCount != count)
-                    throw new ParsingException("number of lists does not match expected number of arguments");
-
-                fun = unboxValue(lambdaExpr(l, env), typeof(FunctionHolder));
+                //     fun = matchExpression(l, env);
+                fun = unboxValue(matchExpression(l, env), typeof(FunctionHolder));
             }
-            else // built in or user defined case
+            else
             {
                 fun = unboxValue(lookup(Expression.Constant(function.getValue()), env), typeof(FunctionHolder));
-                // graham will fix this by changing lookup, so if it fails its his fault
             }
 
-            return null;
+            Expression init = matchExpression(list.values[2], env); // is this correct?
+
+            for (int h = 3; h < foldCount; h++) // lists start at 3, 2 is init parameter
+            {
+                Expression l_ = unboxValue(matchExpression(list.values[h], env), typeof(RacketPair));
+                body.Add(
+                    Expression.Call(
+                    listArrs,
+                    typeof(List<RacketPair>).GetMethod("Add", new Type[] { typeof(RacketPair) }),
+                    l_));
+            }
+
+            body.Add(Expression.Call(null,
+                typeof(FunctionLib).GetMethod("Foldl"), fun, init, listArrs));
+
+           return Expression.Block(new ParameterExpression[] { listArrs }, body);
         }
 
         private static Expression mapExpr(ListNode list, Expression env)
@@ -968,6 +1027,19 @@ namespace DLR_Compiler
             Expression assign = Expression.Assign(arr, argArray);
             body.Add(assign);
 
+
+            if (function.isList()) // lambda case or could be another function call that returns a function, fuckckckckckck
+            {
+                ListNode l = (ListNode)function;
+                //     fun = matchExpression(l, env);
+                fun = unboxValue(matchExpression(l, env), typeof(FunctionHolder));
+            }
+            else
+            {
+                fun = unboxValue(lookup(Expression.Constant(function.getValue()), env), typeof(FunctionHolder));
+            }
+
+            /*
             if (function.isList()) // lambda case 
             {
                 ListNode l = (ListNode)function;
@@ -989,7 +1061,7 @@ namespace DLR_Compiler
             {
                 fun = unboxValue(lookup(Expression.Constant(function.getValue()), env), typeof(FunctionHolder));
                 // graham will fix this by changing lookup, so if it fails its his fault
-            }
+            } */
 
             for (int h = 2; h < mapCount; h++)
             {
