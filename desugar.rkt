@@ -25,7 +25,6 @@
         (set! program (desugar-dll program)))
       (set! program (desugar-tops program))) ;; desugar-tops
   (set! program (map desugar-define program)) ;; desugar the defines now
-  (displayln program)
   (set! program (partition-k 
                  atomic-define?
                  program
@@ -50,7 +49,9 @@
     [(empty? program) 
      '()]
     [else
-     (write (car program) file) (write-output (cdr program) file)]))
+       (write (car program) file)
+       (newline file)
+       (write-output (cdr program) file)]))
 
 (define (is-dll? program)
   (match program 
@@ -181,18 +182,14 @@
                                             rest)]
       [`(list . ,rest) (foldr (lambda (x a) `(cons ,(desugar-exp x) ,a))
 			 `(quote()) rest)] ;; needs testing a is accumulator
+      [`(reverse ,list)`(reverse ,(desugar-exp list))]
       [`(map ,fun . ,lists) `(map ,(desugar-exp fun) ,@(map desugar-exp lists))]
       [`(foldl ,fun ,init . ,lists) `(foldl ,(desugar-exp fun)
                                             ,(desugar-exp init)
                                             ,@(map desugar-exp lists))]
-      #|
-      [`(foldr ,fun ,init ,list ...) (if (null? lists)
-                                        (error `(number of arguments not expected number of argumetns))
-                                          (displayln new_lists)
-                                           `(foldl ,(desugar-exp fun)
-                                            ,(desugar-exp init)
-                                            ,@(map (lambda (l) `(list ,(reverse (cdr))))]  ;; need to test 
-|#
+      [`(foldr ,fun ,init ,lists ...) `(foldl ,(desugar-exp fun)
+                                              ,(desugar-exp init)
+                                              ,@(map (lambda (l) `(reverse ,(desugar-exp l))) lists))]  ;; need to test 
       [`(apply ,fun ,opts ... ,list) `(apply ,(desugar-exp fun)
                                              ,(desugar-exp (foldl cons list opts)))]
       [`(filter ,fun ,list) `(filter ,(desugar-exp fun) ,(desugar-exp list))]

@@ -443,6 +443,10 @@ namespace DLR_Compiler
                         defaultExpression = foldlExpr(list, env);
                         break;
 
+                    case "reverse":
+                        defaultExpression = reverseExpr(list, env);
+                        break;
+
                     case "apply":
                         defaultExpression = applyExpr(list, env);
                         break;
@@ -794,6 +798,16 @@ namespace DLR_Compiler
             Expression type = Expression.Call(null, typeof(TypeUtils).GetMethod("pairType"));
             return wrapInObjBox(cons, type);
             
+        }
+
+        private static Expression reverseExpr(ListNode list, Expression env)
+        {
+            if (list.values.Count != 2)
+                return createRuntimeException("reverse only takes one list");
+
+            Expression l = unboxValue(matchExpression(list.values[1], env), typeof(RacketPair));
+
+            return Expression.Call(null, typeof(FunctionLib).GetMethod("Reverse"), l);
         }
 
         private static Expression setBangExpr(ListNode list, Expression env)
