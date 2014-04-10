@@ -1,4 +1,10 @@
 (begin 
-       (displayln (- 1 2 4))
-       (displayln (- (- 1 2) (- 5 6)))
-       (displayln (- (- 1 2) 4)))
+      (define (test) 
+		  (+  
+			(- 1 2 4)
+			(- (- 1 2) (- 5 6))
+			(- (- 1 2) 4)))
+		(displayln (test))
+		(if (equal? (test) (- 0 10))
+			(displayln 'Passed)
+			(displayln 'Failed)))
