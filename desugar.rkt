@@ -25,7 +25,6 @@
         (set! program (desugar-dll program)))
       (set! program (desugar-tops program))) ;; desugar-tops
   (set! program (map desugar-define program)) ;; desugar the defines now
-  (displayln program)
   (set! program (partition-k 
                  atomic-define?
                  program
@@ -50,7 +49,9 @@
     [(empty? program) 
      '()]
     [else
-     (write (car program) file) (write-output (cdr program) file)]))
+       (write (car program) file)
+       (newline file)
+       (write-output (cdr program) file)]))
 
 (define (is-dll? program)
   (match program 
