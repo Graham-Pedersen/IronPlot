@@ -9,6 +9,36 @@ namespace CompilerLib
 {
     public static class FunctionLib
     {
+        public static ObjBox Reverse(RacketPair list)
+        {
+            bool restNull = false;
+            RacketPair accu = new RacketPair(list.car(), 
+                new ObjBox(new voidObj(), typeof(voidObj)));
+            if (list.cdr().getType() == typeof(voidObj))
+            {
+                restNull = true;
+            }
+            else
+            {
+                list = (RacketPair)list.cdr().getObj();
+            }
+            
+            while (!restNull)
+            {
+                accu = new RacketPair(list.car(),
+                    new ObjBox(accu, typeof(RacketPair)));
+
+                if (list.cdr().getType() == typeof(voidObj))
+                {
+                    restNull = true;
+                }
+                else
+                {
+                    list = (RacketPair)list.cdr().getObj();
+                }
+            }
+            return new ObjBox(accu, typeof(RacketPair));
+        }
         public static ObjBox Map(FunctionHolder function, List<RacketPair> lists)
         {
             List<ObjBox> returnedValues = new List<ObjBox>();
