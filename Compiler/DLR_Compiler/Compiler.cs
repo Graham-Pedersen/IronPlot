@@ -738,16 +738,29 @@ namespace DLR_Compiler
                 return createRuntimeException("wrong number of arguments passed to null? procedure");
             }
 
-            ParameterExpression result = Expression.Parameter(typeof(ObjBox));
 
-            Expression rhs = matchExpression(list.values[1], env);
-            Expression type = Expression.Call(rhs, typeof(ObjBox).GetMethod("getType"));
-            Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
-            
-            Expression test = Expression.Call(voidType, typeof(Type).GetMethod("Equals", new Type[] { typeof(Type) }), type);
+            // the object we are testing is null
+            Expression obj = matchExpression(list.values[1], env);
+
+            //the result that we will assign the result too
+            ParameterExpression result = Expression.Variable(typeof(Boolean));
+
+            //what our ifThenElse expression will branch on
+            Expression getType = Expression.Call(obj, typeof(ObjBox).GetMethod("getType"));
+            Expression test = Expression.Call(getType, typeof(Type).GetMethod("Equals", new Type[] { typeof(Type) }), Expression.Constant(typeof(RacketPair), typeof(Type)));
+
+            Expression isNullCall = Expression.Call(unboxValue(obj, typeof(RacketPair)), typeof(RacketPair).GetMethod("isNull", new Type[] { }));
+            Expression trueBranch = Expression.Assign(result, isNullCall);
+
+            Expression falseBranch = Expression.Assign(result, Expression.Constant(false));
+
+            Expression ifExpr = Expression.IfThenElse(test, trueBranch, falseBranch);
+
 
             Expression boolType = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
-            return wrapInObjBox(test, boolType);
+            Expression wrapResult = wrapInObjBox(result, boolType);
+
+            return Expression.Block(new ParameterExpression[] { result }, new Expression[] { ifExpr, wrapResult });
         }
 
         private static Expression nullList(Expression env)
