@@ -1,11 +1,15 @@
+(define passed #f)
+
 (if #t
-    (begin (display "hi")
-    	   (displayln " there"))
+    (set! passed #t)
     (void))
+	
+(if #f
+	(set! passed #f)
+	(void))
+	
+(if
+	passed
+	(displayln 'Passed)
+	(displayln "Failed"))
 
-
-(if #t (void) (begin (display "should not print")))
-
-(if #f (void) (begin (display "should print")))
-
-(if #f (display "1") (display "2"))

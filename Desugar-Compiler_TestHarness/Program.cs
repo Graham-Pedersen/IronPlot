@@ -24,7 +24,7 @@ namespace Desugar_Compiler_TestHarness
                 Process Compile = Process.Start(comp);
                 StreamReader sr = Compile.StandardOutput;
                 StreamReader sr2 = Compile.StandardError;
-                string output = sr.ReadToEnd();
+                    string output = sr.ReadToEnd();
                 string output2 = sr2.ReadToEnd();
                 if (output2 != String.Empty)
                 {
@@ -144,6 +144,7 @@ namespace Desugar_Compiler_TestHarness
                 if (s.Contains(".plot") && !s.Contains(".tmp"))
                 {
                     string Filename = Path.GetFileNameWithoutExtension(s);
+                    Console.WriteLine("Testing " + Filename);
                         if (RunDesugar(s, s + ".tmp"))
                         {
                             output = Runcompiler(s + ".tmp", Filename + ".exe");

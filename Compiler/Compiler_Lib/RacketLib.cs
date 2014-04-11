@@ -89,15 +89,14 @@ namespace CompilerLib
 
                     args.Add(lists[i].car());
                     ObjBox rest = lists[i].cdr();
-
+                    /*
                     if (rest.getType() == typeof(voidObj))
                     {
                         restNull = true;
                     }
                     else
-                    {
+                    { */
                         lists[i] = (RacketPair)rest.getObj();
-                    }
                 }
                 args.Add(init);
                 init = function.invoke(args); // should be okay if making copies
@@ -718,10 +717,14 @@ namespace CompilerLib
 
         public override bool Equals(object obj)
         {
-            
             if (obj.GetType() == typeof(RacketPair))
             {
                 RacketPair other = (RacketPair) obj;
+                if (this.isNull() && other.isNull())
+                    return true;
+                //one of us is null the other is not
+                if (this.isNull() || other.isNull())
+                    return false;
                 return this.value.Equals(other.car()) && this.rest.Equals(other.cdr());
             }
             

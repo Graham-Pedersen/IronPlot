@@ -7,4 +7,3 @@
 		pass
 		(displayln 'Passed)
 		(displayln 'Failed)))
-(scall System.Console ReadKey)

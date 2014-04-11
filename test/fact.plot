@@ -4,4 +4,7 @@
 			(* x (fact (- x 1))))))
 			
 (define result (fact 5))
-(displayln result)
+
+(if (equal? 120 result)
+	(displayln 'Passed)
+	(displayln 'Failed))

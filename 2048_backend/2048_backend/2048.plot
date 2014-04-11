@@ -30,18 +30,9 @@
 (define (append-element lst elem)
 	(displayln '(in append element))
 	(displayln elem)
+	(displayln lst)
 	(foldr (lambda (l i) 
-		(cons l i)) (list elem) lst)
-
-		(displayln '(test)))
-
-(define (cons_wrap first rest)
-	(cons first rest))
-
-(define (shuffle_right row)
-	(reverse(shuffle_left  row)))
-
-	
+		(cons l i)) (list elem) lst))
 
 
 (define (shuffle_left row)
@@ -50,6 +41,9 @@
 		[(equal? (car row) 0)   (append-element (shuffle_left (cdr row)) 0)]
 		[else (cons (car row) (shuffle_left (cdr row)))]))
 
+
+(define (shuffle_right row)
+	(reverse(shuffle_left  row)))
 
 
 (define (row_left list_row)
@@ -69,6 +63,7 @@
 	    				
 
 (define (row_right list_row)
+	(displayln '(here))
 	(set! list_row (shuffle_right list_row))
 	(define f (car list_row))
 	(define s (car (cdr list_row)))
@@ -92,10 +87,6 @@
 
 
 (define (move_board_right board)
-	(displayln 'hello)
-	(displayln (row_right (car board)))
-	(displayln 'hello)
-	(displayln (move_board_right (cdr board)))
 	(cond 
 		[(null? board) '()]
 		[else    (cons (row_right (car board)) (move_board_right (cdr board)))]))
