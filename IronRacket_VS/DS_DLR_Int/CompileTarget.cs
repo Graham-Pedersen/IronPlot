@@ -12,9 +12,10 @@ namespace DS_DLR_Int
     {
 
         private string SourceFile;
+        private string comptype;
         public override bool Execute()
        {
-            CallCompiler c = new CallCompiler(SourceFile); 
+            CallCompiler c = new CallCompiler(SourceFile,comptype); 
             return true;
         }
         public string SourceFiles
@@ -22,5 +23,11 @@ namespace DS_DLR_Int
             get { return SourceFiles; }
             set { SourceFile = value; }
         }
+        public string CompiliationType
+        {
+            get { return comptype; }
+            set { comptype = value; }
+        }
+
     }
 }

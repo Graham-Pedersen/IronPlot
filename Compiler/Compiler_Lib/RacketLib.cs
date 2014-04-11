@@ -95,15 +95,14 @@ namespace CompilerLib
 
                     args.Add(lists[i].car());
                     ObjBox rest = lists[i].cdr();
-
+                    /*
                     if (rest.getType() == typeof(voidObj))
                     {
                         restNull = true;
                     }
                     else
-                    {
+                    { */
                         lists[i] = (RacketPair)rest.getObj();
-                    }
                 }
                 args.Add(init);
                 init = function.invoke(args); // should be okay if making copies

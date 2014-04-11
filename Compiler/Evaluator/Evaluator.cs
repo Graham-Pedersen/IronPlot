@@ -53,7 +53,7 @@ namespace Evaluator
             // if opening parent then there may be more than one expr
             // can just call parse List to get each expr
             List<Expr> exprs = new List<Expr>();
-            string in_ = input;
+            string in_ = eatWhitespace(input);
             string fExpr;
             while (in_ != "")
             {
@@ -70,7 +70,7 @@ namespace Evaluator
 
         private Expr parse(string input)
         {
-            string in_ = input;
+            string in_ = eatWhitespace(input);
             if (peekChar(in_) == '(')
             {
                 in_ = eatWhitespace(eatChar('(', in_));
