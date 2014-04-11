@@ -60,7 +60,7 @@ namespace DLR_Compiler
             }
         }
 
-        static void createExe(ListNode parseTree, Boolean compile, String outputName)
+        static void createExe(ListNode parseTree, Boolean run, String outputName)
         {
             //Body of the program
             List<Expression> program = new List<Expression>();
@@ -107,24 +107,22 @@ namespace DLR_Compiler
             //turn our program body into a expression block
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton}, program);
            
-            if (compile)
-            {
-                //create and output an assembly
-                var asmName = new AssemblyName(outputName);
-                var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
-                    (asmName, AssemblyBuilderAccess.RunAndSave);
-                var moduleBuilder = asmBuilder.DefineDynamicModule(outputName + "Module", outputName + ".exe");
-                var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
-                var methodBuilder = typeBuilder.DefineMethod("Main",
-                    MethodAttributes.Static, typeof(void), new[] { typeof(string) });
+            //create and output an assembly
+            var asmName = new AssemblyName(outputName);
+            var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
+                (asmName, AssemblyBuilderAccess.RunAndSave);
+            var moduleBuilder = asmBuilder.DefineDynamicModule(outputName + "Module", outputName + ".exe");
+            var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
+            var methodBuilder = typeBuilder.DefineMethod("Main",
+                MethodAttributes.Static, typeof(void), new[] { typeof(string) });
 
-                Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
+            Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
 
-                typeBuilder.CreateType();
-                asmBuilder.SetEntryPoint(methodBuilder);
-                asmBuilder.Save(outputName + ".exe");
-            }
-            else
+            typeBuilder.CreateType();
+            asmBuilder.SetEntryPoint(methodBuilder);
+            asmBuilder.Save(outputName + ".exe");
+            
+            if(run)
             {
                 //Compile and invoke the program in this context
                 Expression.Lambda<Action>(code).Compile()();
