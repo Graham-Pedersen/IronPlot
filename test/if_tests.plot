@@ -1,11 +1,11 @@
 (if #t
-    (begin (display "hi")
+    (begin (displayln "hi")
     	   (displayln " there"))
     (void))
 
 
-(if #t (void) (begin (display "should not print")))
+(if #t (void) (begin (displayln "should not print")))
 
-(if #f (void) (begin (display "should print")))
+(if #f (void) (begin (displayln "should print")))
 
-(if #f (display "1") (display "2"))
+(if #f (displayln "1") (displayln "2"))
