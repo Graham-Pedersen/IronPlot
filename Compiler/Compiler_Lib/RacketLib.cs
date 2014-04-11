@@ -16,15 +16,9 @@ namespace CompilerLib
                 return new ObjBox(list, typeof(RacketPair));
 
             RacketPair accu = new RacketPair(list.car(), 
-                new ObjBox(new voidObj(), typeof(voidObj)));
-            if (list.cdr().getType() == typeof(voidObj))
-            {
-                restNull = true;
-            }
-            else
-            {
+                new ObjBox(new RacketPair(), typeof(RacketPair)));
+
                 list = (RacketPair)list.cdr().getObj();
-            }
             
             while (!list.isNull())
             {

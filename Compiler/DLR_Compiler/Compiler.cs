@@ -875,16 +875,16 @@ namespace DLR_Compiler
 
         private static Expression beginExpr(ListNode list, Expression env)
         {
-            if (list.values.Count < 2)
-            {
-                return createRuntimeException("wrong number of arguments passed to begin procedure");
-            }
-
             List<Expression> body = new List<Expression>();
 
             for (int i = 1; i < list.values.Count; i++)
             {
                 body.Add(matchExpression(list.values[i], env));
+            }
+
+            if (body.Count == 0)
+            {
+                body.Add(voidSingleton);
             }
 
             return Expression.Block(new ParameterExpression[] { }, body);
