@@ -26,22 +26,51 @@
 		[else     (cons (car board) (place_at_i_j num ij (cdr board) (+ i 1) j))]))
 
 
+(define (place_randomly board num)
+	(define continue #t)
+	(define return 0)
+	(while 
+		continue 
+		(begin
+			(define r (new System.Random))
+			(define x (call r Next 0 4))
+			(define y (call r Next 0 4))
+			(cond 
+				[(equal? 0 (get_val (cons x y) board 0)) 
+					(begin
+						(set! continue #f)
+						(set! return (place_at_i_j num (cons x y) board 0 0)))])))
+						
+						return)
 
 
-(define (append-element lst elem)
-	(foldr (lambda (l i) 
-		(cons l i)) (list elem) lst))
+(define (PlaceAndSelectRandomNum board)
+	(define r (new System.Random))
+	(define x (call r Next))
+	(cond
+		[(equal? 0 (% x 2)) (place_randomly board 2)]
+		[else               (place_randomly board 4)]))
+
+
+
+(define (append-element lst accu)
+	(cond
+		[(null? lst) accu]
+		[else (append-element (cdr lst) (cons (car lst) accu))]))
+
+(define (append-element-driver lst elem)
+(append-element (reverse lst) (list elem)))
 
 
 (define (shuffle_left row)
 	(cond
 		[(null? row ) '()] 	
-		[(equal? (car row) 0)   (append-element (shuffle_left (cdr row)) 0)]
+		[(equal? (car row) 0)   (append-element-driver (shuffle_left (cdr row)) 0)]
 		[else (cons (car row) (shuffle_left (cdr row)))]))
 
 
 (define (shuffle_right row)
-	(reverse(shuffle_left  row)))
+	(reverse (shuffle_left  (reverse row))))
 
 
 (define (row_left list_row)
@@ -63,12 +92,13 @@
 
 (define (row_right list_row)
 	
+	(displayln list_row)
 	(set! list_row (shuffle_right list_row))
+	(displayln list_row)
 	(define f (car list_row))
 	(define s (car (cdr list_row)))
 	(define thrd (car (cdr (cdr list_row))))
 	(define fth (car (cdr (cdr (cdr list_row)))))
-	(displayln '(row_right complete pull))
 	(cond
 		[(equal? thrd fth)
 			(cond
@@ -87,7 +117,6 @@
 
 
 (define (move_board_right board)
-	(displayln '(move board right))
 	(cond 
 		[(null? board) '()]
 		[else    (cons (row_right (car board)) (move_board_right (cdr board)))]))
@@ -104,7 +133,7 @@
 				(define thrd (car (car (cdr (cdr board)))))
 				(define fth (car (car (cdr (cdr (cdr board))))))
 				(define tp_list (list f s thrd fth)) 
-				(set! tp_list (row_right tp_list)) ;;Shuffle right
+				(set! tp_list (row_right tp_list)) 
 
 				(define temp_list (list
 					(cdr (car board))
@@ -126,6 +155,15 @@
 					(cons thrd (car (cdr (cdr temp_list))))
 					(cons fth (car(cdr (cdr (cdr temp_list)))))))
                                 temp_list2)]))
+
+
+(define (move_board_down_helper board)
+	(set! board (move_board_down board))
+	(PlaceAndSelectRandomNum board))
+
+
+
+
 
 
 
@@ -162,6 +200,10 @@
 					(cons fth (car(cdr (cdr (cdr temp_list)))))))
                                 temp_list2)]))
 
+(define (move_board_up_helper board)
+	(set! board (move_board_up board))
+	(PlaceAndSelectRandomNum board))
+
 
 
 
@@ -178,38 +220,20 @@
     [else (get_val ij (cdr board) (+ i 1))]))
 
 
-(define (place_randomly board num)
-	(define continue #t)
-	(define return 0)
-	(while 
-		continue 
-		(begin
-			(define r (new System.Random))
-			(define x (call r Next 0 4))
-			(define y (call r Next 0 4))
-			(cond 
-				[(equal? 0 (get_val (cons x y) board 0)) 
-					(begin
-						(set! continue #f)
-						(set! return (place_at_i_j num (cons x y) board 0 0)))])))
-						
-						return)
-
-
-(define (PlaceAndSelectRandomNum board)
-	(define r (new System.Random))
-	(define x (call r Next))
-	(cond
-		[(equal? 0 (% x 2)) (place_randomly board 2)]
-		[else               (place_randomly board 4)]))
-
-
 (define (init_board)
 	(define board (create_empty_board))
-	(displayln '(here))
 	(set! board (place_randomly board 2))
 	(place_randomly board 2))
 	
+
+(define (move_board_left_helper board)
+	(set! board (move_board_left board))
+	(PlaceAndSelectRandomNum board))
+
+(define (move_board_right_helper board)
+	(set! board (move_board_right board))
+	(PlaceAndSelectRandomNum board))
+
 
 (define (debug_display list)
   (displayln (car list))
@@ -217,4 +241,6 @@
   (displayln (car (cdr (cdr list))))
   (displayln (car (cdr (cdr (cdr list)))))
   (displayln '()))
+
+
 

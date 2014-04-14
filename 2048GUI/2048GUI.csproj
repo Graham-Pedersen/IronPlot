@@ -35,7 +35,8 @@
     <Reference Include="Compiler_Lib">
       <HintPath>..\Compiler\DLR_Compiler\bin\Debug\Compiler_Lib.dll</HintPath>
     </Reference>
-    <Reference Include="DLL2048">
+    <Reference Include="DLL2048, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\2048_backend\2048_backend\DLL2048.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />

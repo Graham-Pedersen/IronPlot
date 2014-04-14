@@ -972,7 +972,7 @@ namespace DLR_Compiler
 
             // 1. function is user defined
             // 2. function is built in
-            // 3. function is a lambda
+            // 3. function is a lambda  
 
             Node function = list.values[1];
             Expression fun;

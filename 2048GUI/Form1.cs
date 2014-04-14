@@ -55,24 +55,27 @@ namespace _2048GUI
             switch (e.KeyCode)
             {
                 case Keys.W://up
-                    
                     obj.Add((object)Board);
-                    Board = (ObjBox) DLL2048.move_board_up(env, obj);
+                    Board = (ObjBox) DLL2048.move_board_up_helper(env, obj);
+                   // DLL2048.debug_display(env, obj);
                     redraw_gui(Board);
                     break;
                 case Keys.A://left
                     obj.Add((object)Board);
-                    Board = (ObjBox) DLL2048.move_board_left(env, obj);
+                    Board = (ObjBox) DLL2048.move_board_left_helper(env, obj);
+                  //  DLL2048.debug_display(env, obj);
                     redraw_gui(Board);
                     break;
                 case Keys.S://down
                     obj.Add((object)Board);
-                    Board = (ObjBox) DLL2048.move_board_down(env, obj);
+                    Board = (ObjBox) DLL2048.move_board_down_helper(env, obj);
+                   // DLL2048.net_debug_display(env, obj);
                     redraw_gui(Board);
                     break;
                 case Keys.D://right
                     obj.Add((object)Board);
-                    Board = (ObjBox) DLL2048.move_board_right(env, obj);
+                    Board = (ObjBox) DLL2048.move_board_right_helper(env, obj);
+                  //  DLL2048.debug_display(env, obj);
                     redraw_gui(Board);
                     break;
             }
