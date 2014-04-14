@@ -74,7 +74,7 @@ namespace DLR_Compiler
                 program.Add(assign);
                 program.Add(assignVoid);
 
-                program.Add(setUpTopLevelEnviornemnt(env));
+                program.Add(setUpTopLevelEnvironment(env));
 
                 Expression ret = unboxValue(matchTopLevel(topLevelForms, env), typeof(Object));
 
@@ -120,19 +120,23 @@ namespace DLR_Compiler
             }
         }
 
-        private static Expression setUpTopLevelEnviornemnt(ParameterExpression env)
+        private static Expression setUpTopLevelEnvironment(ParameterExpression env)
         {
             List<Expression> body = new List<Expression>();
-
+            // need to add < <= > >=
             //insert all default functions into the environment
             addBuiltIn(env, body, addExpr(), "+");
             addBuiltIn(env, body, subExpr(), "-");
             addBuiltIn(env, body, multExpr(), "*");
             addBuiltIn(env, body, divExpr(), "/");
             addBuiltIn(env, body, modExpr(), "%");
-            addBuiltIn(env, body, usingExpr(), "using");
-            addBuiltIn(env, body, callExpr(), "call");
-            addBuiltIn(env, body, scallExpr(), "scall");
+  //          addBuiltIn(env, body, lessThanExpr(), "<");
+   //         addBuiltIn(env, body, greaterThanExpr(), ">");
+   //         addBuiltIn(env, body, greaterThanEqExpr(), ">=");
+   //         addBuiltIn(env, body, lessThanEqExpr(), "<=");
+       //     addBuiltIn(env, body, usingExpr(), "using");
+      //      addBuiltIn(env, body, callExpr(), "call");
+       //     addBuiltIn(env, body, scallExpr(), "scall");
 
 
             return Expression.Block(new ParameterExpression[] { }, body);

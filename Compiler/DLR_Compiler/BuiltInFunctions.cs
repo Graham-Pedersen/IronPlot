@@ -10,20 +10,21 @@ namespace DLR_Compiler
 {
     public partial class DLR_Compiler
     {
-        static Expression addExpr()
+        static Expression addExpr() // moved from racketnum
         {
             //make our parameter list
+            
             List<ParameterExpression> paramList = new List<ParameterExpression>();
             paramList.Add(Expression.Variable(typeof(ObjBox)));
-            paramList.Add(Expression.Variable(typeof(ObjBox)));
+           paramList.Add(Expression.Variable(typeof(ObjBox))); 
 
             List<Expression> body = new List<Expression>();
 
             //unbox types
-            Expression lhs = unboxValue(paramList[0], typeof(RacketNum));
-            Expression rhs = unboxValue(paramList[1], typeof(RacketNum));
+           Expression lhs = unboxValue(paramList[0], typeof(RacketNum));
+           Expression rhs = unboxValue(paramList[1], typeof(RacketNum));
 
-            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Plus"), new Expression[] { rhs });
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Plus"), new Expression[] { rhs }); // pass in some sort of list but not sure how
 
             body.Add(result);
 
@@ -31,7 +32,7 @@ namespace DLR_Compiler
             return boxFunc(lambda, paramList.Count);
         }
 
-        static Expression subExpr()
+        static Expression subExpr() // moved from racketnum
         {
             //make our parameter list
             List<ParameterExpression> paramList = new List<ParameterExpression>();
@@ -52,7 +53,7 @@ namespace DLR_Compiler
             return boxFunc(lambda, paramList.Count);
         }
 
-        static Expression multExpr()
+        static Expression multExpr() // moved from racketnum
         {
             //make our parameter list
             List<ParameterExpression> paramList = new List<ParameterExpression>();
@@ -73,7 +74,7 @@ namespace DLR_Compiler
             return boxFunc(lambda, paramList.Count);
         }
 
-        static Expression divExpr()
+        static Expression divExpr() // moved from racketnum
         {
             //make our parameter list
             List<ParameterExpression> paramList = new List<ParameterExpression>();
@@ -94,7 +95,7 @@ namespace DLR_Compiler
             return boxFunc(lambda, paramList.Count);
         }
 
-        static Expression modExpr()
+        static Expression modExpr() // moved from racketnum
         {
             //make our parameter list
             List<ParameterExpression> paramList = new List<ParameterExpression>();
@@ -114,8 +115,44 @@ namespace DLR_Compiler
             Expression lambda = Expression.Lambda(Expression.Block(new ParameterExpression[] { }, body), paramList);
             return boxFunc(lambda, paramList.Count);
         }
+        // TODO
+        /*
+        static Expression lessThanExpr()
+        {
+            List<ParameterExpression> paramList = new List<ParameterExpression>();
+            paramList.Add(Expression.Variable(typeof(ObjBox)));
+            paramList.Add(Expression.Variable(typeof(ObjBox)));
 
+            List<Expression> body = new List<Expression>();
 
+            //unbox types
+            Expression lhs = unboxValue(paramList[0], typeof(RacketNum));
+            Expression rhs = unboxValue(paramList[1], typeof(RacketNum));
+
+            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("LessThan"), new Expression[] { rhs });
+
+            body.Add(result);
+
+            Expression lambda = Expression.Lambda(Expression.Block(new ParameterExpression[] { }, body), paramList);
+            return boxFunc(lambda, paramList.Count);
+        }
+
+        static Expression greaterThanExpr()
+        {
+            return null;
+        }
+
+        static Expression greaterThanEqExpr()
+        {
+            return null;
+        }
+
+        static Expression lessThanEqExpr()
+        {
+            return null;
+        }
+
+        */
 
 
 

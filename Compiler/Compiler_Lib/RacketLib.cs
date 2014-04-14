@@ -9,6 +9,256 @@ namespace CompilerLib
 {
     public static class FunctionLib
     {
+        public static ObjBox Plus(List<RacketNum> args)
+        {
+            
+            if (args.Count == 0) // plust can take zero args
+                return new ObjBox(new RacketInt(0), typeof(RacketInt));
+
+            var sum = 0;
+
+            Type t = args[0].GetType();
+
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in plus must be of same type");
+                sum = sum + num.getValue();     
+            }
+            if (t == typeof(RacketInt))
+            {
+                return new ObjBox(new RacketInt(sum), typeof(RacketInt));
+            }
+            else if (t == typeof(RacketFloat))
+            {
+                return new ObjBox(new RacketFloat(sum), typeof(RacketFloat));
+            }
+            else if (t == typeof(RacketComplex))
+            {
+                return new ObjBox(new RacketComplex(sum), typeof(RacketComplex));
+            }
+            else
+                throw new RuntimeException("do not understand type of RacketNum in plus");
+        }
+
+        public static ObjBox Mult(List<RacketNum> args)
+        {
+
+            if (args.Count == 0) // plust can take zero args
+                return new ObjBox(new RacketInt(1), typeof(RacketInt));
+
+            var sum = 1;
+
+            Type t = args[0].GetType();
+
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in plus must be of same type");
+                sum = sum * num.getValue();
+            }
+            if (t == typeof(RacketInt))
+            {
+                return new ObjBox(new RacketInt(sum), typeof(RacketInt));
+            }
+            else if (t == typeof(RacketFloat))
+            {
+                return new ObjBox(new RacketFloat(sum), typeof(RacketFloat));
+            }
+            else if (t == typeof(RacketComplex))
+            {
+                return new ObjBox(new RacketComplex(sum), typeof(RacketComplex));
+            }
+            else
+                throw new RuntimeException("do not understand type of RacketNum in mult");
+        }
+
+        public static ObjBox Sub(List<RacketNum> args)
+        {
+            if (args.Count < 1)
+                throw new RuntimeException("Subtraction expects at least 1 argument");
+
+            Type t = args[0].GetType();
+            var sum = args[0].getValue();
+
+            if (args.Count == 1)
+                sum = sum * -1;
+
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in plus must be of same type");
+                sum = sum - num.getValue();
+            }
+
+            if (t == typeof(RacketInt))
+            {
+                return new ObjBox(new RacketInt(sum), typeof(RacketInt));
+            }
+            else if (t == typeof(RacketFloat))
+            {
+                return new ObjBox(new RacketFloat(sum), typeof(RacketFloat));
+            }
+            else if (t == typeof(RacketComplex))
+            {
+                return new ObjBox(new RacketComplex(sum), typeof(RacketComplex));
+            }
+            else
+                throw new RuntimeException("do numt understand RacketNum type in subtraction");
+        }
+
+        public static ObjBox Div(List<RacketNum> args)
+        {
+            if (args.Count < 1)
+                throw new RuntimeException("Division expects at least 1 argument");
+
+            Type t = args[0].GetType();
+            var sum = args[0].getValue();
+
+            if (args.Count == 1)
+                sum = 1 / sum;
+
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in plus must be of same type");
+                sum = sum / num.getValue();
+            }
+
+            if (t == typeof(RacketInt))
+            {
+                return new ObjBox(new RacketInt(sum), typeof(RacketInt));
+            }
+            else if (t == typeof(RacketFloat))
+            {
+                return new ObjBox(new RacketFloat(sum), typeof(RacketFloat));
+            }
+            else if (t == typeof(RacketComplex))
+            {
+                return new ObjBox(new RacketComplex(sum), typeof(RacketComplex));
+            }
+            else
+                throw new RuntimeException("do numt understand RacketNum type in division");
+        }
+
+        public static ObjBox Mod(List<RacketNum> args)
+        {
+            if (args.Count != 2)
+                throw new RuntimeException("Modulo expects 2 arguments");
+
+            Type t = args[0].GetType();
+            Type t2 = args[1].GetType();
+            if (t2 != t)
+                throw new RuntimeException("types must be the same in Mod");
+
+            if (t == typeof(RacketInt))
+            {
+                return new ObjBox(new RacketInt(args[0].getValue() % args[1].getValue()), typeof(RacketInt));
+            }
+            else if (t == typeof(RacketFloat))
+            {
+                return new ObjBox(new RacketFloat(args[0].getValue() % args[1].getValue()), typeof(RacketFloat));
+            }
+            else if (t == typeof(RacketComplex))
+            {
+                return new ObjBox(new RacketComplex(args[0].getValue() % args[1].getValue()), typeof(RacketComplex));
+            }
+            else
+                throw new RuntimeException("do numt understand RacketNum type in subtraction");
+        }
+
+        public static ObjBox LessThan(List<RacketNum> args)
+        {
+            if (args.Count < 2)
+                throw new RuntimeException("< expects at least 2 arguments");
+
+            Type t = args[0].GetType();
+            var min = args[0].getValue();
+            Boolean tru = new Boolean();
+            tru = false;
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in < must be of same type");
+                if (num.getValue() <= min)
+                    return new ObjBox(tru, typeof(Boolean));
+                min = num.getValue();
+            }
+            tru = true;
+            return new ObjBox(tru, typeof(Boolean));
+        }
+
+        public static ObjBox LessThanEqual(List<RacketNum> args)
+        {
+            if (args.Count < 2)
+                throw new RuntimeException("<= expects at least 2 arguments");
+
+            Type t = args[0].GetType();
+            var min = args[0].getValue();
+            Boolean tru = new Boolean();
+            tru = false;
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in <= must be of same type");
+                if (num.getValue() < min)
+                    return new ObjBox(tru, typeof(Boolean));
+                min = num.getValue();
+            }
+            tru = true;
+            return new ObjBox(tru, typeof(Boolean));
+        }
+
+        public static ObjBox GreaterThan(List<RacketNum> args)
+        {
+            if (args.Count < 2)
+                throw new RuntimeException("> expects at least 2 arguments");
+
+            Type t = args[0].GetType();
+            var max = args[0].getValue();
+            Boolean tru = new Boolean();
+            tru = false;
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in > must be of same type");
+                if (num.getValue() >= max)
+                    return new ObjBox(tru, typeof(Boolean));
+                max = num.getValue();
+            }
+            tru = true;
+            return new ObjBox(tru, typeof(Boolean));
+        }
+
+        public static ObjBox GreaterThanEqual(List<RacketNum> args)
+        {
+            if (args.Count < 2)
+                throw new RuntimeException(">= expects at least 2 arguments");
+
+            Type t = args[0].GetType();
+            var max= args[0].getValue();
+            Boolean tru = new Boolean();
+            tru = false;
+            for (int i = 0; i < args.Count; i++)
+            {
+                RacketNum num = args[i];
+                if (num.GetType() != t)
+                    throw new RuntimeException("all numbers in >= must be of same type");
+                if (num.getValue() > max)
+                    return new ObjBox(tru, typeof(Boolean));
+                max = num.getValue();
+            }
+            tru = true;
+            return new ObjBox(tru, typeof(Boolean));
+        }
+
         public static ObjBox Map(FunctionHolder function, List<RacketPair> lists)
         {
             List<ObjBox> returnedValues = new List<ObjBox>();
@@ -46,6 +296,7 @@ namespace CompilerLib
 
     public interface RacketNum
     {
+        dynamic getValue();
         ObjBox Plus(RacketNum other);
         ObjBox Sub(RacketNum other);
         ObjBox Mult(RacketNum other);
@@ -60,11 +311,16 @@ namespace CompilerLib
 
     public class RacketInt : RacketNum
     {
-        public int value { private set;  get; }
+        public int value { private set; get; }
 
         public RacketInt(int _value)
         {
             value = _value;
+        }
+
+        public dynamic getValue()
+        {
+            return value;
         }
 
         public override bool Equals(object obj)
@@ -217,6 +473,11 @@ namespace CompilerLib
             value = _value;
         }
 
+        public dynamic getValue()
+        {
+            return value;
+        }
+
         public static implicit operator Double(RacketFloat m)
         {
             return m.value;
@@ -365,6 +626,11 @@ namespace CompilerLib
         public RacketComplex(Complex _value)
         {
             value = _value;
+        }
+
+        public dynamic getValue()
+        {
+            return value;
         }
 
         public static implicit operator Complex(RacketComplex m)
