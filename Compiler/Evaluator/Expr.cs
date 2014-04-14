@@ -39,7 +39,8 @@ namespace Evaluator
             BoolExpr boolcast;
             for (int i = 0; i < args.Count; i++)
             {
-                ret = args[i].eval(env);
+                Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+                ret = args[i].eval(copy);
                 if (ret.GetType() == typeof(BoolExpr))
                 {
                     boolcast = (BoolExpr)ret;
@@ -65,7 +66,8 @@ namespace Evaluator
             BoolExpr boolcast;
             for (int i = 0; i < args.Count; i++)
             {
-                eval_res = args[i].eval(env);
+                Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+                eval_res = args[i].eval(copy);
                 if (eval_res.GetType() == typeof(BoolExpr))
                 {
                     boolcast = (BoolExpr)eval_res;
@@ -92,14 +94,16 @@ namespace Evaluator
 
         public dynamic eval(Dictionary<string,Expr> env)
         {
-            Expr res = cond.eval(env);
+            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+            Dictionary<string, Expr> copy2 = new Dictionary<string, Expr>(env);
+            Expr res = cond.eval(copy);
             if (res.GetType() == typeof(BoolExpr))
             {
                 BoolExpr bool_res = (BoolExpr)res;
                 if (!bool_res.getValue()) // evaluate else_
-                    return else_.eval(env);
+                    return else_.eval(copy2);
             }
-            return then.eval(env);
+            return then.eval(copy2);
         }
 
         public override string ToString()
@@ -198,7 +202,7 @@ namespace Evaluator
 
         public dynamic eval(Dictionary<string, Expr> env)
         {
-            return env;
+            return this.env;
         }
 
         override public string ToString()
@@ -218,7 +222,8 @@ namespace Evaluator
 
         public dynamic eval(Dictionary<string, Expr> env)
         {
-            return new PrimClosExpr(primitive, env);
+            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+            return new PrimClosExpr(primitive, copy);
             /*
             if (BuiltIn.Lookup(primitive))
                 return new PrimClosExpr(primitive, env);
@@ -326,7 +331,7 @@ namespace Evaluator
 
         public ClosExpr(List<string> args, List<Expr> body, Dictionary<string,Expr> env)
         {
-            this.env = env;
+            this.env = new Dictionary<string, Expr>(env);
             this.args = args;
             this.body = body;
         }
@@ -352,9 +357,10 @@ namespace Evaluator
             dynamic ret = null;
             for(int j = 0; j < body_len; j ++)
             {
-                ret = body[j].eval(env);
+                Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+                ret = body[j].eval(copy);
                 if (ret.GetType() == typeof(EnvExpr))
-                    env = ret.eval(env);
+                    env = ret.eval(copy);
 
             }
             return ret;
@@ -405,10 +411,11 @@ namespace Evaluator
          */
         public dynamic eval(Dictionary<string, Expr> env)
         {
-            if (env.ContainsKey(id))
-                env.Remove(id);
-            env.Add(id, exp);
-            return new EnvExpr(env);
+            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+            if (copy.ContainsKey(id))
+                copy.Remove(id);
+            copy.Add(id, exp);
+            return new EnvExpr(copy);
         }
 
         override public string ToString()
@@ -432,11 +439,13 @@ namespace Evaluator
 
         public dynamic eval(Dictionary<string,Expr> env)
         {
-            if (env.ContainsKey(name)) // should i allow 
-                env.Remove(name);
-            ClosExpr value = new ClosExpr(args, body, env);
-            env.Add(name, value);
-            return new EnvExpr(env);
+            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
+            if (copy.ContainsKey(name)) // should i allow 
+                copy.Remove(name);
+            ClosExpr value = new ClosExpr(args, body, copy);
+            Dictionary<string, Expr> copy2 = new Dictionary<string, Expr>(env);
+            copy2.Add(name, value);
+            return new EnvExpr(copy2);
         }
 
         override public string ToString()
@@ -456,7 +465,7 @@ namespace Evaluator
         {
             this.app = app;
             this.parameters = parameters;
-            this.env = env;
+            this.env = new Dictionary<string,Expr>(env);
         }
 
         public override string ToString()
