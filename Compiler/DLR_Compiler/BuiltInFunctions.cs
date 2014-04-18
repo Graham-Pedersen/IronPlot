@@ -16,15 +16,13 @@ namespace DLR_Compiler
             
             List<ParameterExpression> paramList = new List<ParameterExpression>();
             paramList.Add(Expression.Variable(typeof(ObjBox)));
-           paramList.Add(Expression.Variable(typeof(ObjBox))); 
 
             List<Expression> body = new List<Expression>();
 
             //unbox types
-           Expression lhs = unboxValue(paramList[0], typeof(RacketNum));
-           Expression rhs = unboxValue(paramList[1], typeof(RacketNum));
+           Expression numList = unboxValue(paramList[0], typeof(List<RacketNum>)); 
 
-            Expression result = Expression.Call(lhs, typeof(RacketNum).GetMethod("Plus"), new Expression[] { rhs }); // pass in some sort of list but not sure how
+            Expression result = Expression.Call(null, typeof(FunctionLib).GetMethod("Plus"), new Expression[] { numList }); // pass in some sort of list but not sure how
 
             body.Add(result);
 

@@ -990,21 +990,30 @@ namespace DLR_Compiler
             List<Expression> invokeLamb = new List<Expression>();
 
             //Statement to make a List
-            Expression newObjList = Expression.New(typeof(List<Object>).GetConstructor(new Type[] {}));
-            ParameterExpression objList = Expression.Variable(typeof(List<Object>), "argList");
+            Expression newObjList = Expression.New(typeof(List<List<ObjBox>>).GetConstructor(new Type[] {}));
+            ParameterExpression objList = Expression.Variable(typeof(List<List<ObjBox>>), "argList");
             Expression assignExpr = Expression.Assign(objList, newObjList);
+            Expression args = Expression.New(typeof(List<ObjBox>).GetConstructor(new Type[] {}));
+            ParameterExpression argslist = Expression.Variable(typeof(List<ObjBox>), "paramList");
+            Expression assignExpr2 = Expression.Assign(argslist, args);
 
             invokeLamb.Add(objList);
             invokeLamb.Add(assignExpr);
+            invokeLamb.Add(argslist);
+            invokeLamb.Add(assignExpr2);
             
             // add each matched argument into our list of arguments
             for (int i = 1; i < tree.values.Count; i++)
             {
                  invokeLamb.Add(Expression.Call(
-                    objList,
-                    typeof(List<Object>).GetMethod("Add", new Type[] { typeof(Object) }),
-                    Expression.Convert(matchExpression(tree.values[i], env), typeof(Object))));
+                    argslist,
+                    typeof(List<ObjBox>).GetMethod("Add", new Type[] { typeof(ObjBox) }),
+                    matchExpression(tree.values[i], env)));
             }
+            invokeLamb.Add(Expression.Call(
+                   objList,
+                   typeof(List<List<ObjBox>>).GetMethod("Add", new Type[] { typeof(List<ObjBox>) }),
+                  argslist));
 
             Expression getFunction = unboxValue(matchExpression(tree.values[0], env), typeof(FunctionHolder));
   
@@ -1015,7 +1024,7 @@ namespace DLR_Compiler
 
             invokeLamb.Add(invoke);
 
-            return Expression.Block(new ParameterExpression[] {objList}, invokeLamb);
+            return Expression.Block(new ParameterExpression[] {objList, argslist}, invokeLamb);
         }
 
 
