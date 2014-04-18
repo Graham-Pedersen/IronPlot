@@ -414,7 +414,10 @@ namespace Evaluator
             Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
             if (copy.ContainsKey(id))
                 copy.Remove(id);
-            copy.Add(id, exp);
+            if (exp.GetType() == typeof(LamExpr))
+                copy.Add(id, exp.eval(env));
+            else
+                copy.Add(id, exp);
             return new EnvExpr(copy);
         }
 
