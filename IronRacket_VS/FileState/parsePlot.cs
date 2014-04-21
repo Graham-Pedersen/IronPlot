@@ -72,7 +72,9 @@ namespace IRLanguage.FileState
         {
             int left = 0;
             int start_index = 0;
-            while (text[start_index] != '(' && start_index + 1 < text.Length && text[start_index + 1] != 'd')
+            bool test = true;
+
+            while (text[start_index] != '(' && start_index + 2 < text.Length && (text[start_index + 1] != 'd' || text[start_index+2] !='e'))
             { 
                 start_index++;
             }
@@ -83,12 +85,13 @@ namespace IRLanguage.FileState
                 if (text[start_index] == '(')
                 {
                     left++;
+                    test = false;
                 }
                 else if (text[start_index] == ')')
                 {
                     left--;
                 }
-                if (left == 0)
+                if (left == 0 && !test)
                 {
                     break;
                 }

@@ -728,16 +728,29 @@ namespace DLR_Compiler
                 return createRuntimeException("wrong number of arguments passed to null? procedure");
             }
 
-            ParameterExpression result = Expression.Parameter(typeof(ObjBox));
 
-            Expression rhs = matchExpression(list.values[1], env);
-            Expression type = Expression.Call(rhs, typeof(ObjBox).GetMethod("getType"));
-            Expression voidType = Expression.Call(null, typeof(TypeUtils).GetMethod("voidType"));
-            
-            Expression test = Expression.Call(voidType, typeof(Type).GetMethod("Equals", new Type[] { typeof(Type) }), type);
+            // the object we are testing is null
+            Expression obj = matchExpression(list.values[1], env);
+
+            //the result that we will assign the result too
+            ParameterExpression result = Expression.Variable(typeof(Boolean));
+
+            //what our ifThenElse expression will branch on
+            Expression getType = Expression.Call(obj, typeof(ObjBox).GetMethod("getType"));
+            Expression test = Expression.Call(getType, typeof(Type).GetMethod("Equals", new Type[] { typeof(Type) }), Expression.Constant(typeof(RacketPair), typeof(Type)));
+
+            Expression isNullCall = Expression.Call(unboxValue(obj, typeof(RacketPair)), typeof(RacketPair).GetMethod("isNull", new Type[] { }));
+            Expression trueBranch = Expression.Assign(result, isNullCall);
+
+            Expression falseBranch = Expression.Assign(result, Expression.Constant(false));
+
+            Expression ifExpr = Expression.IfThenElse(test, trueBranch, falseBranch);
+
 
             Expression boolType = Expression.Call(null, typeof(TypeUtils).GetMethod("boolType"));
-            return wrapInObjBox(test, boolType);
+            Expression wrapResult = wrapInObjBox(result, boolType);
+
+            return Expression.Block(new ParameterExpression[] { result }, new Expression[] { ifExpr, wrapResult });
         }
 
         private static Expression nullList(Expression env)
@@ -865,16 +878,16 @@ namespace DLR_Compiler
 
         private static Expression beginExpr(ListNode list, Expression env)
         {
-            if (list.values.Count < 2)
-            {
-                return createRuntimeException("wrong number of arguments passed to begin procedure");
-            }
-
             List<Expression> body = new List<Expression>();
 
             for (int i = 1; i < list.values.Count; i++)
             {
                 body.Add(matchExpression(list.values[i], env));
+            }
+
+            if (body.Count == 0)
+            {
+                body.Add(voidSingleton);
             }
 
             return Expression.Block(new ParameterExpression[] { }, body);
@@ -949,7 +962,7 @@ namespace DLR_Compiler
 
             // 1. function is user defined
             // 2. function is built in
-            // 3. function is a lambda
+            // 3. function is a lambda  
 
             Node function = list.values[1];
             Expression fun;

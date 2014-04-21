@@ -220,7 +220,7 @@
                                 line = line.Substring(location);
                                 break;
                             }
-                            char trig = findNextTrigger(line.Substring(location+1), ref location2);
+                            char trig = findNextTrigger(line.Substring(location+1), ref location2); 
                             string type="";
                             string input = line.Substring(location+1, location2);
                             curLoc += location;

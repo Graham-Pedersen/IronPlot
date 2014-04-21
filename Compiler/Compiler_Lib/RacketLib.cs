@@ -16,15 +16,9 @@ namespace CompilerLib
                 return new ObjBox(list, typeof(RacketPair));
 
             RacketPair accu = new RacketPair(list.car(), 
-                new ObjBox(new voidObj(), typeof(voidObj)));
-            if (list.cdr().getType() == typeof(voidObj))
-            {
-                restNull = true;
-            }
-            else
-            {
+                new ObjBox(new RacketPair(), typeof(RacketPair)));
+
                 list = (RacketPair)list.cdr().getObj();
-            }
             
             while (!list.isNull())
             {
@@ -95,15 +89,14 @@ namespace CompilerLib
 
                     args.Add(lists[i].car());
                     ObjBox rest = lists[i].cdr();
-
+                    /*
                     if (rest.getType() == typeof(voidObj))
                     {
                         restNull = true;
                     }
                     else
-                    {
+                    { */
                         lists[i] = (RacketPair)rest.getObj();
-                    }
                 }
                 args.Add(init);
                 init = function.invoke(args); // should be okay if making copies

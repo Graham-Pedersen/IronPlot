@@ -1,17 +1,28 @@
 ﻿<Project DefaultTargets="CompileTarget" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Build</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Compile</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>6CAFC0C6-A428-4d30-A9F9-700E829FEA51</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>IronRacketApplication</RootNamespace>
     <AssemblyName>IronRacketApplication</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Build' ">
+  <PropertyGroup Condition=" '$(Configuration)' == 'compile' ">
     <DebugSymbols>false</DebugSymbols>
-    <OutputPath>bin\Build\</OutputPath>
+    <OutputPath></OutputPath>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'dll' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath></OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'run' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath></OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  
   <ItemGroup>
     <Compile Include="Racket.plot">
       <SubType>Code</SubType>
@@ -25,13 +36,14 @@
   <Target Name="Build" DependsOnTargets="Hello">
   </Target>
 
-  <UsingTask AssemblyFile="C:\Users\graha_000\Programing\IronPlot\IronRacket_VS\DS_DLR_Int\bin\Debug\ClassLibrary1.dll"
+  <UsingTask AssemblyFile="C:\Users\Scott\Documents\Compiler\IronPlot\IronRacket_VS\DS_DLR_Int\bin\Debug\ClassLibrary1.dll"
              TaskName="CompileTarget"/>
   
   <Target Name="CompileTarget">
     <Message Text="Building Your IronRacket Project" Importance="high"/>
-    <CompileTarget 
+    <CompileTarget
        SourceFiles="$(MSBuildProjectDirectory)\@(Compile)"
+       CompiliationType="$(Configuration)"
        />
   </Target>
   

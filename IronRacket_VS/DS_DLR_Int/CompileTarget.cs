@@ -11,16 +11,30 @@ namespace DS_DLR_Int
     public class CompileTarget : Microsoft.Build.Utilities.Task
     {
 
-        private string SourceFile;
+        private string SourceFile = string.Empty;
+        private string comptype;
+
+
         public override bool Execute()
        {
-            CallCompiler c = new CallCompiler(SourceFile); 
+            CallCompiler c = new CallCompiler(SourceFile,comptype);
+            if (c.failed)
+            {
+                this.Log.LogError("Compilation failed for filename " + c.filename);
+                this.Log.LogError(c.output);
+                return false;
+            }
             return true;
         }
         public string SourceFiles
         {
             get { return SourceFiles; }
             set { SourceFile = value; }
+        }
+        public string CompiliationType
+        {
+            get { return comptype; }
+            set { comptype = value; }
         }
     }
 }

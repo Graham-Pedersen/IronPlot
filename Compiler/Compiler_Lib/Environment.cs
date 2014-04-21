@@ -81,7 +81,19 @@ namespace CompilerLib
 
         public void set(String name, ObjBox newValue)
         {
-            env[name] = newValue;
+            if (env.ContainsKey(name))
+            {
+                env[name] = newValue;
+            }
+            else
+            {
+                if (parent == null)
+                {
+                    throw new RuntimeException("variable reference to unscoped variable: " + name.ToString());
+                }
+                parent.set(name, newValue);
+            }
+            
         }
     }
 
