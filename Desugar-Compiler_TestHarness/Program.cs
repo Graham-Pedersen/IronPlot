@@ -24,14 +24,13 @@ namespace Desugar_Compiler_TestHarness
                 Process Compile = Process.Start(comp);
                 StreamReader sr = Compile.StandardOutput;
                 StreamReader sr2 = Compile.StandardError;
-                    string output = sr.ReadToEnd();
+                string output = sr.ReadToEnd();
                 string output2 = sr2.ReadToEnd();
                 if (output2 != String.Empty)
                 {
                     Console.WriteLine("!!!!!!!! FAILED TEST !!!!!!!!!!!");
                     Console.WriteLine("For InputFile " + inputfile + " The compiler has output on STDERR:");
                     Console.WriteLine(output2);
-                    
                 }
                 Compile.WaitForExit();
                 Compile.Close();

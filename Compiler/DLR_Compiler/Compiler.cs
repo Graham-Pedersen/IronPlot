@@ -18,23 +18,15 @@ using CompilerLib;
 
 namespace DLR_Compiler
 {
-   public class DLR_Compiler
+   public class Compiler
     {
         static ParameterExpression voidSingleton;
         static Boolean isDll;
-        public static void Main(string[] args)
+        public static void compile(String filename, String mode, String outputName )
         {
             isDll = false;
-            if (args.Length != 3)
-            {
-                throw new Exception("Compiler called with incorrect number of arguments!");
-            }
             //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
-            string filename = args[0];
             //Console.WriteLine("Compiling file " + filename);
-
-            string mode = args[1];
-            string outputName = args[2];
 
             // make a new simple scheme parser
             SchemeParser ssp = new SchemeParser(filename);
