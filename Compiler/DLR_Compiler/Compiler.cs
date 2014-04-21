@@ -14,6 +14,7 @@ using System.Reflection.Emit;
 using System.Resources;
 using System.Numerics;
 using CompilerLib;
+using System.Diagnostics;
 
 
 namespace DLR_Compiler
@@ -44,11 +45,11 @@ namespace DLR_Compiler
             }
             if (mode == "compile")
             {
-                createExe(topLevelForms, true, outputName);
+                createExe(topLevelForms, false, outputName);
             }
             else
             {
-                createExe(topLevelForms, false, null);
+                createExe(topLevelForms, true, outputName);
             }
         }
 
@@ -116,8 +117,12 @@ namespace DLR_Compiler
             
             if(run)
             {
-                //Compile and invoke the program in this context
-                Expression.Lambda<Action>(code).Compile()();
+                ProcessStartInfo comp = new ProcessStartInfo(outputName + ".exe");
+                comp.UseShellExecute = false;
+                comp.CreateNoWindow = false;
+                Process Compile = Process.Start(comp);
+                Compile.WaitForExit();
+                Compile.Close();
             }
         }
 
