@@ -9,15 +9,12 @@ namespace IRLanguage.ParenMatch
     [Name("bracematch")]
     [Order(After = "default")]
     [UserVisible(true)]
-    public class NoteFormatDefinition : MarkerFormatDefinition
+    public class ParenMatchDef : MarkerFormatDefinition
     {
         #region Constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NoteFormatDefinition"/> class.
-        /// </summary>
-        public NoteFormatDefinition()
+        public ParenMatchDef()
         {
-            //Set the visual properties of text tagged with the NoteTag.
+         
             this.BackgroundColor = Colors.Black;
             this.ForegroundColor = Colors.Blue;
             this.Border = new Pen(new SolidColorBrush(Colors.Red), 2.0);

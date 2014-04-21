@@ -24,7 +24,6 @@ namespace _2048GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Console.WriteLine("TEST");
             this.BringToFront();
             this.Focus();
             this.KeyPreview = true;

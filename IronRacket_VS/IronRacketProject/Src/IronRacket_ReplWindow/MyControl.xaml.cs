@@ -40,6 +40,7 @@ namespace None.IronRacket_ReplWindow
             // Add initial content to the RichTextBox.
             Repl.Document = myFlowDoc;
             Repl.AppendText("> ");
+            Repl.CaretPosition = Repl.CaretPosition.DocumentEnd;
         }
 
 

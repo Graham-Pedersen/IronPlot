@@ -1,4 +1,3 @@
-#:lang dll
 
 (define (create_new_board c1 c2 c3 c4) 
 	(list c1 c2 c3 c4))
@@ -9,7 +8,6 @@
 						(list 0 0 0 0) 
 						(list 0 0 0 0) 
 						(list 0 0 0 0)))
-
 
 (define (place_in_row num y board j)
 	(cond 
@@ -33,7 +31,7 @@
 		continue 
 		(begin
 			(define r (new System.Random))
-			(define x (call r Next 0 4))
+			(define x (call r Next 0 4)) 
 			(define y (call r Next 0 4))
 			(cond 
 				[(equal? 0 (get_val (cons x y) board 0)) 
@@ -42,7 +40,6 @@
 						(set! return (place_at_i_j num (cons x y) board 0 0)))])))
 						
 						return)
-
 
 (define (PlaceAndSelectRandomNum board)
 	(define r (new System.Random))
@@ -91,10 +88,7 @@
 	    				
 
 (define (row_right list_row)
-	
-	(displayln list_row)
 	(set! list_row (shuffle_right list_row))
-	(displayln list_row)
 	(define f (car list_row))
 	(define s (car (cdr list_row)))
 	(define thrd (car (cdr (cdr list_row))))
@@ -157,16 +151,6 @@
                                 temp_list2)]))
 
 
-(define (move_board_down_helper board)
-	(set! board (move_board_down board))
-	(PlaceAndSelectRandomNum board))
-
-
-
-
-
-
-
 (define (move_board_up board)
   (cond 
 		[(equal? board '(() () () ())) board]
@@ -200,12 +184,6 @@
 					(cons fth (car(cdr (cdr (cdr temp_list)))))))
                                 temp_list2)]))
 
-(define (move_board_up_helper board)
-	(set! board (move_board_up board))
-	(PlaceAndSelectRandomNum board))
-
-
-
 
 (define (get_val_from_row board y temp)
   (cond 
@@ -220,6 +198,23 @@
     [else (get_val ij (cdr board) (+ i 1))]))
 
 
+(define (rows_equal r1 r2)
+	(cond
+		[(null? r1) #t]
+		[(equal? (car r1) (car r2))  (rows_equal (cdr r1) (cdr r2))]
+		[else           #f]))
+
+
+
+(define (board_eq b1 b2)
+	(cond 
+		[(null? b1) #t]
+		[else (and (rows_equal (car b1) (car b2)) 
+					(board_eq (cdr b1) (cdr b2)))]))
+
+	
+
+
 (define (init_board)
 	(define board (create_empty_board))
 	(set! board (place_randomly board 2))
@@ -227,12 +222,35 @@
 	
 
 (define (move_board_left_helper board)
+	(define temp_board board)
 	(set! board (move_board_left board))
-	(PlaceAndSelectRandomNum board))
+	(cond
+		[(board_eq temp_board board) board]
+		[else (PlaceAndSelectRandomNum board)]))
+
 
 (define (move_board_right_helper board)
+	(define temp_board board)
 	(set! board (move_board_right board))
-	(PlaceAndSelectRandomNum board))
+	(cond 
+		[(board_eq temp_board board) board]
+		[else (PlaceAndSelectRandomNum board)]))
+
+(define (move_board_up_helper board)
+	(define temp_board board)
+	(set! board (move_board_up board))
+	(cond
+		[(board_eq temp_board board) board]
+		[else (PlaceAndSelectRandomNum board)]))
+
+
+(define (move_board_down_helper board)
+	(define temp_board board)
+	(set! board (move_board_down board))
+	(cond
+		[(board_eq temp_board board) board]
+		[else (PlaceAndSelectRandomNum board)]))
+
 
 
 (define (debug_display list)
@@ -242,5 +260,5 @@
   (displayln (car (cdr (cdr (cdr list)))))
   (displayln '()))
 
-
-
+(define x (create_empty_board))
+(scall System.Console ReadKey)

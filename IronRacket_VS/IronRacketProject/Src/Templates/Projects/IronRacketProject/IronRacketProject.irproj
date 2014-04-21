@@ -41,7 +41,7 @@
   
   <Target Name="CompileTarget">
     <Message Text="Building Your IronRacket Project" Importance="high"/>
-    <CompileTarget 
+    <CompileTarget
        SourceFiles="$(MSBuildProjectDirectory)\@(Compile)"
        CompiliationType="$(Configuration)"
        />

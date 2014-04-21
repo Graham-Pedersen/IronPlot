@@ -71,7 +71,7 @@ namespace IRLanguage.ParenMatch
         {
             Contract.Requires(aggregator != null);
 
-            // TODO: handle affinity
+
             SnapshotSpan span = new SnapshotSpan(point, 1);
 
             var classifications = aggregator.GetClassificationSpans(span);
@@ -134,7 +134,7 @@ namespace IRLanguage.ParenMatch
                             return true;
                         }
                     }
-                    // TODO: is this the correct affinity
+
                     else if (currentChar == open && !IsInCommentOrLiteral(aggregator, new SnapshotPoint(start.Snapshot, offset + line.Start.Position), PositionAffinity.Successor))
                     {
                         openCount++;
@@ -143,7 +143,7 @@ namespace IRLanguage.ParenMatch
                     offset++;
                 }
 
-                // move on to the next line
+    
                 lineNumber++;
                 if (lineNumber > stopLineNumber)
                     break;
@@ -183,7 +183,6 @@ namespace IRLanguage.ParenMatch
                 while (offset >= 0)
                 {
                     char currentChar = lineText[offset];
-                    // TODO: is this the correct affinity
                     if (currentChar == open && !IsInCommentOrLiteral(aggregator, new SnapshotPoint(start.Snapshot, offset + line.Start.Position), PositionAffinity.Successor))
                     {
                         if (closeCount > 0)
@@ -196,7 +195,6 @@ namespace IRLanguage.ParenMatch
                             return true;
                         }
                     }
-                    // TODO: is this the correct affinity
                     else if (currentChar == close && !IsInCommentOrLiteral(aggregator, new SnapshotPoint(start.Snapshot, offset + line.Start.Position), PositionAffinity.Successor))
                     {
                         closeCount++;
