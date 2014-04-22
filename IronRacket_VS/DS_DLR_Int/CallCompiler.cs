@@ -53,15 +53,14 @@ namespace DS_DLR_Int
                 }
                 System.IO.File.Copy(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\Compiler_Lib\bin\Debug\Compiler_Lib.dll", directory + @"\Compiler_Lib.dll");
 
-
             }
-         
-
        
 
         private static void Runcompiler(string inputfile, string output_name)
         {
-            ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1} {2}", inputfile, comptype, output_name));
+            DLR_Compiler.Compiler.compile(inputfile, comptype, output_name);
+            /*
+             ProcessStartInfo comp = new ProcessStartInfo(@"C:\Users\Scott\Documents\Compiler\IronPlot\Compiler\DLR_Compiler\bin\Debug\DLR_Compiler.exe", String.Format("\"{0}\" {1} {2}", inputfile, comptype, output_name));
             comp.UseShellExecute = true;
             comp.CreateNoWindow = false;
             try
@@ -72,9 +71,11 @@ namespace DS_DLR_Int
             }
             catch (Exception e)
             {
-
+                ; //TODO catch error
             }
-        }    
+             */
+
+        }
 
         private static Result RunDesugar(string inputfile,string tempfile)
         {
@@ -116,7 +117,6 @@ namespace DS_DLR_Int
                     R.failed = false;
                     R.output = string.Empty;
                 }
-              
             }
             return R;
 

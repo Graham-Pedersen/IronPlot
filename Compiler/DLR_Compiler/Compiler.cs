@@ -18,23 +18,15 @@ using CompilerLib;
 
 namespace DLR_Compiler
 {
-   public class DLR_Compiler
+   public class Compiler
     {
         static ParameterExpression voidSingleton;
         static Boolean isDll;
-        public static void Main(string[] args)
+        public static void compile(String filename, String mode, String outputName )
         {
             isDll = false;
-            if (args.Length != 3)
-            {
-                throw new Exception("Compiler called with incorrect number of arguments!");
-            }
             //string filename = @"C:\Users\graha_000\Programing\IronPlot\test\12.plot";
-            string filename = args[0];
             //Console.WriteLine("Compiling file " + filename);
-
-            string mode = args[1];
-            string outputName = args[2];
 
             // make a new simple scheme parser
             SchemeParser ssp = new SchemeParser(filename);
@@ -60,7 +52,7 @@ namespace DLR_Compiler
             }
         }
 
-        static void createExe(ListNode parseTree, Boolean compile, String outputName)
+        static void createExe(ListNode parseTree, Boolean run, String outputName)
         {
             //Body of the program
             List<Expression> program = new List<Expression>();
@@ -107,24 +99,22 @@ namespace DLR_Compiler
             //turn our program body into a expression block
             Expression code = Expression.Block(new ParameterExpression[] { env, voidSingleton}, program);
            
-            if (compile)
-            {
-                //create and output an assembly
-                var asmName = new AssemblyName(outputName);
-                var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
-                    (asmName, AssemblyBuilderAccess.RunAndSave);
-                var moduleBuilder = asmBuilder.DefineDynamicModule(outputName + "Module", outputName + ".exe");
-                var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
-                var methodBuilder = typeBuilder.DefineMethod("Main",
-                    MethodAttributes.Static, typeof(void), new[] { typeof(string) });
+            //create and output an assembly
+            var asmName = new AssemblyName(outputName);
+            var asmBuilder = AssemblyBuilder.DefineDynamicAssembly
+                (asmName, AssemblyBuilderAccess.RunAndSave);
+            var moduleBuilder = asmBuilder.DefineDynamicModule(outputName + "Module", outputName + ".exe");
+            var typeBuilder = moduleBuilder.DefineType("Program", TypeAttributes.Public);
+            var methodBuilder = typeBuilder.DefineMethod("Main",
+                MethodAttributes.Static, typeof(void), new[] { typeof(string) });
 
-                Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
+            Expression.Lambda<Action>(code).CompileToMethod(methodBuilder);
 
-                typeBuilder.CreateType();
-                asmBuilder.SetEntryPoint(methodBuilder);
-                asmBuilder.Save(outputName + ".exe");
-            }
-            else
+            typeBuilder.CreateType();
+            asmBuilder.SetEntryPoint(methodBuilder);
+            asmBuilder.Save(outputName + ".exe");
+            
+            if(run)
             {
                 //Compile and invoke the program in this context
                 Expression.Lambda<Action>(code).Compile()();
