@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler_Lib", "..\Compiler
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desugar-Compiler_TestHarness", "..\Desugar-Compiler_TestHarness\Desugar-Compiler_TestHarness.csproj", "{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronRacket_ReplWindow", "IronRacketProject\Src\IronRacket_ReplWindow\IronRacket_ReplWindow.csproj", "{734CA12D-8407-401B-BF1A-675A69CDD923}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Evaluator", "..\Compiler\Evaluator\Evaluator.csproj", "{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +53,14 @@ Global
 		{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AD508C8-0CF2-4F45-900C-2F5B526DD6C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{734CA12D-8407-401B-BF1A-675A69CDD923}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{734CA12D-8407-401B-BF1A-675A69CDD923}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{734CA12D-8407-401B-BF1A-675A69CDD923}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{734CA12D-8407-401B-BF1A-675A69CDD923}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFF00EEC-D2FC-4590-9551-F8A4EEC3095B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
