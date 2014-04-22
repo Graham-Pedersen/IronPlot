@@ -6,6 +6,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>IronRacketApplication</RootNamespace>
     <AssemblyName>IronRacketApplication</AssemblyName>
+    
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'compile' ">
     <DebugSymbols>false</DebugSymbols>
@@ -28,7 +29,8 @@
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
-
+  <Target Name="ResolveAssemblyReferences"/>
+  <Target Name="GetFrameWorkPaths"/>
   
   <Target Name="Hello">
     <Message Text="Hello MSBuild" Importance="high"/>
@@ -36,6 +38,8 @@
   <Target Name="Build" DependsOnTargets="Hello">
   </Target>
 
+
+  
   <UsingTask AssemblyFile="C:\Users\Scott\Documents\Compiler\IronPlot\IronRacket_VS\DS_DLR_Int\bin\Debug\ClassLibrary1.dll"
              TaskName="CompileTarget"/>
   
