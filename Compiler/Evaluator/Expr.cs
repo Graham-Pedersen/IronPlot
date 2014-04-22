@@ -15,7 +15,7 @@ namespace Evaluator
             this.val = str;
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+        public dynamic eval(Dictionary<string,Expr> env)
         {
             return this;
         }
@@ -25,6 +25,7 @@ namespace Evaluator
             return val;
         }
     }
+
     public class AndExpr : Expr
     {
         List<Expr> args;
@@ -39,8 +40,7 @@ namespace Evaluator
             BoolExpr boolcast;
             for (int i = 0; i < args.Count; i++)
             {
-                Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
-                ret = args[i].eval(copy);
+                ret = args[i].eval(env);
                 if (ret.GetType() == typeof(BoolExpr))
                 {
                     boolcast = (BoolExpr)ret;
@@ -66,25 +66,28 @@ namespace Evaluator
             BoolExpr boolcast;
             for (int i = 0; i < args.Count; i++)
             {
-                Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
-                eval_res = args[i].eval(copy);
+                eval_res = args[i].eval(env);
                 if (eval_res.GetType() == typeof(BoolExpr))
                 {
                     boolcast = (BoolExpr)eval_res;
                     if (!boolcast.getValue())
                         continue;
+                    else
+                        return new BoolExpr(true);
                 }
                 else
                     return eval_res;
             }
-            return false;
+            return new BoolExpr(false); // changed this jsut now
         }
     }
+
     public class IfExpr : Expr
     {
         Expr cond;
         Expr then;
         Expr else_;
+
         public IfExpr(Expr cond, Expr then, Expr else_)
         {
             this.cond = cond;
@@ -92,18 +95,28 @@ namespace Evaluator
             this.else_ = else_;
         }
 
-        public dynamic eval(Dictionary<string,Expr> env)
+        public dynamic eval(Dictionary<string, Expr> env)
         {
-            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
-            Dictionary<string, Expr> copy2 = new Dictionary<string, Expr>(env);
-            Expr res = cond.eval(copy);
+            
+            if(cond.GetType() == typeof(AtomDefExpr) || cond.GetType() == typeof(FuncDefExpr)
+                || then.GetType() == typeof(AtomDefExpr) || then.GetType() == typeof(FuncDefExpr)
+                || else_.GetType() == typeof(AtomDefExpr) || else_.GetType() == typeof(FuncDefExpr))
+                throw new EvaluatorException("define: not allowed in an expression context");
+
+            Expr res = cond.eval(env);
+
             if (res.GetType() == typeof(BoolExpr))
             {
                 BoolExpr bool_res = (BoolExpr)res;
                 if (!bool_res.getValue()) // evaluate else_
-                    return else_.eval(copy2);
+                    return else_.eval(env);
+                else
+                    return then.eval(env);
             }
-            return then.eval(copy2);
+            else if(res.GetType() == typeof(EnvExpr))
+                throw new EvaluatorException("define: not allowed in an expression context");
+
+            return then.eval(env);
         }
 
         public override string ToString()
@@ -111,6 +124,7 @@ namespace Evaluator
             return base.ToString(); // dont know what to print
         }
     }
+
     public class BoolExpr : Expr
     {
         bool val;
@@ -180,7 +194,7 @@ namespace Evaluator
 
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+        public dynamic eval(Dictionary<string,Expr> env)
         {
             return this;
         }
@@ -193,14 +207,14 @@ namespace Evaluator
 
     public class EnvExpr : Expr
     {
-        private Dictionary<string, Expr> env;
+        private Dictionary<string,Expr> env;
 
-        public EnvExpr(Dictionary<string, Expr> env)
+        public EnvExpr(Dictionary<string,Expr> env)
         {
-            this.env = env;
+            this.env = new Dictionary<string, Expr>(env);
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+       public dynamic eval(Dictionary<string,Expr> env)
         {
             return this.env;
         }
@@ -220,15 +234,9 @@ namespace Evaluator
             this.primitive = prim;
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+       public dynamic eval(Dictionary<string,Expr> env)
         {
-            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
-            return new PrimClosExpr(primitive, copy);
-            /*
-            if (BuiltIn.Lookup(primitive))
-                return new PrimClosExpr(primitive, env);
-            else
-                throw new EvaluatorException(String.Format("{0}: undefined", primitive)); */
+            return new PrimClosExpr(primitive, env);
         }
 
         override public string ToString()
@@ -247,7 +255,7 @@ namespace Evaluator
             this.value = val;
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+       public dynamic eval(Dictionary<string,Expr> env)
         {
             return this;
         }
@@ -278,7 +286,9 @@ namespace Evaluator
             // look up in environment?
             // if not in environment throw exception
             if (env.ContainsKey(name))
-                return env[name];//.eval(env);
+            {
+                return env[name];
+            }
             else if (BuiltIn.Lookup(name))
                 return new PrimFuncExpr(name).eval(env);
             else
@@ -297,22 +307,19 @@ namespace Evaluator
     {
         string fun;
         Dictionary<string, Expr> env;
+
         public PrimClosExpr(string fun, Dictionary<string, Expr> env)
         {
             this.fun = fun;
-            this.env = env;
+            this.env = new Dictionary<string, Expr>(env);
         }
 
         public dynamic apply(List<Expr> parameters)
         {
-            /*
-            if(!BuiltIn.Lookup(fun)) // repetitive
-                throw new EvaluatorException(String.Format("{0}: undefined", fun));
-            */
             return BuiltIn.Call(fun, parameters, env);
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+     public dynamic eval(Dictionary<string,Expr> env)
         {
             return new PrimFuncExpr(fun);
         }
@@ -329,14 +336,14 @@ namespace Evaluator
         List<string> args;
         List<Expr> body;
 
-        public ClosExpr(List<string> args, List<Expr> body, Dictionary<string,Expr> env)
+        public ClosExpr(List<string> args, List<Expr> body, Dictionary<string, Expr> env)
         {
             this.env = new Dictionary<string, Expr>(env);
             this.args = args;
             this.body = body;
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+       public dynamic eval(Dictionary<string,Expr> env)
         {
             return new LamExpr(args, body);
         }
@@ -350,19 +357,21 @@ namespace Evaluator
             int len = parameters.Count;
             for (int i = 0; i < len; i++)
             {
-                env.Add(args[i], parameters[i]);
+                if (parameters[i].GetType() == typeof(AtomDefExpr) || parameters[i].GetType() == typeof(FuncDefExpr))
+                    throw new EvaluatorException("define: not allowed in an expression context");
+                env.Add(args[i], parameters[i].eval(env));
             }
 
             int body_len = body.Count;
             dynamic ret = null;
             for(int j = 0; j < body_len; j ++)
             {
-                Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
-                ret = body[j].eval(copy);
+                ret = body[j].eval(env);
                 if (ret.GetType() == typeof(EnvExpr))
-                    env = ret.eval(copy);
-
+                    env = new Dictionary<string,Expr>(ret.eval(env));
             }
+            if (ret.GetType() == typeof(EnvExpr))
+                throw new EvaluatorException("no expression after a sequence of internal definitions");
             return ret;
         }
 
@@ -383,7 +392,7 @@ namespace Evaluator
             this.body = body;
         }
 
-        public dynamic eval(Dictionary<string,Expr> env)
+       public dynamic eval(Dictionary<string,Expr> env)
         {
             return new ClosExpr(args, body, env);
         }
@@ -405,20 +414,19 @@ namespace Evaluator
             this.exp = exp;
         }
 
-        /* if in environment, remove previous definition
+        /* if in environment, throw exception
          * add to environment
          * return new environment
          */
-        public dynamic eval(Dictionary<string, Expr> env)
+        public dynamic eval(Dictionary<string,Expr> env)
         {
-            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
-            if (copy.ContainsKey(id))
-                copy.Remove(id);
-            if (exp.GetType() == typeof(LamExpr))
-                copy.Add(id, exp.eval(env));
-            else
-                copy.Add(id, exp);
-            return new EnvExpr(copy);
+            Dictionary<string, Expr> new_env = new Dictionary<string, Expr>(env);
+            if (new_env.ContainsKey(id))
+                new_env.Remove(id);
+
+            new_env.Add(id, exp.eval(env));
+            return new EnvExpr(new_env);
+
         }
 
         override public string ToString()
@@ -440,15 +448,14 @@ namespace Evaluator
             this.body = body;
         }
 
-        public dynamic eval(Dictionary<string,Expr> env)
+        public dynamic eval(Dictionary<string,Expr> env) 
         {
-            Dictionary<string, Expr> copy = new Dictionary<string, Expr>(env);
-            if (copy.ContainsKey(name)) // should i allow 
-                copy.Remove(name);
-            ClosExpr value = new ClosExpr(args, body, copy);
-            Dictionary<string, Expr> copy2 = new Dictionary<string, Expr>(env);
-            copy2.Add(name, value);
-            return new EnvExpr(copy2);
+            ClosExpr value = new ClosExpr(args, body, env);
+            Dictionary<string, Expr> new_env = new Dictionary<string, Expr>(env);
+            if (new_env.ContainsKey(name))
+                new_env.Remove(name);
+            new_env.Add(name, value);
+            return new EnvExpr(new_env);
         }
 
         override public string ToString()
@@ -476,7 +483,7 @@ namespace Evaluator
             return base.ToString();
         }
 
-        public dynamic eval(Dictionary<string, Expr> env)
+        public dynamic eval(Dictionary<string,Expr> env)
         {
             Expr res = app.eval(env);
             Type res_type = res.GetType();
@@ -490,7 +497,7 @@ namespace Evaluator
 
     public interface Expr
     {
-        dynamic eval(Dictionary<string, Expr> env);
+        public dynamic eval(Dictionary<string, Expr> env);
 
         string ToString();
 
