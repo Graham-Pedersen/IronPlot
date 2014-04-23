@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -46,7 +47,7 @@ namespace None.IronRacket_ReplWindow
 
         private bool matchParens(string ss)
         {
-            bool flag = false;
+            bool flag = (string.IsNullOrWhiteSpace(ss) ? false : true);
             int left = 0;
             int i;
             for (i = 0; i < ss.Length; i++)
@@ -93,19 +94,38 @@ namespace None.IronRacket_ReplWindow
             }
 
             String ss = s.Substring(last_i_of+1);
-            if (matchParens(ss))
+            if (string.IsNullOrWhiteSpace(ss))
             {
-                Repl.AppendText("\n");
-                foreach (string x in ev.evaluate(ss))
-                {
-                    Repl.AppendText(x+"\n");
-                }
-                Repl.AppendText("> ");
+                Repl.AppendText("\r> ");
                 Repl.CaretPosition = Repl.Document.ContentEnd;
                 return true;
             }
+            if (matchParens(ss))
+            {
+                Repl.AppendText("\r");
+                List<string> F;
+                try
+                {
+                    F = ev.evaluate(ss);
+                    foreach (string x in F)
+                    {
+                        Repl.AppendText(x + "\r");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Repl.AppendText("Error!\r");
+                    Repl.AppendText(e.Message + "\r");
+                }
+                finally
+                {
+                    Repl.AppendText("> ");
+                    Repl.CaretPosition = Repl.Document.ContentEnd;
+                }
+                return true;
+            }
 
-            Repl.AppendText("\nParen Mismatch detected\n");
+            Repl.AppendText("\rParen Mismatch detected\r");
             Repl.AppendText("> " + ss.TrimEnd());
             Repl.CaretPosition = Repl.Document.ContentEnd;
             return true;
