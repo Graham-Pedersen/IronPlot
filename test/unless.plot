@@ -1,10 +1,9 @@
 (unless #t 
-	(display "should not print"))
+	(displayln "Failed"))
 
 (unless #t
-	(display "should")
-	(display " not")
-	(display " print"))
+	(displayln "Failed")
+	(displayln "Failed"))
 
 (unless #f
-	(display "should print"))
+	(displayln "Passed"))

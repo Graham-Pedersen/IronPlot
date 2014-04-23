@@ -1,4 +1,6 @@
 (define (add x y)
 	(+ x y))
 
-(displayln (add 1 2))
+(if (equal? 3 (add 1 2))
+	(displayln "Passed")
+	(displayln "Failed"))

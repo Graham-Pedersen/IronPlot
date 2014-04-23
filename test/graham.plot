@@ -6,4 +6,6 @@
 		0
 		(+ (car list) (suml (cdr list))))))
 
-(displayln (suml l))
+(if (equal? 10 (suml l))
+	(displayln "Passed")
+	(displayln "Failed"))

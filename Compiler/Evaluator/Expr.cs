@@ -497,7 +497,7 @@ namespace Evaluator
 
     public interface Expr
     {
-        public dynamic eval(Dictionary<string, Expr> env);
+        dynamic eval(Dictionary<string, Expr> env);
 
         string ToString();
 

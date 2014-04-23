@@ -4,5 +4,7 @@
 	(begin 
 		(set! i (+ i 1))))
 		
-(displayln i)
+(if (equal? i 10)
+	(displayln "Passed")
+	(displayln "Failed"))
 	
