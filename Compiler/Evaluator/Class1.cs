@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Evaluator
 {
+    Int64 curr_addr = 0;
     public class EvaluatorException : Exception
     {
         public EvaluatorException()

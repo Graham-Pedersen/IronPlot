@@ -25,11 +25,13 @@ namespace Evaluator
 
     public class Evaluator
     {
-        Dictionary<string,Expr> env;
+        Dictionary<string, Expr> env;
+    //    Dictionary<string,Int64> env;
+  //      Tuple<Dictionary<Int64, Expr>, Int64> store;
 
         public Evaluator()
         {
-            env = new Dictionary<string,Expr>(); 
+            env = new Dictionary<string,Expr>();
         }
 
         // external facing function
@@ -290,6 +292,8 @@ namespace Evaluator
 
                 while (peekChar(in_) != ')')
                 {
+                    if (peekChar(in_) == '(')
+                        throw new EvaluatorException("define: bad syntax");
                     string arg = peekWord(in_);
                     args.Add(arg);
                     in_ = eatWhitespace(eatWord(arg, in_));
