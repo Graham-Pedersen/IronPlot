@@ -129,6 +129,11 @@ namespace CompilerLib
 
         public static ObjBox callMethod(Object instance, MethodInfo m, List<Type> argTypes, List<Object> objArray)
         {
+            /*Console.WriteLine(instance);
+            Console.WriteLine(m);
+            foreach (object o in objArray)
+                Console.WriteLine(o);
+             * */
             if (m.ReturnType == typeof(void))
             {
                 m.Invoke(instance, objArray.ToArray());
@@ -302,26 +307,33 @@ namespace CompilerLib
             assemblyList.Add(Assembly.Load(DLL_ASSEMBLY_PATH));
         }
 
-
-        public static void import(String s)
+        public static void import(String filename, String nSpace)
         {
-            //if the string s is a filename we should have a .dll to import
-            if (File.Exists(s))
+            if (File.Exists(filename))
             {
-                Assembly dll = Assembly.LoadFile(s);
+                Assembly dll = Assembly.LoadFile(filename);
                 if (dll == null)
                 {
-                    throw new RuntimeException("Could not resolve using:" + s);
+                    throw new RuntimeException(String.Format("Could not resolve namespace: {0} in file: {1}", nSpace, filename));
                 }
                 assemblyList.Add(dll);
-                return;
+                import(nSpace);
             }
-            List<Type> typelist = namespaceLookup(s);
+            else
+            {
+                throw new RuntimeException("Could not find file: " + filename);
+            }
+        }
+
+        public static void import(String nSpace)
+        {
+            //if the string s is a filename we should have a .dll to import
+            List<Type> typelist = namespaceLookup(nSpace);
             if (typelist.Count == 0)
             {
-                throw new RuntimeException("Could not resolve any types in namespace:s");
+                throw new RuntimeException("Could not resolve any types in namespace:" + nSpace);
             }
-            nameSpaceList.Add(s);
+            nameSpaceList.Add(nSpace);
         }
 
 
@@ -374,6 +386,7 @@ namespace CompilerLib
 
         private static List<Type> namespaceLookup(String spaceName)
         {
+
             List<Type> ret = new List<Type>();
             foreach(Assembly a in assemblyList)
             {

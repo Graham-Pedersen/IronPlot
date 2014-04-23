@@ -33,9 +33,9 @@ namespace CompilerLib
         {
             List<ObjBox> returnedValues = new List<ObjBox>();
             List<Object> args = new List<Object>();
-            bool restNull = false;
+            bool restNull = lists[0].isNull();
             int listLength = -1;
-            while(! restNull)
+            while(!restNull)
             {
                 args.Clear();
                 for(int i = 0; i < lists.Count; i++)
@@ -44,11 +44,11 @@ namespace CompilerLib
                         listLength = lists[i].length();
                     if (lists[i].length() != listLength)
                         throw new RuntimeException("Lists must be of same length");
-
+                    
                     args.Add(lists[i].car());
                     ObjBox rest = lists[i].cdr();
 
-                    if (rest.getType() == typeof(voidObj))
+                    if (((RacketPair) rest.getObj()).isNull())
                     {
                         restNull = true;
                     }
@@ -67,7 +67,7 @@ namespace CompilerLib
         {
             ObjBox init = init_param;
             List<Object> args = new List<Object>();
-            bool restNull = false;
+            bool restNull = lists[0].isNull();
             int listLength;
 
             if (function.param_num != lists.Count + 1)

@@ -8,7 +8,7 @@
 	(define ipHostInfo
 			(scall (cons_qual "System.Net.Dns") GetHostEntry
 				(scall (cons_qual "System.Net.Dns") GetHostName)))
-	(displayln "input the ip of the host you want to connect to")
+	(displayln '(input the ip of the host you want to connect to))
 	(define ip (scall (cons_qual "System.Net.IPAddress") Parse (scall System.Console ReadLine)))
 	(define port 11000)
 	(displayln  (cons '(connecting) (cons ip (cons '(and port) (cons port '())))))

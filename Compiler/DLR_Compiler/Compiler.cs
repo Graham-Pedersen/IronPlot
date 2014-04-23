@@ -532,16 +532,30 @@ namespace DLR_Compiler
 
         private static Expression netImportStmt(ListNode list, Expression env)
         {
-            if(list.values.Count != 2)
+            if(list.values.Count == 2)
             {
-                return createRuntimeException("wrong number of arguments passed to using procedure");
+                Expression importStr = unboxValue(aliasOrLiteralName(list.values[1], env), typeof(String));
+                return Expression.Block(
+                new ParameterExpression[] { },
+                new Expression[] { Expression.Call(null, typeof(typeResolver).GetMethod("import", new Type[] { typeof(String) }), importStr), voidSingleton });
+        
+            }
+            else if (list.values.Count == 3)
+            {
+
+                Expression filename = unboxValue(aliasOrLiteralName(list.values[1], env), typeof(String));
+                Expression importStr = unboxValue(aliasOrLiteralName(list.values[2], env), typeof(String));
+                return Expression.Block(
+                new ParameterExpression[] { },
+                new Expression[] { Expression.Call(null, typeof(typeResolver).GetMethod("import", new Type[] { typeof(String), typeof(String) }), filename, importStr), voidSingleton });
+        
+            }
+            else
+            {
+                return createRuntimeException("wrong number of arguments passed to using procedure: " + list.values.Count);
             }
 
-            Expression importStr = Expression.Constant(list.values[1].getValue());
-            return Expression.Block(
-            new ParameterExpression[] { }, 
-            new Expression[]  { Expression.Call(null, typeof(typeResolver).GetMethod("import", new Type[] { typeof(String) }), importStr) , voidSingleton });
-        }
+          }
 
         private static Expression scallNetExpr(ListNode list, Expression env)
         {
@@ -656,6 +670,10 @@ namespace DLR_Compiler
             if (tree.isList())
             {
                 return matchExpression(tree, env);
+            }
+            else if(isStr(tree.getValue()))
+            {
+                return parseStr(tree.getValue());
             }
             
             List<Expression> body = new List<Expression>();

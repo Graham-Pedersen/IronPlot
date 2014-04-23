@@ -121,6 +121,13 @@ namespace SimpleSchemeParser
                         continue;
                     }
                 }
+                if (s[index] == '\"')
+                {
+                    Tuple<LeafNode, int> ret = captureString(s, index, nesting);
+                    index = ret.Item2;
+                    values.Add(ret.Item1);
+                    continue;
+                }
                 if (s[index] == ')')
                 {
                     index += 1;
@@ -166,16 +173,13 @@ namespace SimpleSchemeParser
 
         private Tuple<LeafNode, int> captureString(String s, int index, int nesting)
         {
-            String atom;
-            Regex r;
+            int innerIndex = index + 1;
+            while (s[innerIndex] != '\"')
+            {
+                innerIndex += 1;
+            }
 
-            r = new Regex(patternMatchString);
-            Match m = r.Match(s, index);
-            atom = m.Value;
-          //  r = new Regex(patternMatchAtomNoWhiteSpace);
-          //  atom = r.Match(atom).Value;
-
-            return Tuple.Create<LeafNode, int>(new LeafNode(atom, nesting), m.Index + m.Length);
+            return Tuple.Create<LeafNode, int>(new LeafNode(s.Substring(index, (innerIndex - index) + 1), nesting), innerIndex + 1);
         }
 
     }
