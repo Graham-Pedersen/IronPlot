@@ -311,7 +311,7 @@ namespace Evaluator
         public PrimClosExpr(string fun, Dictionary<string, Expr> env)
         {
             this.fun = fun;
-            this.env = new Dictionary<string, Expr>(env);
+            this.env = env;
         }
 
         public dynamic apply(List<Expr> parameters)
@@ -338,7 +338,7 @@ namespace Evaluator
 
         public ClosExpr(List<string> args, List<Expr> body, Dictionary<string, Expr> env)
         {
-            this.env = new Dictionary<string, Expr>(env);
+            this.env = env;
             this.args = args;
             this.body = body;
         }
@@ -354,12 +354,16 @@ namespace Evaluator
                 throw new EvaluatorException("the expected number of arguments does not match the given number");
 
             // need to bind the args to params in the environment
+       //     Dictionary<env
             int len = parameters.Count;
             for (int i = 0; i < len; i++)
             {
                 if (parameters[i].GetType() == typeof(AtomDefExpr) || parameters[i].GetType() == typeof(FuncDefExpr))
                     throw new EvaluatorException("define: not allowed in an expression context");
-                env.Add(args[i], parameters[i].eval(env));
+                Expr val = parameters[i].eval(env);
+                if (env.ContainsKey(args[i]))
+                    env.Remove(args[i]);
+                env.Add(args[i], val);
             }
 
             int body_len = body.Count;
@@ -424,8 +428,8 @@ namespace Evaluator
             if (new_env.ContainsKey(id))
                 new_env.Remove(id);
 
-            new_env.Add(id, exp.eval(env));
-            return new EnvExpr(new_env);
+            new_env.Add(id, exp.eval(new_env));
+            return new EnvExpr(new Dictionary<string,Expr>(new_env)); // doing this so lambdas know about themselves
 
         }
 
@@ -450,12 +454,12 @@ namespace Evaluator
 
         public dynamic eval(Dictionary<string,Expr> env) 
         {
-            ClosExpr value = new ClosExpr(args, body, env);
+        //    ClosExpr value = new ClosExpr(args, body, env);
             Dictionary<string, Expr> new_env = new Dictionary<string, Expr>(env);
             if (new_env.ContainsKey(name))
                 new_env.Remove(name);
-            new_env.Add(name, value);
-            return new EnvExpr(new_env);
+            new_env.Add(name, new ClosExpr(args, body, new_env));
+            return new EnvExpr(new Dictionary<string,Expr>(new_env)); // doing this once again so lambdas know about themselves
         }
 
         override public string ToString()

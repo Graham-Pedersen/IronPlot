@@ -283,7 +283,7 @@ namespace Evaluator
                 if (arg.GetType() != typeof(NumExpr))
                     throw new EvaluatorException("expected number?");
                 f_num = (NumExpr)arg;
-                long num = f_num.eval(env);
+                long num = f_num.getValue();
                 if (num <= max)
                     return new BoolExpr(false);
                 max = num;
