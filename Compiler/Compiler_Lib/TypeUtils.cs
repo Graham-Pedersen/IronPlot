@@ -87,6 +87,15 @@ namespace CompilerLib
             Type t = typeResolver.resolve(s);
             typelist.Add(t);
         }
+
+        public Type resolveType()
+        {
+            if (typelist.Count != 1)
+            {
+                throw new RuntimeException("Trying to get type of list of types");
+            }
+            return typelist[0];
+        }
     }
 
     public static class NetIneractLib
