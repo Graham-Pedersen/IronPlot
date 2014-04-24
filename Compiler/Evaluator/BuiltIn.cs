@@ -21,7 +21,8 @@ namespace Evaluator
                 function == "*" || function == "cons" ||
                 function == "car" || function == "cdr" ||
                 function == "rest" || function == "first" ||
-                function == "map" || function == "list")
+                function == "map" || function == "list" ||
+                function == "null?")
                 return true;
             else
                 return false;
@@ -63,6 +64,8 @@ namespace Evaluator
                     return GreaterThan(args, env);
                 case ">=":
                     return GreaterThanEqual(args, env);
+                case "null?":
+                    return NullHuh(args, env);
                 default:
                     throw new EvaluatorException(String.Format("{0}: undefined", function));
             }
@@ -344,7 +347,7 @@ namespace Evaluator
             return new BoolExpr(true);
         }
 
-        private static bool GreaterThanEqual(List<Expr> args, Dictionary<string, Expr> env)
+        private static BoolExpr GreaterThanEqual(List<Expr> args, Dictionary<string, Expr> env)
         {
             int len = args.Count;
             if (len < 2)
@@ -363,11 +366,21 @@ namespace Evaluator
                 num_f = (NumExpr)arg;
                 long num = num_f.getValue();
                 if (num > min)
-                    return false;
+                    return new BoolExpr(false);
 
                 min = num;
             }
-            return true;
+            return new BoolExpr(true);
+        }
+
+        private static BoolExpr NullHuh(List<Expr> args, Dictionary<string, Expr> env)
+        {
+            if(args.Count != 1)
+                throw new EvaluatorException(String.Format("the expected number of arguments does not match the given number{0} expected: 1", "\n"));
+
+            if (args[0].eval(env).GetType() == typeof(EmptyExpr))
+                return new BoolExpr(true);
+            return new BoolExpr(false);
         }
     }
 }

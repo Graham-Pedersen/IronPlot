@@ -161,6 +161,10 @@ namespace Evaluator
             {
                 if (peekChar(in_) == '(')
                     arg_s = peekList(in_);
+                else if (peekChar(in_) == '"')
+                {
+                    arg_s = peekString(in_);
+                }
                 else
                     arg_s = peekWord(in_);
 
@@ -182,6 +186,10 @@ namespace Evaluator
             {
                 if (peekChar(in_) == '(')
                     arg_s = peekList(in_);
+                    else if (peekChar(in_) == '"')
+                {
+                    arg_s = peekString(in_);
+                }
                 else
                     arg_s = peekWord(in_);
 
@@ -200,6 +208,10 @@ namespace Evaluator
             string cond_s;
             if (peekChar(in_) == '(')
                 cond_s = peekList(in_);
+            else if (peekChar(in_) == '"')
+            {
+                    cond_s = peekString(in_);
+            }
             else
                 cond_s = peekWord(in_);
 
@@ -210,6 +222,10 @@ namespace Evaluator
             string then_s;
             if (peekChar(in_) == '(')
                 then_s = peekList(in_);
+            else if (peekChar(in_) == '"')
+            {
+                then_s = peekString(in_);
+            }
             else
                 then_s = peekWord(in_);
 
@@ -220,6 +236,10 @@ namespace Evaluator
             string else_s;
             if (peekChar(in_) == '(')
                 else_s = peekList(in_);
+            else if (peekChar(in_) == '"')
+            {
+                else_s = peekString(in_);
+            }
             else
                 else_s = peekWord(in_);
 
@@ -262,6 +282,10 @@ namespace Evaluator
                 string word;
                 if (peekChar(in_) == '(')
                     word = peekList(in_);
+                else if (peekChar(in_) == '"')
+                {
+                    word = peekString(in_);
+                }
                 else
                     word = peekWord(in_);   
 
@@ -310,6 +334,10 @@ namespace Evaluator
                     string word;
                     if (peekChar(in_) == '(')
                         word = peekList(in_);
+                    else if (peekChar(in_) == '"')
+                    {
+                        word = peekString(in_);
+                    }
                     else
                         word = peekWord(in_);
 
@@ -328,6 +356,10 @@ namespace Evaluator
                 string exp;
                 if (peekChar(in_) == '(')
                     exp = peekList(in_);
+                else if (peekChar(in_) == '"')
+                {
+                    exp = peekString(in_);
+                }
                 else
                     exp = peekWord(in_);
 
@@ -383,7 +415,25 @@ namespace Evaluator
                 if (open_paren == 0)
                     break;
             }
+            if (open_paren != 0)
+                throw new EvaluatorException("Paren mismatch");
             return input.Substring(0, i+1);
+        }
+
+        private string peekString(string input)
+        {
+            if (input[0] != '"')
+                throw new EvaluatorException("error peeking string");
+
+            int i;
+            int len = input.Length;
+            for (i = 1; i < len; i++)
+            {
+                if (input[i] == '"')
+                    break;
+            }
+            return input.Substring(0, i + 1);
+
         }
 
         //returns new string, to be functional
